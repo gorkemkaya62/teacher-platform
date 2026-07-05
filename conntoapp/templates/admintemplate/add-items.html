@@ -1,0 +1,163 @@
+{% extends 'conntoapp/adminbase/adminpanelbase.html' %}
+{% load static %}
+
+{% block title %}Profil Ekle{% endblock %}
+
+{% block content %}
+  <div class="sb2-2">
+    <div class="sb2-2-2">
+      <ul>
+        <li><a>Profil Yönetimi</a></li>
+        <li class="active-bre"><a>Bilgi Ekle</a></li>
+      </ul>
+    </div>
+    <div class="sb2-2-add-blog sb2-2-1">
+      <h2>Öğretmen Profili</h2>
+      <p>Profilinizi ne kadar detaylı doldurursanız kurs merkezleri sizi o kadar kolay bulur.</p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+
+      <ul class="nav nav-tabs tab-list">
+        <li class="active">
+          <a data-toggle="tab" href="#teacherProfile"><i class="fa fa-info"></i><span>Profil Bilgileri</span></a>
+        </li>
+        <li><a data-toggle="tab" href="#Skills"><i class="fa fa-heart"></i><span>Yetkinlikler</span></a></li>
+        <li><a data-toggle="tab" href="#Educations"><i class="fa fa-book"></i><span>Eğitim</span></a></li>
+        <li><a data-toggle="tab" href="#Experiences"><i class="fa fa-check"></i><span>Deneyim</span></a></li>
+        <li><a data-toggle="tab" href="#Services"><i class="fa fa-user"></i><span>Verdiği Dersler</span></a></li>
+        <li><a data-toggle="tab" href="#Certificates"><i class="fa fa-trophy"></i><span>Sertifikalar</span></a></li>
+        <li><a data-toggle="tab" href="#Works"><i class="fa fa-briefcase"></i><span>Ders Materyalleri</span></a></li>
+        <li><a data-toggle="tab" href="#Blogs"><i class="fa fa-font"></i><span>Blog</span></a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="teacherProfile" class="tab-pane fade in active">
+          <div class="box-inn-sp">
+            <div class="inn-title">
+              <h4>Profil Bilgileri</h4>
+              <p>Branş, deneyim, şehir, ilçe, cinsiyet ve biyografi bilgilerinizi girin.</p>
+            </div>
+            <div class="bor">
+              <form method="POST" enctype="multipart/form-data" action="{% url 'teacherProfileAccept' %}">
+                {% csrf_token %}
+                {% for field in teacherProfileForm %}
+                  {% if field.name != 'image' %}
+                    <br><label>{{ field.label }}</label>{{ field }}
+                  {% endif %}
+                {% endfor %}
+                <div class="file-field input-field">
+                  <div class="btn"><span>Fotoğraf</span>{{ teacherProfileForm.image }}</div>
+                  <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="{{ user.image }}" />
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary">KAYDET</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div id="Skills" class="tab-pane fade">
+          <div class="inn-title"><h4>Yetkinlikler</h4><p>Yetkinliklerinizi ve seviyelerinizi ekleyin.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherSkillAccept' %}">
+              {% csrf_token %}
+              {% for field in teacherSkillForm %}<label>{{ field.label }}</label>{{ field }}{% endfor %}
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="Educations" class="tab-pane fade">
+          <div class="inn-title"><h4>Eğitim Geçmişi</h4><p>Üniversite ve eğitim bilgilerinizi ekleyin.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherEducationAccept' %}">
+              {% csrf_token %}
+              {% for field in teacherEducationForm %}<br><label>{{ field.label }}</label>{{ field }}{% endfor %}
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="Experiences" class="tab-pane fade">
+          <div class="inn-title"><h4>Öğretmenlik Deneyimi</h4><p>Daha önce çalıştığınız kurumları ekleyin.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherExperienceAccept' %}">
+              {% csrf_token %}
+              {% for field in teacherExperienceForm %}<label>{{ field.label }}</label>{{ field }}{% endfor %}
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="Services" class="tab-pane fade">
+          <div class="inn-title"><h4>Verdiği Dersler</h4><p>Hangi dersleri/branşları verebileceğinizi ekleyin.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherServiceAccept' %}">
+              {% csrf_token %}
+              {% for field in teacherServiceForm %}<label>{{ field.label }}</label>{{ field }}{% endfor %}
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="Works" class="tab-pane fade">
+          <div class="inn-title"><h4>Ders Materyalleri</h4><p>Projelerinizi ve materyallerinizi ekleyin.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherWorkAccept' %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% for field in teacherWorkForm %}
+                {% if 'work_image' not in field.name %}
+                  <label>{{ field.label }}</label>{{ field }}
+                {% endif %}
+              {% endfor %}
+              <div class="file-field input-field"><div class="btn"><span>Görsel 1</span>{{ teacherWorkForm.work_image1 }}</div></div>
+              <div class="file-field input-field"><div class="btn"><span>Görsel 2</span>{{ teacherWorkForm.work_image2 }}</div></div>
+              <div class="file-field input-field"><div class="btn"><span>Görsel 3</span>{{ teacherWorkForm.work_image3 }}</div></div>
+              <div class="file-field input-field"><div class="btn"><span>Görsel 4</span>{{ teacherWorkForm.work_image4 }}</div></div>
+              <div class="file-field input-field"><div class="btn"><span>Görsel 5</span>{{ teacherWorkForm.work_image5 }}</div></div>
+              <div class="file-field input-field"><div class="btn"><span>Görsel 6</span>{{ teacherWorkForm.work_image6 }}</div></div>
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="Blogs" class="tab-pane fade">
+          <div class="inn-title"><h4>Blog</h4><p>Eğitim içeriklerinizi paylaşın.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherBlogAccept' %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              {% for field in teacherBlogForm %}
+                {% if field.name != 'blog_image' %}<label>{{ field.label }}</label>{{ field }}{% endif %}
+              {% endfor %}
+              <div class="file-field input-field"><div class="btn"><span>Görsel</span>{{ teacherBlogForm.blog_image }}</div></div>
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+
+        <div id="Certificates" class="tab-pane fade">
+          <div class="inn-title"><h4>Sertifikalar</h4><p>Sertifika ve ödüllerinizi ekleyin.</p></div>
+          <div class="bor">
+            <form method="POST" action="{% url 'teacherCertificateAccept' %}">
+              {% csrf_token %}
+              {% for field in teacherCertificateForm %}<label>{{ field.label }}</label>{{ field }}{% endfor %}
+              <button type="submit" class="btn btn-primary">KAYDET</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block js_files %}
+  <script src="{% static 'adminstatic/js/city-district.js' %}"></script>
+  <script>
+    initCityDistrictSelect('#id_city', '#id_district');
+  </script>
+{% endblock %}

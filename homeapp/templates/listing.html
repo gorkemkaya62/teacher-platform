@@ -1,0 +1,196 @@
+{% extends 'conntoapp/homebase/homebase.html' %}
+{% load static %}
+
+{% block title %}Öğretmen Rehberi — {{ SITE_NAME }}{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+<style>
+  .map-container { display: flex; height: 560px; gap: 16px; }
+  #map { flex: 1; border-radius: 12px; }
+  .experts-sidebar { width: 280px; background: #fff; border-radius: 12px; border: 1px solid var(--ct-border); overflow: hidden; }
+  .experts-sidebar .header { padding: 14px 16px; background: var(--ct-teal); color: #fff; font-weight: 600; }
+  .expert-card { padding: 12px 16px; border-bottom: 1px solid var(--ct-border); display: flex; gap: 10px; align-items: center; }
+  .expert-card img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+  .expert-popup .btn { background: var(--ct-teal); color: #fff; padding: 6px 14px; border-radius: 8px; display: inline-block; margin-top: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="connto-page-head">
+  <div class="container">
+    <h1>Öğretmen Rehberi</h1>
+    <p>Arama kriterlerinize uygun öğretmen profilleri</p>
+  </div>
+</section>
+
+<section class="connto-directory">
+  <div class="container">
+    <div class="row">
+      <aside class="col-md-3">
+        <div class="connto-card connto-filter-panel">
+          <h3><i class="fa fa-filter"></i> Filtrele</h3>
+          <form method="GET" action="{% url 'search' %}">
+            <div class="connto-field">
+              <label>Branş</label>
+              <select name="branch" class="form-control">
+                <option value="">Tümü</option>
+                {% for value, label in branches %}
+                  <option value="{{ value }}" {% if selected_branch == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="connto-field">
+              <label>Deneyim</label>
+              <select name="experience" class="form-control">
+                <option value="">Tümü</option>
+                {% for value, label in experiences %}
+                  <option value="{{ value }}" {% if selected_experience == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="connto-field">
+              <label>Şehir</label>
+              <select name="city" class="form-control">
+                <option value="">Tümü</option>
+                {% for value, label in cities %}
+                  <option value="{{ value }}" {% if selected_city == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="connto-field">
+              <label>Cinsiyet</label>
+              <select name="gender" class="form-control">
+                <option value="">Tümü</option>
+                {% for value, label in genders %}
+                  <option value="{{ value }}" {% if selected_gender == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="submit" class="connto-btn connto-btn--primary connto-btn--block">Uygula</button>
+          </form>
+        </div>
+      </aside>
+
+      <div class="col-md-9">
+        <div class="connto-directory__toolbar">
+          <span>{{ users|length }} öğretmen bulundu</span>
+          <button class="connto-btn connto-btn--outline connto-btn--sm" data-toggle="modal" data-target="#mapModal">
+            <i class="fa fa-map-marker"></i> Haritada Göster
+          </button>
+        </div>
+
+        <div class="row connto-teacher-grid">
+          {% for user in users %}
+            <div class="col-sm-6 col-lg-4">
+              <div class="connto-teacher-card">
+                <img class="connto-teacher-card__photo" src="{{ user.image.url }}" alt="{{ user.fullname }}" />
+                <h4>{{ user.fullname }}</h4>
+                <p class="connto-teacher-card__branch">{{ user.get_branch_display }}</p>
+                <p class="connto-teacher-card__meta">
+                  <i class="fa fa-map-marker"></i> {{ user.get_city_display }}
+                  · {{ user.get_experience_years_display }}
+                </p>
+                {% if user.short_description %}
+                  <p class="connto-teacher-card__desc">{{ user.short_description|truncatechars:80 }}</p>
+                {% endif %}
+                <a href="{% url 'getUser' user.id %}" target="_blank" class="connto-btn connto-btn--primary connto-btn--sm connto-btn--block">Profil</a>
+              </div>
+            </div>
+          {% empty %}
+            <div class="col-xs-12">
+              <div class="connto-card connto-empty-state">
+                <i class="fa fa-search"></i>
+                <p>Henüz sonuç yok. Filtreleri değiştirin veya ana sayfadan arama yapın.</p>
+                <a href="{% url 'home' %}" class="connto-btn connto-btn--outline">Ana Sayfaya Dön</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal fade" id="mapModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content connto-card" style="border:none;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">Öğretmen Haritası</h4>
+      </div>
+      <div class="modal-body">
+        <div class="map-container">
+          <div id="map"></div>
+          <div class="experts-sidebar">
+            <div class="header">Arama Sonuçları</div>
+            <div class="experts-list">
+              {% for user in users %}
+              <a target="_blank" href="{% url 'getUser' user.id %}">
+                <div class="expert-card" data-city="{{ user.city }}">
+                  <img src="{{ user.image.url }}" alt="{{ user.fullname }}">
+                  <div>
+                    <strong>{{ user.fullname }}</strong><br>
+                    <small>{{ user.get_city_display }} · {{ user.get_branch_display }}</small>
+                  </div>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js_files %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    const cityCoordinates = {
+        'Istanbul': [41.0082, 28.9784], 'Ankara': [39.9334, 32.8597], 'Izmir': [38.4192, 27.1287],
+        'Bursa': [40.1885, 29.0610], 'Antalya': [36.8969, 30.7133], 'Adana': [37.0000, 35.3213],
+        'Gaziantep': [37.0662, 37.3833], 'Konya': [37.8719, 32.4843], 'Mersin': [36.8000, 34.6333],
+    };
+    let map = null;
+    let markers = L.markerClusterGroup();
+    let cityMarkers = {};
+    let allTeachers = [];
+    $('#mapModal').on('shown.bs.modal', function () {
+        if (!map) {
+            map = L.map('map').setView([39.9334, 32.8597], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
+            {% for user in users %}
+            allTeachers.push({
+                id: '{{ user.id }}', name: '{{ user.fullname }}',
+                city: capitalizeFirstLetter('{{ user.city }}'),
+                branch: '{{ user.get_branch_display }}',
+                image: '{{ user.image.url }}',
+                profileUrl: '{% url "getUser" user.id %}'
+            });
+            {% endfor %}
+            const byCity = {};
+            allTeachers.forEach(t => { (byCity[t.city] = byCity[t.city] || []).push(t); });
+            Object.entries(byCity).forEach(([city, list]) => {
+                if (cityCoordinates[city]) {
+                    const m = L.marker(cityCoordinates[city]);
+                    m.bindPopup('<b>' + city + '</b><br>' + list.length + ' öğretmen');
+                    markers.addLayer(m);
+                    cityMarkers[city] = m;
+                }
+            });
+            map.addLayer(markers);
+        }
+        setTimeout(() => map.invalidateSize(), 100);
+    });
+});
+</script>
+{% endblock %}

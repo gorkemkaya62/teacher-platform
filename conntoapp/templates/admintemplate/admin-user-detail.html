@@ -1,0 +1,243 @@
+{% extends 'admintemplate/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Öğretmen Detayları</h2>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Geri Dön</a>
+            <a href="{% url 'admin_delete_user' user.id %}" class="btn btn-danger" onclick="return confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz?')">Kullanıcıyı Sil</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Kişisel Bilgiler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{{ user.image.url }}" alt="{{ user.fullname }}" class="img-fluid rounded">
+                        </div>
+                        <div class="col-md-9">
+                            <p><strong>Ad Soyad:</strong> {{ user.fullname }}</p>
+                            <p><strong>E-posta:</strong> {{ user.email }}</p>
+                            <p><strong>Cinsiyet:</strong> {{ user.get_gender_display }}</p>
+                            <p><strong>Doğum Tarihi:</strong> {{ user.birth_date }}</p>
+                            <p><strong>Telefon:</strong> {{ user.phone }}</p>
+                            <p><strong>Branş:</strong> {{ user.get_branch_display }}</p>
+                            <p><strong>Deneyim:</strong> {{ user.get_experience_years_display }}</p>
+                            <p><strong>Şehir:</strong> {{ user.get_city_display }}</p>
+                            <p><strong>İlçe:</strong> {{ user.get_district_display|default:"Belirtilmemiş" }}</p>
+                            <p><strong>Kısa Tanıtım:</strong> {{ user.short_description }}</p>
+                            <p><strong>Biyografi:</strong> {{ user.long_description }}</p>
+                            <p><strong>Görüntülenme:</strong> {{ user.view }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Sosyal Medya</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Twitter:</strong> {{ user.twitter }}</p>
+                    <p><strong>Facebook:</strong> {{ user.facebook }}</p>
+                    <p><strong>LinkedIn:</strong> {{ user.linkedin }}</p>
+                    <p><strong>Instagram:</strong> {{ user.instagram }}</p>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Yetenekler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Yetenek</th>
+                                    <th>Seviye</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for skill in skills %}
+                                <tr>
+                                    <td>{{ skill.skill_name }}</td>
+                                    <td>{{ skill.skill_degree }}%</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Eğitim</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Okul</th>
+                                    <th>Bölüm</th>
+                                    <th>Derece</th>
+                                    <th>Başlangıç</th>
+                                    <th>Bitiş</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for education in educations %}
+                                <tr>
+                                    <td>{{ education.school_name }}</td>
+                                    <td>{{ education.department }}</td>
+                                    <td>{{ education.degree }}</td>
+                                    <td>{{ education.start_date }}</td>
+                                    <td>{{ education.end_date|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Deneyim</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Şirket</th>
+                                    <th>Departman</th>
+                                    <th>Başlangıç</th>
+                                    <th>Bitiş</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for experience in experiences %}
+                                <tr>
+                                    <td>{{ experience.institution_name }}</td>
+                                    <td>{{ experience.department }}</td>
+                                    <td>{{ experience.start_date }}</td>
+                                    <td>{{ experience.end_date|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Hizmetler</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Hizmet</th>
+                                    <th>Açıklama</th>
+                                    <th>Arama Sayısı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for service in services %}
+                                <tr>
+                                    <td>{{ service.service_name }}</td>
+                                    <td>{{ service.service_description }}</td>
+                                    <td>{{ service.service_search_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Çalışmalar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for work in works %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{{ work.work_image1.url }}" class="card-img-top" alt="{{ work.work_title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ work.work_title }}</h5>
+                                    <p class="card-text">{{ work.work_about }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Blog Yazıları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for blog in blogs %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{{ blog.blog_image.url }}" class="card-img-top" alt="{{ blog.blog_title }}">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ blog.blog_title }}</h5>
+                                    <p class="card-text">{{ blog.blog_content|truncatewords:30 }}</p>
+                                    <p class="card-text"><small class="text-muted">{{ blog.blog_date }} - {{ blog.blog_view }} görüntülenme</small></p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Ödüller</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Ödül</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for award in awards %}
+                                <tr>
+                                    <td>{{ award.award_name }}</td>
+                                    <td>{{ award.award_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

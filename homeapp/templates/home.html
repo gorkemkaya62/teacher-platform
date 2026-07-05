@@ -1,0 +1,102 @@
+{% extends 'conntoapp/homebase/homebase.html' %}
+{% load static %}
+
+{% block title %}Öğretmen Bul — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+  <section class="connto-hero-banner">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-7">
+          <p class="connto-eyebrow">Kurs Merkezleri & Öğretmenler</p>
+          <h1>Doğru öğretmeni<br>birkaç tıkla bulun</h1>
+          <p class="connto-lead">Branş, deneyim ve konuma göre filtreleyin; profilleri karşılaştırın ve iletişime geçin.</p>
+        </div>
+        <div class="col-md-5">
+          <div class="connto-card connto-search-panel">
+            <h2>Öğretmen Ara</h2>
+            <form method="GET" action="{% url 'search' %}">
+              {% if messages %}
+                {% for message in messages %}
+                  <p class="connto-alert">{{ message }}</p>
+                {% endfor %}
+              {% endif %}
+              <div class="connto-field">
+                <label>Branş</label>
+                <select name="branch">
+                  <option value="">Seçin</option>
+                  {% for value, label in branches %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="connto-field">
+                <label>Deneyim</label>
+                <select name="experience">
+                  <option value="">Seçin</option>
+                  {% for value, label in experiences %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="connto-field">
+                <label>Şehir</label>
+                <select name="city">
+                  <option value="">Seçin</option>
+                  {% for value, label in cities %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="connto-field">
+                <label>Cinsiyet</label>
+                <select name="gender">
+                  <option value="">Tercih yok</option>
+                  {% for value, label in genders %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="connto-btn connto-btn--primary connto-btn--block">Öğretmen Ara</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="connto-section">
+    <div class="container">
+      <h2 class="connto-section__title">Popüler Branşlar</h2>
+      <div class="row">
+        {% for service in most_searched_services %}
+          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col">
+            <div class="connto-chip-card"><i class="fa fa-book"></i><span>{{ service.service_name }}</span></div>
+          </div>
+        {% empty %}
+          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-calculator"></i><span>Matematik</span></div></div>
+          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-language"></i><span>İngilizce</span></div></div>
+          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-flask"></i><span>Fen</span></div></div>
+          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-pencil"></i><span>Türkçe</span></div></div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="connto-section connto-section--muted">
+    <div class="container">
+      <h2 class="connto-section__title">Nasıl Çalışır?</h2>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="connto-step-card"><span class="connto-step-card__num">1</span><h3>Ara & Filtrele</h3><p>Branş ve konuma göre öğretmenleri listeleyin.</p></div>
+        </div>
+        <div class="col-sm-4">
+          <div class="connto-step-card"><span class="connto-step-card__num">2</span><h3>Profili İncele</h3><p>Eğitim, sertifika ve deneyim bilgilerini görün.</p></div>
+        </div>
+        <div class="col-sm-4">
+          <div class="connto-step-card"><span class="connto-step-card__num">3</span><h3>İletişime Geç</h3><p>Size uygun öğretmenle doğrudan iletişim kurun.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

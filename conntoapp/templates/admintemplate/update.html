@@ -1,0 +1,65 @@
+{% extends 'conntoapp/adminbase/adminpanelbase.html' %}
+{% load static %}
+
+{% block title %}
+  Add Items
+{% endblock %}
+
+{% block content %}
+  <div class="sb2-2">
+    <div class="sb2-2-2">
+      <ul>
+        <li>
+          <a href="#"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
+        </li>
+        <li class="active-bre">
+          <a href="#">Listing Skills</a>
+        </li>
+      </ul>
+    </div>
+    <div class="sb2-2-3">
+      <div class="row">
+        {% if messages %}
+          <div>
+            {% for message in messages %}
+              <p>{{ message }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+            <label for="">{{ field.label }}</label>
+            {% if field.name|slice:':10' == 'work_image' %}
+              <div class="file-field input-field">
+                <div class="btn">
+                  <span>File</span>
+                  <input type="file" name="{{ field.name }}" />
+                </div>
+                <div class="file-path-wrapper">
+                  <input class="file-path validate" type="text" placeholder="{{ field.value }}" />
+                  <img width="50px" height="50px" src="{{ field.value.url }}" alt="" />
+                </div>
+              </div>
+            {% elif field.name == 'blog_image' %}
+              <div class="file-field input-field">
+                <div class="btn">
+                  <span>File</span>
+                  <input type="file" name="{{ field.name }}" />
+                </div>
+                <div class="file-path-wrapper">
+                  <input class="file-path validate" type="text" placeholder="{{ field.value }}" />
+                  <img width="50px" height="50px" src="{{ field.value.url }}" alt="" />
+                </div>
+              </div>
+            {% else %}
+              {{ field }}
+            {% endif %}
+          {% endfor %}
+          <br />
+          <button type="submit" class="btn btn-primary">UPDATE</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

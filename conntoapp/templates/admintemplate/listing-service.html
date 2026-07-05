@@ -1,0 +1,72 @@
+{% extends 'conntoapp/adminbase/adminpanelbase.html' %}
+{% load static %}
+
+{% block title %}
+  Profil Yönetimi
+{% endblock %}
+
+{% block content %}
+  <div class="sb2-2">
+    <div class="sb2-2-2">
+      <ul>
+        <li>
+          <a ><i class="fa fa-home" aria-hidden="true"></i> Home</a>
+        </li>
+        <li class="active-bre">
+          <a >Verdigim Dersler</a>
+        </li>
+      </ul>
+    </div>
+    <div class="sb2-2-3">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box-inn-sp">
+            <div class="inn-title">
+              <h4>Verdigim Dersler</h4>
+              <a class="dropdown-button drop-down-meta" href="#" data-activates="dr-users"><i class="material-icons">more_vert</i></a>
+              <ul id="dr-users" class="dropdown-content">
+                <li>
+                  <a href="{% url 'addItems' %}">Yeni Ekle</a>
+                </li>
+              </ul>
+
+              <!-- Dropdown Structure -->
+            </div>
+            <div class="tab-inn">
+              <div class="table-responsive table-desi">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Ögretmen</th>
+                      <th>Service Name</th>
+                      <th>Description</th>
+                      <th>Düzenle</th>
+                      <th>Sil</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for service in user.userservices.all %}
+                      <tr>
+                        <td>
+                          <span class="list-img"><img src="{{ user.image.url }}" alt="" /></span>
+                        </td>
+                        <td>{{ service.service_name }}</td>
+                        <td>{{ service.service_description }}</td>
+                        <td>
+                          <a href="{% url 'updateService' service.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                        </td>
+                        <td>
+                          <a href="#" onclick="confirmDelete('{% url 'deleteService' service.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

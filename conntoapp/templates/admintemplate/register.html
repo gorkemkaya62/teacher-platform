@@ -1,0 +1,76 @@
+{% extends 'conntoapp/adminbase/adminloginregisterbase.html' %}
+{% load static %}
+
+{% block title %}Üye Ol — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="connto-auth">
+  <div class="connto-card connto-auth-card connto-auth-card--wide">
+    <h1>Üye Ol</h1>
+    <p class="connto-auth-card__sub">{{ SITE_TAGLINE }}</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p class="connto-alert">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <div class="connto-auth-toggle">
+      <label>
+        <input type="checkbox" id="is_course_center" onchange="toggleForms()">
+        Kurs Merkezi hesabı oluştur
+      </label>
+    </div>
+
+    <form method="POST" id="individual_form" class="connto-form">
+      {% csrf_token %}
+      <div id="user_form">
+        {% for field in form %}
+          <div class="connto-field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+          </div>
+        {% endfor %}
+      </div>
+      <label class="connto-check">
+        <input type="checkbox" name="checkBox" required />
+        Kullanım şartlarını kabul ediyorum
+      </label>
+      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">Kayıt Ol</button>
+    </form>
+
+    <form method="POST" id="course_center_form" class="connto-form" style="display: none;">
+      {% csrf_token %}
+      <input type="hidden" name="is_course_center" value="true">
+      {% for field in course_center_form %}
+        <div class="connto-field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        </div>
+      {% endfor %}
+      <label class="connto-check">
+        <input type="checkbox" name="checkBox" required />
+        Kullanım şartlarını kabul ediyorum
+      </label>
+      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">Kayıt Ol</button>
+    </form>
+
+    <p class="connto-auth-footer">
+      Zaten hesabınız var mı? <a href="{% url 'login' %}">Giriş yapın</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  function toggleForms() {
+    var isCC = document.getElementById('is_course_center').checked;
+    document.getElementById('individual_form').style.display = isCC ? 'none' : 'block';
+    document.getElementById('course_center_form').style.display = isCC ? 'block' : 'none';
+  }
+</script>
+{% endblock %}
+
+{% block js_files %}
+  <script src="{% static 'adminstatic/js/city-district.js' %}"></script>
+  <script>initCityDistrictSelect('#id_city', '#id_district');</script>
+{% endblock %}

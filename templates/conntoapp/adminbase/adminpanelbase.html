@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Quicksand:300,400,500" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'adminstatic/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'adminstatic/css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'adminstatic/css/mob.css' %}" />
+    <link rel="stylesheet" href="{% static 'adminstatic/css/bootstrap.css' %}" />
+    <link rel="stylesheet" href="{% static 'adminstatic/css/materialize.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'edu-theme.css' %}?v=3" />
+    {% block css_files %}{% endblock %}
+  </head>
+  <body class="edu-panel-page">
+    {% include 'conntoapp/partials/edu-decor.html' with variant='ambient' %}
+    <div class="container-fluid sb1">
+      <div class="row">
+        <div class="col-md-2 col-sm-3 col-xs-6 sb1-1">
+          <a href="#" class="btn-close-menu"><i class="fa fa-times"></i></a>
+          <a href="#" class="atab-menu"><i class="fa fa-bars tab-menu"></i></a>
+          <a href="{% url 'addItems' %}" class="logo" style="font-weight: 700; font-size: 1.2rem; color: #fff; text-decoration: none;">{{ SITE_NAME }}</a>
+        </div>
+        <div class="col-md-6 col-sm-6 mob-hide"></div>
+        <div class="col-md-2 tab-hide"></div>
+        <div class="col-md-2 col-sm-3 col-xs-6">
+          <a class="waves-effect dropdown-button top-user-pro" href="#" data-activates="top-menu">
+            <img src="{{ user.image.url }}" alt="" />Hesabım <i class="fa fa-angle-down"></i>
+          </a>
+          <ul id="top-menu" class="dropdown-content top-menu-sty">
+            <li>
+              <a target="_blank" href="{% url 'usersite_home' user.id %}" class="waves-effect">
+                <i class="fa fa-home"></i> Profil Sitem
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'updatePassword' %}" class="waves-effect"><i class="fa fa-unlock"></i> Şifre Değiştir</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+              <a href="{% url 'logout' %}" class="ho-dr-con-last waves-effect">
+                <i class="fa fa-sign-out"></i> Çıkış Yap
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid sb2">
+      <div class="row">
+        <div class="sb2-1">
+          <div class="sb2-12">
+            <ul>
+              <li><img src="{{ user.image.url }}" alt="" /></li>
+              <li><h5>{{ user.fullname }} <span>{{ user.email }}</span></h5></li>
+            </ul>
+          </div>
+          <div class="sb2-13">
+            <ul class="collapsible">
+              <li><a href="{% url 'addItems' %}"><i class="fa fa-address-card"></i> Profil Düzenle</a></li>
+              <li><a href="{% url 'listingSkill' %}"><i class="fa fa-heart"></i> Yetkinliklerim</a></li>
+              <li><a href="{% url 'listingEducation' %}"><i class="fa fa-info"></i> Eğitimlerim</a></li>
+              <li><a href="{% url 'listingExperience' %}"><i class="fa fa-check"></i> Deneyimlerim</a></li>
+              <li><a href="{% url 'listingService' %}"><i class="fa fa-user"></i> Verdiğim Dersler</a></li>
+              <li><a href="{% url 'listingAward' %}"><i class="fa fa-trophy"></i> Sertifikalarım</a></li>
+              <li><a href="{% url 'listingWork' %}"><i class="fa fa-book"></i> Materyallerim</a></li>
+              <li><a href="{% url 'listingBlog' %}"><i class="fa fa-book"></i> Blog Yazılarım</a></li>
+            </ul>
+          </div>
+        </div>
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+
+    <script>
+      function confirmDelete(deleteUrl) {
+        Swal.fire({
+          title: 'Emin misiniz?',
+          text: 'Bu kaydı silmek istiyor musunuz?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Evet, sil',
+          cancelButtonText: 'İptal'
+        }).then((result) => {
+          if (result.isConfirmed) { window.location.href = deleteUrl }
+        })
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{% static 'adminstatic/js/jquery.min.js' %}"></script>
+    <script src="{% static 'adminstatic/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'adminstatic/js/materialize.min.js' %}"></script>
+    <script src="{% static 'adminstatic/js/custom.js' %}"></script>
+    {% block js_files %}{% endblock %}
+  </body>
+</html>

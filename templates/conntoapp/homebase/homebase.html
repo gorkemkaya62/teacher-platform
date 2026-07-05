@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="{{ SITE_TAGLINE }}" />
+    <link href="{% static 'homestatic/assets/images/favicon/favicon.png' %}" rel="icon" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="{% static 'homestatic/assets/css/external.css' %}" rel="stylesheet" />
+    <link href="{% static 'homestatic/assets/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'homestatic/assets/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'edu-theme.css' %}?v=5" rel="stylesheet" />
+    {% block css_files %}{% endblock css_files %}
+    <title>{% block title %}{{ SITE_NAME }}{% endblock title %}</title>
+  </head>
+
+  <body class="connto-page">
+    <div id="wrapper" class="wrapper clearfix">
+      <header class="connto-header">
+        <div class="container-fluid connto-header__inner">
+          <a class="connto-logo" href="{% url 'home' %}">{{ SITE_NAME|upper }}</a>
+
+          <form class="connto-header-search" method="GET" action="{% url 'search' %}">
+            <i class="fa fa-search"></i>
+            <select name="branch" class="connto-header-search__select" required>
+              <option value="">Branş, deneyim veya şehir ile öğretmen ara…</option>
+              {% for value, label in header_branches %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="connto-header-search__btn">Ara</button>
+          </form>
+
+          <div class="connto-header__actions">
+            {% if user.is_authenticated %}
+              <a href="{% url 'addItems' %}" class="connto-user-chip">
+                <span class="connto-user-chip__avatar">{{ user.fullname|slice:":1"|upper }}</span>
+                <span class="connto-user-chip__email">{{ user.email }}</span>
+              </a>
+            {% elif is_course_center_view %}
+              <a href="{% url 'adminlogout' %}" class="connto-btn connto-btn--outline connto-btn--sm">Çıkış</a>
+            {% else %}
+              <a href="{% url 'login' %}" class="connto-btn connto-btn--outline connto-btn--sm">Giriş</a>
+              <a href="{% url 'register' %}" class="connto-btn connto-btn--primary connto-btn--sm">Üye Ol</a>
+            {% endif %}
+          </div>
+
+          <button type="button" class="connto-header-toggle navbar-toggle collapsed" data-toggle="collapse" data-target="#connto-mobile-nav">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+
+        <div class="collapse connto-mobile-nav" id="connto-mobile-nav">
+          <a href="{% url 'home' %}">Ana Sayfa</a>
+          <a href="{% url 'login' %}">Giriş Yap</a>
+          <a href="{% url 'register' %}">Üye Ol</a>
+        </div>
+      </header>
+
+      <main class="connto-main">
+        {% block content %}{% endblock content %}
+      </main>
+
+      {% block show_cta %}
+      <section class="connto-cta">
+        <div class="container text-center">
+          <h3>Öğretmen profilinizi oluşturun</h3>
+          <p>Kurs merkezleri sizi kolayca bulsun — kayıt ücretsiz.</p>
+          <a href="{% url 'register' %}" class="connto-btn connto-btn--primary connto-btn--lg">Hemen Kayıt Ol</a>
+        </div>
+      </section>
+      {% endblock %}
+
+      <footer class="connto-footer">
+        <div class="container">
+          <span>© 2025 {{ SITE_NAME }} — {{ SITE_TAGLINE }}</span>
+        </div>
+      </footer>
+    </div>
+
+    {% block js_files %}{% endblock js_files %}
+    <script src="{% static 'homestatic/assets/js/jquery-2.2.4.min.js' %}"></script>
+    <script src="{% static 'homestatic/assets/js/plugins.js' %}"></script>
+    <script src="{% static 'homestatic/assets/js/functions.js' %}"></script>
+  </body>
+</html>

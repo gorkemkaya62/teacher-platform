@@ -1,0 +1,57 @@
+{% extends 'conntoapp/adminbase/adminloginregisterbase.html' %}
+{% load static %}
+
+{% block title %}Giriş Yap — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<div class="connto-auth">
+  <div class="connto-card connto-auth-card">
+    <h1>Giriş Yap</h1>
+    <p class="connto-auth-card__sub">{{ SITE_TAGLINE }}</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <p class="connto-alert">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+
+    <div class="connto-auth-toggle">
+      <label>
+        <input type="checkbox" id="is_course_center_login" onchange="toggleLoginType()">
+        Kurs Merkezi hesabı ile giriş
+      </label>
+    </div>
+
+    <form method="POST" class="connto-form">
+      {% csrf_token %}
+      <div class="connto-field">
+        <label for="email">E-posta</label>
+        <input type="email" name="email" id="email" required placeholder="ornek@email.com">
+      </div>
+      <div class="connto-field">
+        <label for="password">Şifre</label>
+        <input type="password" name="password" id="password" required placeholder="••••••••">
+      </div>
+      <input type="hidden" name="is_course_center" id="is_course_center_hidden" value="false">
+      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">
+        <span id="login_text">Giriş Yap</span>
+      </button>
+    </form>
+
+    <p class="connto-auth-footer">
+      Hesabınız yok mu? <a href="{% url 'register' %}">Üye olun</a><br>
+      <a href="{% url 'forgotPassword' %}">Şifremi unuttum</a> ·
+      <a href="{% url 'admin_panel_login' %}">Yönetici</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  function toggleLoginType() {
+    var c = document.getElementById('is_course_center_login');
+    document.getElementById('is_course_center_hidden').value = c.checked;
+    document.getElementById('login_text').textContent = c.checked ? 'Kurs Merkezi Girişi' : 'Giriş Yap';
+  }
+  document.addEventListener('DOMContentLoaded', toggleLoginType);
+</script>
+{% endblock %}

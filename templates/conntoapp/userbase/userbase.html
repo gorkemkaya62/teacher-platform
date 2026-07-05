@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/" />
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <link rel="stylesheet" href="{% static 'userstatic/assets/css/iconoir.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'userstatic/assets/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'userstatic/assets/css/aos.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'userstatic/assets/css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'edu-theme.css' %}?v=6" />
+    {% block css_files %}
+    {% endblock %}
+  </head>
+
+  <body class="edu-portfolio-page">
+    {% include 'conntoapp/partials/edu-decor.html' with variant='ambient' %}
+    <main class="main-aboutpage">
+      <!-- Header -->
+      <header class="header-area">
+        <div class="container">
+          <div class="gx-row d-flex align-items-center justify-content-between">
+            <a class="logo" href="{% url 'usersite_home' user.id %}" style="font-weight: 700; font-size: 1.1rem; text-decoration: none; color: inherit;">{{ SITE_NAME }}</a>
+
+            <nav class="navbar">
+              <ul class="menu">
+                <li>
+                  <a href="{% url 'usersite_home' user.id %}">Ana Sayfa</a>
+                </li>
+                <li class="">
+                  <a href="{% url 'about' user.id %}">Hakkımda</a>
+                </li>
+                <li>
+                  <a href="{% url 'work' user.id %}">Materyaller</a>
+                </li>
+                <li>
+                  <a href="{% url 'contact' user.id %}">İletişim</a>
+                </li>
+              </ul>
+              <a href="{% url 'contact' user.id %}" class="theme-btn">İletişim</a>
+            </nav>
+
+            <a href="{% url 'contact' user.id %}" class="theme-btn">İletişim</a>
+
+            <div class="show-menu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {% block content %}
+      {% endblock %}
+
+      <!-- Footer -->
+      <footer class="footer-area">
+        <div class="container">
+          <div class="footer-content text-center">
+            <a href="{% url 'usersite_home' user.id %}" class="logo" style="font-weight: 700; text-decoration: none; color: inherit;">{{ SITE_NAME }}</a>
+            <ul class="footer-menu">
+              <li>
+                <a href="{% url "usersite_home" user.id %}">Ana Sayfa</a>
+              </li>
+              <li>
+                <a href="{% url 'about' user.id %}">Hakkımda</a>
+              </li>
+              <li>
+                <a href="{% url 'work' user.id %}">Materyaller</a>
+              </li>
+              <li>
+                <a href="{% url 'contact' user.id %}">İletişim</a>
+              </li>
+            </ul>
+            <p class="copyright">
+              &copy; {{ SITE_NAME }} — {{ SITE_TAGLINE }}
+            </p>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="{% static 'userstatic/assets/js/jquery-3.6.4.js' %}"></script>
+    <script src="{% static 'userstatic/assets/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'userstatic/assets/js/aos.js' %}"></script>
+    <script src="{% static 'userstatic/assets/js/main.js' %}"></script>
+    {% block js_files %}
+    {% endblock %}
+  </body>
+
+  <!-- Mirrored from wpriverthemes.com/landing/gridx-html/about.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 11 Feb 2025 13:01:55 GMT -->
+</html>

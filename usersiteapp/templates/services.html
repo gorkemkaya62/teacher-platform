@@ -1,0 +1,47 @@
+{% extends 'conntoapp/userbase/userbase.html' %}
+{% load static %}
+
+{% block title %}{{ user.fullname }}{% endblock %}
+
+{% block content %}
+  <section class="service-area">
+    <div class="container">
+      <h1 class="section-heading" data-aos="fade-up">
+        <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Star" />
+        Verdiği Dersler — {{ user.get_branch_display }}
+        <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Star" />
+      </h1>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="service-sidebar" data-aos="fade-right">
+            <div class="service-sidebar-inner shadow-box">
+              <ul>
+                {% for service in user.userservices.all %}
+                  <li><i class="iconoir-check icon"></i> {{ service.service_name }}</li>
+                {% empty %}
+                  <li>Henüz ders eklenmemiş.</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="service-content-wrap" data-aos="zoom-in">
+            <div class="service-content-inner shadow-box">
+              <div class="service-items">
+                {% for service in user.userservices.all %}
+                  <div class="service-item">
+                    <h3>{{ service.service_name }}</h3>
+                    <p>{{ service.service_description }}</p>
+                  </div>
+                {% empty %}
+                  <p>Bu öğretmen henüz ders bilgisi eklememiş.</p>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
