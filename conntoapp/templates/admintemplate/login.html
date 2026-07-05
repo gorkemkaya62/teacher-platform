@@ -15,11 +15,13 @@
       {% endfor %}
     {% endif %}
 
-    <div class="connto-auth-toggle">
-      <label>
-        <input type="checkbox" id="is_course_center_login" onchange="toggleLoginType()">
-        Kurs Merkezi hesabı ile giriş
-      </label>
+    <div class="connto-auth-tabs" role="tablist" aria-label="Giriş türü">
+      <button type="button" class="connto-auth-tab connto-auth-tab--active" data-type="teacher" role="tab" aria-selected="true">
+        Öğretmen Giriş
+      </button>
+      <button type="button" class="connto-auth-tab" data-type="course_center" role="tab" aria-selected="false">
+        Kurs Merkezi Giriş
+      </button>
     </div>
 
     <form method="POST" class="connto-form">
@@ -33,9 +35,7 @@
         <input type="password" name="password" id="password" required placeholder="••••••••">
       </div>
       <input type="hidden" name="is_course_center" id="is_course_center_hidden" value="false">
-      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">
-        <span id="login_text">Giriş Yap</span>
-      </button>
+      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">Giriş Yap</button>
     </form>
 
     <p class="connto-auth-footer">
@@ -47,11 +47,25 @@
 </div>
 
 <script>
-  function toggleLoginType() {
-    var c = document.getElementById('is_course_center_login');
-    document.getElementById('is_course_center_hidden').value = c.checked;
-    document.getElementById('login_text').textContent = c.checked ? 'Kurs Merkezi Girişi' : 'Giriş Yap';
-  }
-  document.addEventListener('DOMContentLoaded', toggleLoginType);
+  (function () {
+    var tabs = document.querySelectorAll('.connto-auth-tab');
+    var hidden = document.getElementById('is_course_center_hidden');
+
+    function setLoginType(type) {
+      var isCourseCenter = type === 'course_center';
+      hidden.value = isCourseCenter ? 'true' : 'false';
+      tabs.forEach(function (tab) {
+        var active = tab.dataset.type === type;
+        tab.classList.toggle('connto-auth-tab--active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        setLoginType(tab.dataset.type);
+      });
+    });
+  })();
 </script>
 {% endblock %}

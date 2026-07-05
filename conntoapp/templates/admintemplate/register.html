@@ -15,11 +15,13 @@
       {% endfor %}
     {% endif %}
 
-    <div class="connto-auth-toggle">
-      <label>
-        <input type="checkbox" id="is_course_center" onchange="toggleForms()">
-        Kurs Merkezi hesabı oluştur
-      </label>
+    <div class="connto-auth-tabs" role="tablist" aria-label="Kayıt türü">
+      <button type="button" class="connto-auth-tab connto-auth-tab--active" data-type="teacher" role="tab" aria-selected="true">
+        Öğretmen Üye Ol
+      </button>
+      <button type="button" class="connto-auth-tab" data-type="course_center" role="tab" aria-selected="false">
+        Kurs Merkezi Üye Ol
+      </button>
     </div>
 
     <form method="POST" id="individual_form" class="connto-form">
@@ -62,11 +64,28 @@
 </div>
 
 <script>
-  function toggleForms() {
-    var isCC = document.getElementById('is_course_center').checked;
-    document.getElementById('individual_form').style.display = isCC ? 'none' : 'block';
-    document.getElementById('course_center_form').style.display = isCC ? 'block' : 'none';
-  }
+  (function () {
+    var tabs = document.querySelectorAll('.connto-auth-tab');
+    var teacherForm = document.getElementById('individual_form');
+    var courseCenterForm = document.getElementById('course_center_form');
+
+    function setRegisterType(type) {
+      var isCourseCenter = type === 'course_center';
+      teacherForm.style.display = isCourseCenter ? 'none' : 'block';
+      courseCenterForm.style.display = isCourseCenter ? 'block' : 'none';
+      tabs.forEach(function (tab) {
+        var active = tab.dataset.type === type;
+        tab.classList.toggle('connto-auth-tab--active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        setRegisterType(tab.dataset.type);
+      });
+    });
+  })();
 </script>
 {% endblock %}
 
