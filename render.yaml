@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: teacher-platform
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-prod.txt && python manage.py collectstatic --no-input
+    startCommand: gunicorn ogretmenim.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DJANGO_SETTINGS_MODULE
+        value: ogretmenim.settings
+      - key: DEBUG
+        value: "false"
