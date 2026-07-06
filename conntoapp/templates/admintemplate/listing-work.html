@@ -1,20 +1,14 @@
 {% extends 'conntoapp/adminbase/adminpanelbase.html' %}
 {% load static %}
 
-{% block title %}
-  Profil Y�netimi
-{% endblock %}
+{% block title %}Profil Yönetimi{% endblock %}
 
 {% block content %}
   <div class="sb2-2">
     <div class="sb2-2-2">
       <ul>
-        <li>
-          <a ><i class="fa fa-home" aria-hidden="true"></i> Home</a>
-        </li>
-        <li class="active-bre">
-          <a >Materyallerim</a>
-        </li>
+        <li><a><i class="fa fa-home" aria-hidden="true"></i> Ana Sayfa</a></li>
+        <li class="active-bre"><a>Materyallerim</a></li>
       </ul>
     </div>
     <div class="sb2-2-3">
@@ -25,46 +19,36 @@
               <h4>Materyallerim</h4>
               <a class="dropdown-button drop-down-meta" href="#" data-activates="dr-users"><i class="material-icons">more_vert</i></a>
               <ul id="dr-users" class="dropdown-content">
-                <li>
-                  <a href="{% url 'addItems' %}">Yeni Ekle</a>
-                </li>
+                <li><a href="{% url 'addItems' %}">Yeni Ekle</a></li>
               </ul>
-
-              <!-- Dropdown Structure -->
             </div>
             <div class="tab-inn">
               <div class="table-responsive table-desi">
                 <table class="table table-hover">
                   <thead>
                     <tr>
-                      <th>Work Image</th>
-                      <th>Work Name</th>
-                      <th>Work Title</th>
-                      <th>Work Service</th>
-                      <th>Work Year</th>
-                      <th>D�zenle</th>
+                      <th>Görsel</th>
+                      <th>Ad</th>
+                      <th>Başlık</th>
+                      <th>Ders</th>
+                      <th>Yıl</th>
+                      <th>Düzenle</th>
                       <th>Sil</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for work in user.userworks.all %}
                       <tr>
-                        <td>
-                          <span class="list-img"><img src="{{ work.work_image1.url }}" alt="" /></span>
-                        </td>
-                        <td>
-                          <span class="list-enq-name">{{ work.work_name }}</span>
-                        </td>
+                        <td><span class="list-img"><img src="{{ work.work_image1.url }}" alt="" /></span></td>
+                        <td><span class="list-enq-name">{{ work.work_name }}</span></td>
                         <td>{{ work.work_title }}</td>
                         <td>{{ work.work_service }}</td>
                         <td>{{ work.work_year|date:'Y' }}</td>
-                        <td>
-                          <a href="{% url 'updateWork' work.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
-                        </td>
-                        <td>
-                          <a href="#" onclick="confirmDelete('{% url 'deleteWork' work.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                        </td>
+                        <td><a href="{% url 'updateWork' work.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
+                        <td><a href="#" onclick="confirmDelete('{% url 'deleteWork' work.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
                       </tr>
+                    {% empty %}
+                      <tr><td colspan="7">Henüz materyal eklenmemiş.</td></tr>
                     {% endfor %}
                   </tbody>
                 </table>

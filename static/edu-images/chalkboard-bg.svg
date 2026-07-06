@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="board" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2a3430"/>
+      <stop offset="50%" stop-color="#1e2623"/>
+      <stop offset="100%" stop-color="#151a18"/>
+    </linearGradient>
+    <filter id="noise">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.04"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#board)"/>
+  <rect width="1920" height="1080" filter="url(#noise)" opacity="0.5"/>
+
+  <!-- Books stack (bottom left) -->
+  <g opacity="0.22" fill="none" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="80" y="780" width="120" height="28" rx="2"/>
+    <rect x="88" y="748" width="110" height="28" rx="2"/>
+    <rect x="96" y="716" width="100" height="28" rx="2"/>
+    <line x1="140" y1="716" x2="140" y2="808"/>
+  </g>
+
+  <!-- Math formulas (right) -->
+  <g opacity="0.18" fill="none" stroke="#e8e8e8" stroke-width="2" font-family="Georgia, serif">
+    <text x="1450" y="280" fill="#e8e8e8" font-size="42" opacity="0.9">x + y = z</text>
+    <text x="1380" y="360" fill="#e8e8e8" font-size="28" opacity="0.7">a² + b² = c²</text>
+    <text x="1500" y="440" fill="#e8e8e8" font-size="24" opacity="0.6">+ f(x) dx</text>
+  </g>
+
+  <!-- Triangle & circle (right) -->
+  <g opacity="0.15" fill="none" stroke="#e8e8e8" stroke-width="2.5">
+    <polygon points="1600,520 1720,680 1480,680"/>
+    <circle cx="1350" cy="580" r="55"/>
+    <line x1="1295" y1="580" x2="1405" y2="580"/>
+    <line x1="1350" y1="525" x2="1350" y2="635"/>
+  </g>
+
+  <!-- Chalk lines (subtle) -->
+  <g opacity="0.08" fill="none" stroke="#ffffff" stroke-width="1.5">
+    <line x1="200" y1="400" x2="500" y2="420"/>
+    <line x1="220" y1="450" x2="480" y2="440"/>
+    <line x1="1100" y1="750" x2="1300" y2="770"/>
+    <line x1="1120" y1="800" x2="1280" y2="790"/>
+  </g>
+
+  <!-- Pencil sketch (top right faint) -->
+  <g opacity="0.12" fill="none" stroke="#e8e8e8" stroke-width="2">
+    <line x1="1700" y1="120" x2="1780" y2="200"/>
+    <polygon points="1780,200 1760,210 1770,190"/>
+  </g>
+</svg>

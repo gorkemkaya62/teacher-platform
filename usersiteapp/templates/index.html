@@ -28,12 +28,11 @@
         <div class="col-md-6">
           <div class="about-credentials-wrap">
             <div data-aos="zoom-in">
-              <div class="banner shadow-box">
-                <div class="">
-                  <div>
-                    <span></span>
-                  </div>
-                </div>
+              <div class="banner shadow-box connto-ataturk-banner">
+                <blockquote class="connto-ataturk-banner__quote">
+                  "Öğretmenler! Yeni nesil, cumhuriyetin fedakâr öğretmen ve eğitimcileri, sizler yetiştireceksiniz. Ve yeni nesil, sizin eseriniz olacaktır."
+                </blockquote>
+                <img src="{% static 'userstatic/assets/images/ataturk-sign.png' %}" alt="Mustafa Kemal Atatürk imzası" class="connto-ataturk-banner__sign" />
               </div>
             </div>
 
@@ -95,11 +94,15 @@
               <div class="about-services-box info-box shadow-box h-full">
                 <a href="{% url "services" user.id %}" class="overlay-link"></a>
                 <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
-                <div class="icon-boxes">
-                  <i class="iconoir-book"></i>
-                  <i class="iconoir-gym"></i>
-                  <i class="iconoir-vials"></i>
-                  <i class="iconoir-code"></i>
+                <div class="connto-services-icon" aria-hidden="true">
+                  <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="10" width="52" height="44" rx="6" stroke="#0c2340" stroke-width="2.5" fill="#eaf2f1"/>
+                    <path d="M36 10v44" stroke="#2D7D6F" stroke-width="2"/>
+                    <path d="M18 22h14M18 30h14M18 38h10" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M44 22h10M44 30h10M44 38h8" stroke="#64748b" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="62" cy="18" r="12" fill="#2D7D6F" opacity="0.15"/>
+                    <path d="M58 18l3 3 6-6" stroke="#2D7D6F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
                 </div>
                 <div class="d-flex align-items-center justify-content-between">
                   <div class="infos">

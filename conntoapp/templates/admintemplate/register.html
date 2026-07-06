@@ -5,7 +5,15 @@
 
 {% block content %}
 <div class="connto-auth">
-  <div class="connto-card connto-auth-card connto-auth-card--wide">
+  <div class="connto-glass-card connto-auth-card connto-auth-card--wide">
+    <div class="connto-auth-logo" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="24" fill="#2D7D6F"/>
+        <path d="M14 18h20v2H14zM14 22h14v2H14zM14 26h18v2H14z" fill="#fff" opacity="0.9"/>
+        <path d="M30 14l6 6-6 6v-4h-4v-4h4v-4z" fill="#fff"/>
+      </svg>
+    </div>
+
     <h1>Üye Ol</h1>
     <p class="connto-auth-card__sub">{{ SITE_TAGLINE }}</p>
 
@@ -15,16 +23,18 @@
       {% endfor %}
     {% endif %}
 
-    <div class="connto-auth-tabs" role="tablist" aria-label="Kayıt türü">
+    <div class="connto-auth-tabs-wrap" role="tablist" aria-label="Kayıt türü">
       <button type="button" class="connto-auth-tab connto-auth-tab--active" data-type="teacher" role="tab" aria-selected="true">
-        Öğretmen Üye Ol
+        <i class="fa fa-graduation-cap"></i>
+        <span>Öğretmen Üye Ol</span>
       </button>
       <button type="button" class="connto-auth-tab" data-type="course_center" role="tab" aria-selected="false">
-        Kurs Merkezi Üye Ol
+        <i class="fa fa-building"></i>
+        <span>Kurs Merkezi Üye Ol</span>
       </button>
     </div>
 
-    <form method="POST" id="individual_form" class="connto-form">
+    <form method="POST" id="individual_form" class="connto-form connto-form--glass">
       {% csrf_token %}
       <div id="user_form">
         {% for field in form %}
@@ -38,10 +48,10 @@
         <input type="checkbox" name="checkBox" required />
         Kullanım şartlarını kabul ediyorum
       </label>
-      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">Kayıt Ol</button>
+      <button type="submit" class="connto-btn connto-btn--glass connto-btn--block connto-btn--lg">Kayıt Ol</button>
     </form>
 
-    <form method="POST" id="course_center_form" class="connto-form" style="display: none;">
+    <form method="POST" id="course_center_form" class="connto-form connto-form--glass" style="display: none;">
       {% csrf_token %}
       <input type="hidden" name="is_course_center" value="true">
       {% for field in course_center_form %}
@@ -54,7 +64,7 @@
         <input type="checkbox" name="checkBox" required />
         Kullanım şartlarını kabul ediyorum
       </label>
-      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">Kayıt Ol</button>
+      <button type="submit" class="connto-btn connto-btn--glass connto-btn--block connto-btn--lg">Kayıt Ol</button>
     </form>
 
     <p class="connto-auth-footer">

@@ -623,29 +623,56 @@ body.edu-auth-page .input-field select:focus {
    ÖĞRETMEN PANELİ
    ══════════════════════════════════════ */
 body.edu-panel-page {
-  background: var(--edu-bg) var(--edu-img-panel) center top / cover fixed !important;
+  background: #f4f6f9 !important;
+  min-height: 100vh;
+}
+
+body.edu-panel-page .sb2 {
+  background: #e8edf2 !important;
+  min-height: calc(100vh - 59px);
 }
 
 body.edu-panel-page .sb1 {
-  background: var(--edu-navy) !important;
-  box-shadow: var(--edu-shadow-sm);
+  background: rgba(45, 125, 111, 0.88) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 body.edu-panel-page .sb2-1 {
-  background: var(--edu-navy-mid) !important;
+  background: #e8edf2 !important;
+  height: auto;
+  min-height: calc(100vh - 59px);
+  border-right: 1px solid #dde3ea;
+}
+
+body.edu-panel-page .sb2-12,
+body.edu-panel-page .sb2-13 {
+  background: #ffffff !important;
+}
+
+body.edu-panel-page .sb2-13 ul li a {
+  color: #4a5568 !important;
+}
+
+body.edu-panel-page .sb2-13 ul li a:hover,
+body.edu-panel-page .sb2-13 ul li a:focus {
+  background: #2D7D6F !important;
+  color: #fff !important;
 }
 
 body.edu-panel-page .sb2-2 {
-  background: transparent !important;
+  background: #e8edf2 !important;
+  min-height: calc(100vh - 59px);
 }
 
 body.edu-panel-page .sb2-2-add-blog,
 body.edu-panel-page .box-inn-sp,
 body.edu-panel-page .bor {
-  background: var(--edu-surface) !important;
+  background: #ffffff !important;
   border-radius: var(--edu-radius-lg) !important;
-  border: 1px solid var(--edu-border) !important;
-  box-shadow: var(--edu-shadow-sm) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06) !important;
 }
 
 body.edu-panel-page .sb2-2-add-blog h2 {
@@ -655,18 +682,18 @@ body.edu-panel-page .sb2-2-add-blog h2 {
 
 body.edu-panel-page .btn-primary,
 body.edu-panel-page .waves-effect.btn.btn-primary {
-  background: var(--edu-navy) !important;
+  background: #2D7D6F !important;
   border-radius: var(--edu-radius) !important;
 }
 
 body.edu-panel-page .tab-list li.active a {
-  color: var(--edu-navy) !important;
-  border-bottom-color: var(--edu-gold) !important;
+  color: #2D7D6F !important;
+  border-bottom-color: #2D7D6F !important;
   font-weight: 700;
 }
 
 body.edu-panel-page .sb2-1 ul li a:hover {
-  color: var(--edu-gold-light) !important;
+  color: #2D7D6F !important;
 }
 
 /* ══════════════════════════════════════
@@ -741,6 +768,38 @@ body.edu-portfolio-page .banner {
   min-height: 120px;
 }
 
+body.edu-portfolio-page .connto-ataturk-banner {
+  padding: 28px 32px !important;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+
+body.edu-portfolio-page .connto-ataturk-banner__quote {
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.01em;
+}
+
+body.edu-portfolio-page .connto-ataturk-banner__sign {
+  width: 160px;
+  max-width: 70%;
+  height: auto;
+  display: block;
+  opacity: 0.95;
+  filter: brightness(0) invert(1);
+}
+
 body.edu-portfolio-page .footer-area {
   background: var(--edu-navy) !important;
   border-top: 3px solid var(--edu-gold);
@@ -796,6 +855,25 @@ body.edu-portfolio-page .section-heading h1 {
 body.edu-portfolio-page .about-area {
   padding-top: 40px;
   padding-bottom: 60px;
+}
+
+body.edu-portfolio-page .connto-services-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 28px auto 36px;
+  max-width: 120px;
+  opacity: 0.9;
+}
+
+body.edu-portfolio-page .connto-services-icon svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+body.edu-portfolio-page .header-area .navbar .theme-btn {
+  display: none !important;
 }
 
 /* İletişim sayfası — ikon kutucukları */
@@ -1823,11 +1901,15 @@ body.connto-page .wrapper {
   text-align: center;
 }
 
-/* ── Auth pages ── */
-body.connto-auth-page {
-  background: var(--ct-bg) !important;
+/* ── Auth pages (glass + chalkboard) ── */
+body.connto-auth-page,
+body.connto-chalkboard-page {
   font-family: var(--ct-font) !important;
   min-height: 100vh;
+}
+
+body.connto-auth-page.connto-chalkboard-page {
+  background: #1a1a1a url("/static/edu-images/chalkboard-bg.svg") center / cover fixed !important;
 }
 
 .connto-auth {
@@ -1836,13 +1918,41 @@ body.connto-auth-page {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-  background: linear-gradient(160deg, var(--ct-mint-light) 0%, var(--ct-bg) 50%, #fff 100%);
+  background: transparent;
+}
+
+.connto-auth .connto-glass-card {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.connto-glass-card {
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.connto-auth-logo {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+}
+
+.connto-auth-logo svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .connto-auth-card {
   width: 100%;
   max-width: 420px;
-  padding: 36px 32px;
+  padding: 36px 32px 28px;
 }
 
 .connto-auth-card--wide {
@@ -1850,88 +1960,204 @@ body.connto-auth-page {
 }
 
 .connto-auth-card h1 {
-  font-size: 1.65rem;
+  font-size: 2rem;
   font-weight: 800;
-  color: var(--ct-text) !important;
+  color: #0f172a !important;
   text-align: center;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
 }
 
 .connto-auth-card__sub {
   text-align: center;
-  font-size: 0.9rem;
-  color: var(--ct-text-muted);
+  font-size: 1rem;
+  color: #334155;
   margin: 0 0 24px;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
-.connto-auth-tabs {
+.connto-auth-tabs-wrap {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.42);
+  border-radius: 14px;
+  padding: 5px;
   margin-bottom: 24px;
 }
 
 .connto-auth-tab {
-  border: 2px solid var(--ct-border);
-  background: var(--ct-surface);
-  color: var(--ct-text-secondary);
-  border-radius: var(--ct-radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: #334155;
+  border-radius: 10px;
   padding: 12px 10px;
   font-family: var(--ct-font);
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
   line-height: 1.3;
 }
 
+.connto-auth-tab i {
+  font-size: 1.25rem;
+}
+
 .connto-auth-tab:hover {
-  border-color: var(--ct-teal);
-  color: var(--ct-teal);
+  color: #2D7D6F;
 }
 
 .connto-auth-tab--active {
-  background: var(--ct-teal);
-  border-color: var(--ct-teal);
+  background: #2D7D6F;
   color: #fff;
-  box-shadow: var(--ct-shadow-sm);
+  box-shadow: 0 4px 12px rgba(45, 125, 111, 0.35);
 }
 
 .connto-auth-tab--active:hover {
-  background: var(--ct-teal-hover);
-  border-color: var(--ct-teal-hover);
+  background: #256859;
   color: #fff;
 }
 
-.connto-auth-toggle {
-  background: var(--ct-bg-muted);
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 20px;
-  font-size: 0.875rem;
+.connto-form--glass .connto-field label {
+  color: #0f172a;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 8px;
 }
 
-.connto-auth-toggle label {
+.connto-input-icon {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0;
+}
+
+.connto-input-icon > .fa {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(26, 46, 53, 0.55);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 2;
+  line-height: 1;
+}
+
+.connto-input-icon input {
+  width: 100%;
+  padding: 13px 14px 13px 44px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  font-family: var(--ct-font);
+  font-size: 0.92rem;
+  color: #1a2e35;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.connto-input-icon input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 125, 111, 0.25);
+}
+
+.connto-input-icon--password input {
+  padding-right: 44px;
+}
+
+.connto-password-toggle {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: rgba(26, 46, 53, 0.45);
   cursor: pointer;
-  color: var(--ct-text-secondary);
-  font-weight: 500;
+  padding: 8px;
+  line-height: 1;
+}
+
+.connto-password-toggle:hover {
+  color: #2D7D6F;
+}
+
+.connto-form--glass input[type="text"],
+.connto-form--glass input[type="email"],
+.connto-form--glass input[type="password"],
+.connto-form--glass input[type="date"],
+.connto-form--glass input[type="number"],
+.connto-form--glass select,
+.connto-form--glass textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  font-family: var(--ct-font);
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.connto-form--glass input:focus,
+.connto-form--glass select:focus,
+.connto-form--glass textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(45, 125, 111, 0.25);
+}
+
+/* İkonlu alanlar — genel form padding'ini ezer */
+.connto-field .connto-input-icon input[type="text"],
+.connto-field .connto-input-icon input[type="email"],
+.connto-field .connto-input-icon input[type="password"],
+.connto-form--glass .connto-input-icon input[type="text"],
+.connto-form--glass .connto-input-icon input[type="email"],
+.connto-form--glass .connto-input-icon input[type="password"] {
+  padding: 14px 16px 14px 46px;
+  font-size: 1rem;
+}
+
+.connto-field .connto-input-icon--password input,
+.connto-form--glass .connto-input-icon--password input {
+  padding-right: 44px;
+}
+
+.connto-btn--glass {
+  background: #2D7D6F !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 20px rgba(45, 125, 111, 0.35) !important;
+  transition: background 0.2s, transform 0.15s !important;
+}
+
+.connto-btn--glass:hover {
+  background: #256859 !important;
+  transform: translateY(-1px);
+}
+
+.connto-auth .connto-btn--glass.connto-btn--lg {
+  padding: 15px 28px;
+  font-size: 1.05rem;
 }
 
 .connto-auth-footer {
   text-align: center;
   margin-top: 24px;
-  font-size: 0.875rem;
-  color: var(--ct-text-muted);
-  line-height: 1.8;
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.9;
 }
 
 .connto-auth-footer a {
-  color: var(--ct-teal);
-  font-weight: 600;
+  color: #1d6b5f;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -1939,8 +2165,34 @@ body.connto-auth-page {
   text-decoration: underline;
 }
 
+.connto-check {
+  color: rgba(26, 46, 53, 0.8);
+}
+
+.connto-auth .connto-alert {
+  background: rgba(254, 242, 242, 0.98);
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  line-height: 1.45;
+}
+
 .connto-form {
   margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .connto-auth-tab span {
+    font-size: 0.65rem;
+  }
+
+  .connto-auth-card {
+    padding: 28px 20px 22px;
+  }
 }
 
 /* ── Responsive ── */
@@ -1977,4 +2229,137 @@ body.connto-auth-page {
     align-items: flex-start;
     gap: 12px;
   }
+}
+
+/* ══════════════════════════════════════
+   Ana sayfa & arama — tahta arka plan
+   ══════════════════════════════════════ */
+body.connto-page.connto-chalkboard-page {
+  background: #1a1a1a url("/static/edu-images/chalkboard-bg.svg") center / cover fixed !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-header {
+  background: rgba(45, 125, 111, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+body.connto-page.connto-chalkboard-page .connto-logo {
+  color: #fff !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-logo:hover {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-header-search {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.connto-page.connto-chalkboard-page .connto-header-search__btn,
+body.connto-page.connto-chalkboard-page .connto-btn--primary {
+  background: #2D7D6F !important;
+  border-color: #2D7D6F !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-header-search__btn:hover,
+body.connto-page.connto-chalkboard-page .connto-btn--primary:hover {
+  background: #256859 !important;
+  border-color: #256859 !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-btn--outline {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-btn--outline:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+  color: #fff !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-mobile-nav {
+  background: rgba(30, 30, 30, 0.85);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.connto-page.connto-chalkboard-page .connto-mobile-nav a {
+  color: #fff !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-hero-banner {
+  background: transparent;
+  border-bottom: none;
+  padding: 40px 0 48px;
+}
+
+body.connto-page.connto-chalkboard-page .connto-hero-banner h1,
+body.connto-page.connto-chalkboard-page .connto-section__title,
+body.connto-page.connto-chalkboard-page .connto-page-head h1 {
+  color: #fff !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-eyebrow {
+  color: #7dd3c0;
+}
+
+body.connto-page.connto-chalkboard-page .connto-lead,
+body.connto-page.connto-chalkboard-page .connto-page-head p,
+body.connto-page.connto-chalkboard-page .connto-directory__toolbar {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+body.connto-page.connto-chalkboard-page .connto-card,
+body.connto-page.connto-chalkboard-page .connto-search-panel,
+body.connto-page.connto-chalkboard-page .connto-filter-panel,
+body.connto-page.connto-chalkboard-page .connto-teacher-card,
+body.connto-page.connto-chalkboard-page .connto-chip-card,
+body.connto-page.connto-chalkboard-page .connto-step-card,
+body.connto-page.connto-chalkboard-page .connto-empty-state {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-section--muted {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+body.connto-page.connto-chalkboard-page .connto-page-head {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+body.connto-page.connto-chalkboard-page .connto-cta {
+  background: rgba(45, 125, 111, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+body.connto-page.connto-chalkboard-page .connto-footer {
+  background: rgba(15, 15, 15, 0.82);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+body.connto-page.connto-chalkboard-page .connto-field label {
+  color: #1a2e35;
+}
+
+body.connto-page.connto-chalkboard-page .connto-step-card h3,
+body.connto-page.connto-chalkboard-page .connto-search-panel h2,
+body.connto-page.connto-chalkboard-page .connto-filter-panel h3,
+body.connto-page.connto-chalkboard-page .connto-teacher-card h4 {
+  color: #1a2e35 !important;
+}
+
+body.connto-page.connto-chalkboard-page .connto-step-card__num {
+  background: #2D7D6F;
 }

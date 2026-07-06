@@ -5,7 +5,15 @@
 
 {% block content %}
 <div class="connto-auth">
-  <div class="connto-card connto-auth-card">
+  <div class="connto-glass-card connto-auth-card">
+    <div class="connto-auth-logo" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="24" cy="24" r="24" fill="#2D7D6F"/>
+        <path d="M14 18h20v2H14zM14 22h14v2H14zM14 26h18v2H14z" fill="#fff" opacity="0.9"/>
+        <path d="M30 14l6 6-6 6v-4h-4v-4h4v-4z" fill="#fff"/>
+      </svg>
+    </div>
+
     <h1>Giriş Yap</h1>
     <p class="connto-auth-card__sub">{{ SITE_TAGLINE }}</p>
 
@@ -15,27 +23,38 @@
       {% endfor %}
     {% endif %}
 
-    <div class="connto-auth-tabs" role="tablist" aria-label="Giriş türü">
+    <div class="connto-auth-tabs-wrap" role="tablist" aria-label="Giriş türü">
       <button type="button" class="connto-auth-tab connto-auth-tab--active" data-type="teacher" role="tab" aria-selected="true">
-        Öğretmen Giriş
+        <i class="fa fa-graduation-cap"></i>
+        <span>Öğretmen Girişi</span>
       </button>
       <button type="button" class="connto-auth-tab" data-type="course_center" role="tab" aria-selected="false">
-        Kurs Merkezi Giriş
+        <i class="fa fa-building"></i>
+        <span>Kurs Merkezi Girişi</span>
       </button>
     </div>
 
-    <form method="POST" class="connto-form">
+    <form method="POST" class="connto-form connto-form--glass">
       {% csrf_token %}
       <div class="connto-field">
         <label for="email">E-posta</label>
-        <input type="email" name="email" id="email" required placeholder="ornek@email.com">
+        <div class="connto-input-icon">
+          <i class="fa fa-envelope-o"></i>
+          <input type="email" name="email" id="email" required placeholder="ornek@email.com">
+        </div>
       </div>
       <div class="connto-field">
         <label for="password">Şifre</label>
-        <input type="password" name="password" id="password" required placeholder="••••••••">
+        <div class="connto-input-icon connto-input-icon--password">
+          <i class="fa fa-lock"></i>
+          <input type="password" name="password" id="password" required placeholder="••••••••">
+          <button type="button" class="connto-password-toggle" id="togglePassword" aria-label="Şifreyi göster">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
       </div>
       <input type="hidden" name="is_course_center" id="is_course_center_hidden" value="false">
-      <button type="submit" class="connto-btn connto-btn--primary connto-btn--block connto-btn--lg">Giriş Yap</button>
+      <button type="submit" class="connto-btn connto-btn--glass connto-btn--block connto-btn--lg">Giriş Yap</button>
     </form>
 
     <p class="connto-auth-footer">
@@ -50,6 +69,8 @@
   (function () {
     var tabs = document.querySelectorAll('.connto-auth-tab');
     var hidden = document.getElementById('is_course_center_hidden');
+    var passwordInput = document.getElementById('password');
+    var toggleBtn = document.getElementById('togglePassword');
 
     function setLoginType(type) {
       var isCourseCenter = type === 'course_center';
@@ -66,6 +87,16 @@
         setLoginType(tab.dataset.type);
       });
     });
+
+    if (toggleBtn && passwordInput) {
+      toggleBtn.addEventListener('click', function () {
+        var icon = toggleBtn.querySelector('i');
+        var show = passwordInput.type === 'password';
+        passwordInput.type = show ? 'text' : 'password';
+        icon.classList.toggle('fa-eye', !show);
+        icon.classList.toggle('fa-eye-slash', show);
+      });
+    }
   })();
 </script>
 {% endblock %}
