@@ -22,38 +22,38 @@
                 {% endfor %}
               {% endif %}
               <div class="connto-field">
-                <label>Branş</label>
-                <select name="branch">
-                  <option value="">Seçin</option>
+                <label for="search-branch">Branş</label>
+                <select name="branch" id="search-branch" class="connto-select">
+                  <option value="" {% if not selected_branch %}selected{% endif %}>Seçiniz</option>
                   {% for value, label in branches %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if selected_branch == value %}selected{% endif %}>{{ label }}</option>
                   {% endfor %}
                 </select>
               </div>
               <div class="connto-field">
-                <label>Deneyim</label>
-                <select name="experience">
-                  <option value="">Seçin</option>
+                <label for="search-experience">Deneyim</label>
+                <select name="experience" id="search-experience" class="connto-select">
+                  <option value="" {% if not selected_experience %}selected{% endif %}>Seçiniz</option>
                   {% for value, label in experiences %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if selected_experience == value %}selected{% endif %}>{{ label }}</option>
                   {% endfor %}
                 </select>
               </div>
               <div class="connto-field">
-                <label>Şehir</label>
-                <select name="city">
-                  <option value="">Seçin</option>
+                <label for="search-city">Şehir</label>
+                <select name="city" id="search-city" class="connto-select">
+                  <option value="" {% if not selected_city %}selected{% endif %}>Seçiniz</option>
                   {% for value, label in cities %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if selected_city == value %}selected{% endif %}>{{ label }}</option>
                   {% endfor %}
                 </select>
               </div>
               <div class="connto-field">
-                <label>Cinsiyet</label>
-                <select name="gender">
-                  <option value="">Tercih yok</option>
+                <label for="search-gender">Cinsiyet</label>
+                <select name="gender" id="search-gender" class="connto-select">
+                  <option value="" {% if not selected_gender %}selected{% endif %}>Seçiniz</option>
                   {% for value, label in genders %}
-                    <option value="{{ value }}">{{ label }}</option>
+                    <option value="{{ value }}" {% if selected_gender == value %}selected{% endif %}>{{ label }}</option>
                   {% endfor %}
                 </select>
               </div>

@@ -1650,6 +1650,39 @@ body.connto-page .wrapper {
   margin: 0 0 20px;
 }
 
+/* Filtre select — homestatic appearance:none override */
+body.connto-page .connto-select,
+body.connto-page .connto-field select.connto-select,
+body.connto-page .connto-filter-panel select.connto-select {
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px !important;
+  line-height: 1.4 !important;
+  height: auto !important;
+  color: #1a2e35 !important;
+  background-color: #fff !important;
+  border: 1px solid var(--ct-border) !important;
+  border-radius: 10px !important;
+  font-family: var(--ct-font) !important;
+  font-size: 0.9rem !important;
+  text-overflow: clip;
+  overflow: visible;
+  white-space: normal;
+  cursor: pointer;
+}
+
+body.connto-page .connto-select option {
+  color: #1a2e35;
+  background: #fff;
+}
+
+body.connto-page .connto-select option[value=""] {
+  color: #64748b;
+}
+
 .connto-section {
   padding: 56px 0;
 }

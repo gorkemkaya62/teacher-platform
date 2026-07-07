@@ -28,7 +28,7 @@
   <!-- Math formulas (right) -->
   <g opacity="0.18" fill="none" stroke="#e8e8e8" stroke-width="2" font-family="Georgia, serif">
     <text x="1450" y="280" fill="#e8e8e8" font-size="42" opacity="0.9">x + y = z</text>
-    <text x="1380" y="360" fill="#e8e8e8" font-size="28" opacity="0.7">a² + b² = c²</text>
+    <text x="1380" y="360" fill="#e8e8e8" font-size="28" opacity="0.7">aï¿½ + bï¿½ = cï¿½</text>
     <text x="1500" y="440" fill="#e8e8e8" font-size="24" opacity="0.6">+ f(x) dx</text>
   </g>
 

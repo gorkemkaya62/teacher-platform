@@ -18,6 +18,10 @@ def home(request):
         'cities': CustomUserChoices.TURKISH_CITIES,
         'genders': CustomUserChoices.GENDER_CHOICES,
         'most_searched_services': most_searched_services,
+        'selected_branch': request.GET.get('branch', ''),
+        'selected_experience': request.GET.get('experience', ''),
+        'selected_city': request.GET.get('city', ''),
+        'selected_gender': request.GET.get('gender', ''),
     }
     return render(request, "home.html", context)
 
