@@ -19,7 +19,7 @@
               <h4>Eğitimlerim</h4>
               <a class="dropdown-button drop-down-meta" href="#" data-activates="dr-users"><i class="material-icons">more_vert</i></a>
               <ul id="dr-users" class="dropdown-content">
-                <li><a href="{% url 'addItems' %}">Yeni Ekle</a></li>
+                <li><a href="{% url 'addItems' %}?tab=educations">Yeni Ekle</a></li>
               </ul>
             </div>
             <div class="tab-inn">
@@ -42,11 +42,11 @@
                     {% for education in user.usereducations.all %}
                       <tr>
                         <td><span class="list-img"><img src="{{ user.image.url }}" alt="" /></span></td>
-                        <td><span class="list-enq-name">{{ education.degree }}</span></td>
+                        <td><span class="list-enq-name">{{ education.get_degree_display }}</span></td>
                         <td>{{ education.school_name }}</td>
                         <td>{{ education.department }}</td>
                         <td>{{ education.start_date }}</td>
-                        <td>{{ education.end_date }}</td>
+                        <td>{% if education.end_date %}{{ education.end_date }}{% else %}Devam ediyor{% endif %}</td>
                         <td>{{ education.short_description }}</td>
                         <td><a href="{% url 'updateEducation' education.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
                         <td><a href="#" onclick="confirmDelete('{% url 'deleteEducation' education.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>

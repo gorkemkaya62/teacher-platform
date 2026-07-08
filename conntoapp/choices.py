@@ -119,7 +119,7 @@ class CustomUserChoices():
     
 class CustomUserEducationChoices():
     DEGREE_CHOICES = [
-        ("Bachelor’s Degree", "Bachelor’s Degree"),
-        ("Master’s Degree", "Master’s Degree"),
-        ("Ph.D.", "Ph.D."),
+        ("Bachelor’s Degree", "Lisans"),
+        ("Master’s Degree", "Yüksek Lisans"),
+        ("Ph.D.", "Doktora"),
     ]

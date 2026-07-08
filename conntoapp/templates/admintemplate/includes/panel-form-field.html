@@ -1,0 +1,13 @@
+<div class="edu-panel-field{% if field.field.widget.input_type == 'date' %} edu-panel-field--date{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {% if field.field.widget.input_type == 'date' %}
+    <div class="connto-date-field">{{ field }}</div>
+  {% else %}
+    {{ field }}
+  {% endif %}
+  {% if field.errors %}
+    {% for error in field.errors %}
+      <p class="edu-panel-field__error">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+</div>

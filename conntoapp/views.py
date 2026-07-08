@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from django.urls import reverse
 from .forms import (
     TeacherRegisterForm, TeacherLoginForm, TeacherProfileForm, TeacherSkillForm,
     TeacherEducationForm, TeacherExperienceForm, TeacherServiceForm, TeacherWorkForm,
@@ -73,6 +74,10 @@ def adminregister(request):
         return redirect("addItems")
     
     if request.method == "POST":
+        if not request.POST.get('checkBox'):
+            messages.error(request, "Kayıt olmak için kullanım şartlarını kabul etmelisiniz.")
+            return redirect("register")
+
         is_course_center = request.POST.get('is_course_center', False)
 
         if is_course_center:
@@ -176,11 +181,26 @@ def generate_random_password(length=8):
 
 # Add Item Part Start
 
+ADD_ITEMS_TAB_ALIASES = {
+    'profile': 'profile',
+    'skills': 'skills',
+    'educations': 'educations',
+    'experiences': 'experiences',
+    'services': 'services',
+    'certificates': 'certificates',
+    'works': 'works',
+    'blogs': 'blogs',
+}
 
-@login_required
-def addItems(request):
+
+def _redirect_add_items_tab(tab='profile'):
+    tab = ADD_ITEMS_TAB_ALIASES.get(tab, tab)
+    return redirect(f"{reverse('addItems')}?tab={tab}")
+
+
+def _add_items_context(user, active_tab=None, **form_overrides):
     context = {
-        'teacherProfileForm': TeacherProfileForm(instance=request.user),
+        'teacherProfileForm': TeacherProfileForm(instance=user),
         'teacherSkillForm': TeacherSkillForm(),
         'teacherEducationForm': TeacherEducationForm(),
         'teacherExperienceForm': TeacherExperienceForm(),
@@ -189,114 +209,204 @@ def addItems(request):
         'teacherBlogForm': TeacherBlogForm(),
         'teacherCertificateForm': TeacherCertificateForm(),
     }
-    return render(request, "admintemplate/add-items.html", context)
+    context.update(form_overrides)
+    if active_tab:
+        context['active_tab'] = active_tab
+    return context
+
+
+def _add_items_tab_from_post(request, default='profile'):
+    tab = request.POST.get('active_tab', default)
+    return ADD_ITEMS_TAB_ALIASES.get(tab, default)
+
+
+def _is_add_items_post(request):
+    return request.POST.get('form_source') == 'add_items'
+
+
+@login_required
+def addItems(request):
+    active_tab = request.GET.get('tab')
+    return render(request, "admintemplate/add-items.html", _add_items_context(
+        request.user,
+        active_tab=active_tab,
+    ))
 
 
 @login_required
 def teacherProfileAccept(request):
-    if request.method == "POST":
-        form = TeacherProfileForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return redirect("addItems")
-        else:
-            print(form.errors)
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('profile')
+
+    tab = _add_items_tab_from_post(request, 'profile')
+    form = TeacherProfileForm(request.POST, request.FILES, instance=request.user)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Profil bilgileri kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherProfileForm=form),
+    )
 
 @login_required
 def teacherSkillAccept(request):
     if request.method == "POST":
-        form = TeacherSkillForm(request.POST)
+        from_add_items = _is_add_items_post(request)
+        tab = _add_items_tab_from_post(request, 'skills')
+        form = TeacherSkillForm(request.POST, user=request.user)
         if form.is_valid():
-            if form.cleaned_data["skill_degree"] > 100 or form.cleaned_data["skill_degree"] < 0:
-                messages.error(request, "Yetkinlik seviyesi 0-100 arasında olmalıdır")
-                return redirect("addItems")
             skill = form.save(commit=False)
             skill.custom_user = request.user
             skill.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+            messages.success(request, "Yetkinlik kaydedildi.")
+            if from_add_items:
+                return _redirect_add_items_tab(tab)
+            return redirect("listingSkill")
+
+        if from_add_items:
+            return render(
+                request,
+                "admintemplate/add-items.html",
+                _add_items_context(request.user, active_tab=tab, teacherSkillForm=form),
+            )
+
+        return render(request, "admintemplate/listing-skill.html", {
+            'teacherSkillForm': form,
+        })
+
+    return redirect("listingSkill")
 
 @login_required
 def teacherEducationAccept(request):
-    if request.method == "POST":
-        form = TeacherEducationForm(request.POST)
-        if form.is_valid():
-            education = form.save(commit=False)
-            education.custom_user = request.user
-            education.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('educations')
+
+    tab = _add_items_tab_from_post(request, 'educations')
+    form = TeacherEducationForm(request.POST)
+    if form.is_valid():
+        education = form.save(commit=False)
+        education.custom_user = request.user
+        education.save()
+        messages.success(request, "Eğitim bilgisi kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherEducationForm=form),
+    )
     
 @login_required
 def teacherCertificateAccept(request):
-    if request.method == "POST":
-        form = TeacherCertificateForm(request.POST)
-        if form.is_valid():
-            award = form.save(commit=False)
-            award.custom_user = request.user
-            award.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('certificates')
+
+    tab = _add_items_tab_from_post(request, 'certificates')
+    form = TeacherCertificateForm(request.POST)
+    if form.is_valid():
+        award = form.save(commit=False)
+        award.custom_user = request.user
+        award.save()
+        messages.success(request, "Sertifika kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherCertificateForm=form),
+    )
 
 @login_required
 def teacherExperienceAccept(request):
-    if request.method == "POST":
-        form = TeacherExperienceForm(request.POST)
-        if form.is_valid():
-            experience = form.save(commit=False)
-            experience.custom_user = request.user
-            experience.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('experiences')
+
+    tab = _add_items_tab_from_post(request, 'experiences')
+    form = TeacherExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save(commit=False)
+        experience.custom_user = request.user
+        experience.save()
+        messages.success(request, "Deneyim kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherExperienceForm=form),
+    )
     
 @login_required
 def teacherServiceAccept(request):
-    if request.method == "POST":
-        form = TeacherServiceForm(request.POST)
-        if form.is_valid():
-            service = form.save(commit=False)
-            service.custom_user = request.user
-            service.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('services')
+
+    tab = _add_items_tab_from_post(request, 'services')
+    form = TeacherServiceForm(request.POST)
+    if form.is_valid():
+        service = form.save(commit=False)
+        service.custom_user = request.user
+        service.save()
+        messages.success(request, "Ders bilgisi kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherServiceForm=form),
+    )
 
 @login_required
 def teacherWorkAccept(request):
-    if request.method == "POST":
-        form = TeacherWorkForm(request.POST, request.FILES)
-        if form.is_valid():
-            work = form.save(commit=False)
-            work.custom_user = request.user
-            work.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('works')
+
+    tab = _add_items_tab_from_post(request, 'works')
+    form = TeacherWorkForm(request.POST, request.FILES)
+    if form.is_valid():
+        work = form.save(commit=False)
+        work.custom_user = request.user
+        work.save()
+        messages.success(request, "Ders materyali kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherWorkForm=form),
+    )
     
 @login_required
 def teacherBlogAccept(request):
-    if request.method == "POST":
-        form = TeacherBlogForm(request.POST, request.FILES)
-        if form.is_valid():
-            blog = form.save(commit=False)
-            blog.custom_user = request.user
-            blog.blog_date = date.today()
-            blog.save()
-            return redirect("addItems")
-    else:
-        return redirect("addItems")
+    if request.method != "POST":
+        return _redirect_add_items_tab('blogs')
+
+    tab = _add_items_tab_from_post(request, 'blogs')
+    form = TeacherBlogForm(request.POST, request.FILES)
+    if form.is_valid():
+        blog = form.save(commit=False)
+        blog.custom_user = request.user
+        blog.blog_date = date.today()
+        blog.save()
+        messages.success(request, "Blog yazısı kaydedildi.")
+        return _redirect_add_items_tab(tab)
+
+    return render(
+        request,
+        "admintemplate/add-items.html",
+        _add_items_context(request.user, active_tab=tab, teacherBlogForm=form),
+    )
     
     
 # Listing Area start
 @login_required
 def listingSkill(request):
-    return render(request, "admintemplate/listing-skill.html")
+    return render(request, "admintemplate/listing-skill.html", {
+        'teacherSkillForm': TeacherSkillForm(),
+    })
 
 @login_required
 def listingEducation(request):
@@ -344,27 +454,39 @@ def updatePassword(request):
 
 @login_required
 def updateSkill(request, pk):
-    skill = UserSkill.objects.filter(id = pk).first()
+    skill = UserSkill.objects.filter(id=pk, custom_user=request.user).first()
+    if not skill:
+        messages.error(request, "Yetkinlik bulunamadı.")
+        return redirect("listingSkill")
+
     if request.method == "POST":
-        form = TeacherSkillForm(request.POST, instance=skill)
+        form = TeacherSkillForm(request.POST, instance=skill, user=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, "Yetkinlik güncellendi.")
             return redirect("listingSkill")
     else:
-        form = TeacherSkillForm(instance=skill)
-        return render(request, "admintemplate/update.html", {'form': form})
+        form = TeacherSkillForm(instance=skill, user=request.user)
+
+    return render(request, "admintemplate/update.html", {'form': form})
 
 @login_required
 def updateEducation(request, pk):
-    education = UserEducation.objects.filter(id = pk).first()
+    education = UserEducation.objects.filter(id=pk, custom_user=request.user).first()
+    if not education:
+        messages.error(request, "Eğitim kaydı bulunamadı.")
+        return redirect("listingEducation")
+
     if request.method == "POST":
         form = TeacherEducationForm(request.POST, instance=education)
         if form.is_valid():
             form.save()
+            messages.success(request, "Eğitim bilgisi güncellendi.")
             return redirect("listingEducation")
     else:
         form = TeacherEducationForm(instance=education)
-        return render(request, "admintemplate/update.html", {'form': form})
+
+    return render(request, "admintemplate/update.html", {'form': form})
     
 @login_required
 def updateExperience(request, pk):

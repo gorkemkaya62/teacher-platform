@@ -19,10 +19,35 @@
               <h4>Yetkinliklerim</h4>
               <a class="dropdown-button drop-down-meta" href="#" data-activates="dr-users"><i class="material-icons">more_vert</i></a>
               <ul id="dr-users" class="dropdown-content">
-                <li><a href="{% url 'addItems' %}">Yeni Ekle</a></li>
+                <li><a href="{% url 'addItems' %}?tab=skills">Yeni Ekle</a></li>
               </ul>
             </div>
             <div class="tab-inn">
+              {% if messages %}
+                {% for message in messages %}
+                  <p style="color: {% if message.tags == 'success' %}#15803d{% else %}#b91c1c{% endif %};">{{ message }}</p>
+                {% endfor %}
+              {% endif %}
+
+              <div class="bor" style="margin-bottom: 24px;">
+                <h5 style="margin-bottom: 16px;">Yeni Yetkinlik Ekle</h5>
+                <form method="POST" action="{% url 'teacherSkillAccept' %}" class="connto-skill-form">
+                  {% csrf_token %}
+                  {% for field in teacherSkillForm %}
+                    <div class="skill-field-wrap" style="margin-bottom: 12px;">
+                      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                      {{ field }}
+                      {% if field.errors %}
+                        {% for error in field.errors %}
+                          <p class="skill-degree-error" data-server-error="1" style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+                        {% endfor %}
+                      {% endif %}
+                    </div>
+                  {% endfor %}
+                  <button type="submit" class="btn btn-primary">KAYDET</button>
+                </form>
+              </div>
+
               <div class="table-responsive table-desi">
                 <table class="table table-hover">
                   <thead>
@@ -55,4 +80,8 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block js_files %}
+  <script src="{% static 'adminstatic/js/skill-degree.js' %}"></script>
 {% endblock %}

@@ -57,8 +57,8 @@
             <ul>
               {% for education in user.usereducations.all %}
                 <li>
-                  <p class="date">{{ education.start_date|date:"Y" }} - {% if education.end_date %}{{ education.end_date|date:"Y" }}{% else %}Devam{% endif %}</p>
-                  <h2>{{ education.degree }}</h2>
+                  <p class="date">{{ education.start_date|date:"d.m.Y" }}{% if education.end_date %} - {{ education.end_date|date:"d.m.Y" }}{% else %} - Devam ediyor{% endif %}</p>
+                  <h2>{{ education.get_degree_display }}</h2>
                   <p class="type">{{ education.school_name }}</p>
                 </li>
               {% empty %}

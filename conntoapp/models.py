@@ -157,7 +157,7 @@ class UserBlogs(models.Model):
     
 class UserAwards(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="userawards")
-    award_name = models.CharField(max_length=30, verbose_name="Sertifika/Ödül Adı")
+    award_name = models.CharField(max_length=1000, verbose_name="Sertifika/Ödül Adı")
     award_date = models.DateField(verbose_name="Tarih")
 
     class Meta:

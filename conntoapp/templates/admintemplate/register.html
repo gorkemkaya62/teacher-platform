@@ -38,16 +38,25 @@
       {% csrf_token %}
       <div id="user_form">
         {% for field in form %}
-          <div class="connto-field">
+          <div class="connto-field{% if field.name == 'birth_date' %} connto-field--date{% endif %}">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
+            {% if field.name == 'birth_date' %}
+              <div class="connto-date-field">
+                {{ field }}
+                <button type="button" class="connto-date-trigger" aria-label="Takvimden tarih seç" tabindex="-1">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            {% else %}
+              {{ field }}
+            {% endif %}
           </div>
         {% endfor %}
       </div>
-      <label class="connto-check">
-        <input type="checkbox" name="checkBox" required />
-        Kullanım şartlarını kabul ediyorum
-      </label>
+      <div class="connto-check connto-check--terms">
+        <input type="checkbox" name="checkBox" class="connto-terms-checkbox" required />
+        <button type="button" class="connto-terms-open">Kullanım şartlarını kabul ediyorum</button>
+      </div>
       <button type="submit" class="connto-btn connto-btn--glass connto-btn--block connto-btn--lg">Kayıt Ol</button>
     </form>
 
@@ -60,16 +69,37 @@
           {{ field }}
         </div>
       {% endfor %}
-      <label class="connto-check">
-        <input type="checkbox" name="checkBox" required />
-        Kullanım şartlarını kabul ediyorum
-      </label>
+      <div class="connto-check connto-check--terms">
+        <input type="checkbox" name="checkBox" class="connto-terms-checkbox" required />
+        <button type="button" class="connto-terms-open">Kullanım şartlarını kabul ediyorum</button>
+      </div>
       <button type="submit" class="connto-btn connto-btn--glass connto-btn--block connto-btn--lg">Kayıt Ol</button>
     </form>
 
     <p class="connto-auth-footer">
       Zaten hesabınız var mı? <a href="{% url 'login' %}">Giriş yapın</a>
     </p>
+  </div>
+</div>
+
+<div class="connto-modal" id="terms-modal" aria-hidden="true" role="dialog" aria-labelledby="terms-modal-title">
+  <div class="connto-modal__backdrop" data-terms-close></div>
+  <div class="connto-modal__dialog" role="document">
+    <h2 id="terms-modal-title">Kullanım Şartları</h2>
+    <div class="connto-modal__body">
+      <p>{{ SITE_NAME }} platformunu kullanarak aşağıdaki şartları okuduğunuzu ve kabul ettiğinizi beyan edersiniz:</p>
+      <ul>
+        <li>Kayıt sırasında verdiğiniz bilgilerin doğru ve güncel olmasından siz sorumlusunuz.</li>
+        <li>Platformu yalnızca yasal ve eğitim amaçlı kullanmayı kabul edersiniz.</li>
+        <li>Hesap güvenliğinizden ve şifrenizin gizliliğinden siz sorumlusunuz.</li>
+        <li>Diğer kullanıcıların kişisel verilerini izinsiz paylaşmamayı kabul edersiniz.</li>
+        <li>Platform, hizmet koşullarını güncelleme hakkını saklı tutar.</li>
+      </ul>
+    </div>
+    <div class="connto-modal__actions">
+      <button type="button" class="connto-btn connto-btn--outline" data-terms-close>Vazgeç</button>
+      <button type="button" class="connto-btn connto-btn--glass" id="terms-modal-confirm">Onaylıyorum</button>
+    </div>
   </div>
 </div>
 
@@ -94,6 +124,59 @@
       tab.addEventListener('click', function () {
         setRegisterType(tab.dataset.type);
       });
+    });
+
+    var termsModal = document.getElementById('terms-modal');
+    var termsConfirmBtn = document.getElementById('terms-modal-confirm');
+    var pendingTermsCheckbox = null;
+
+    function openTermsModal(checkbox) {
+      pendingTermsCheckbox = checkbox;
+      termsModal.classList.add('connto-modal--open');
+      termsModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeTermsModal() {
+      termsModal.classList.remove('connto-modal--open');
+      termsModal.setAttribute('aria-hidden', 'true');
+      pendingTermsCheckbox = null;
+    }
+
+    document.querySelectorAll('.connto-terms-open').forEach(function (button) {
+      button.addEventListener('click', function () {
+        var form = button.closest('form');
+        var checkbox = form ? form.querySelector('.connto-terms-checkbox') : null;
+        openTermsModal(checkbox);
+      });
+    });
+
+    document.querySelectorAll('.connto-terms-checkbox').forEach(function (checkbox) {
+      checkbox.addEventListener('click', function (event) {
+        if (checkbox.dataset.approved === 'true') {
+          checkbox.dataset.approved = 'false';
+          return;
+        }
+        event.preventDefault();
+        openTermsModal(checkbox);
+      });
+    });
+
+    termsConfirmBtn.addEventListener('click', function () {
+      if (pendingTermsCheckbox) {
+        pendingTermsCheckbox.checked = true;
+        pendingTermsCheckbox.dataset.approved = 'true';
+      }
+      closeTermsModal();
+    });
+
+    termsModal.querySelectorAll('[data-terms-close]').forEach(function (button) {
+      button.addEventListener('click', closeTermsModal);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && termsModal.classList.contains('connto-modal--open')) {
+        closeTermsModal();
+      }
     });
   })();
 </script>

@@ -1,4 +1,5 @@
 from django import forms
+from datetime import date
 from .models import (
     CustomUser, UserSkill, UserEducation, UserExperience,
     UserServices, UserWorks, UserBlogs, UserAwards, CourseCenter, AdminUser,
@@ -6,6 +7,35 @@ from .models import (
 from .choices import CustomUserChoices, CustomUserEducationChoices, TeacherChoices
 from .district_data import get_district_choices, is_valid_district
 from django.contrib.auth.forms import PasswordChangeForm
+
+
+def calendar_date_widget(required=True):
+    attrs = {
+        'type': 'date',
+        'class': 'connto-date-picker',
+        'title': 'Takvimden tarih seçin',
+    }
+    if required:
+        attrs['required'] = True
+    return forms.DateInput(format='%Y-%m-%d', attrs=attrs)
+
+
+def configure_calendar_date_field(field, *, max_date=None, min_date=None, required=None):
+    field.input_formats = ['%Y-%m-%d']
+    field.widget.format = '%Y-%m-%d'
+    field.widget.attrs.setdefault('type', 'date')
+    css_class = field.widget.attrs.get('class', '')
+    if 'connto-date-picker' not in css_class.split():
+        field.widget.attrs['class'] = f'{css_class} connto-date-picker'.strip()
+    field.widget.attrs.setdefault('title', 'Takvimden tarih seçin')
+    if max_date is not None:
+        field.widget.attrs['max'] = max_date.isoformat()
+    if min_date is not None:
+        field.widget.attrs['min'] = min_date.isoformat()
+    if required is False:
+        field.widget.attrs.pop('required', None)
+    elif required is True:
+        field.widget.attrs['required'] = True
 
 
 class CityDistrictFormMixin:
@@ -51,7 +81,7 @@ class TeacherRegisterForm(CityDistrictFormMixin, forms.ModelForm):
             'password': forms.PasswordInput(attrs={'type': 'password', 'required': True, 'placeholder': 'Şifre'}),
             'email': forms.EmailInput(attrs={'type': 'email', 'required': True, 'placeholder': 'E-posta'}),
             'gender': forms.Select(choices=CustomUserChoices.GENDER_CHOICES, attrs={'required': True}),
-            'birth_date': forms.DateInput(attrs={'type': 'date', 'required': True}),
+            'birth_date': calendar_date_widget(required=True),
             'branch': forms.Select(choices=TeacherChoices.BRANCH_CHOICES, attrs={'required': True}),
             'city': forms.Select(choices=CustomUserChoices.TURKISH_CITIES, attrs={
                 'required': True,
@@ -63,6 +93,15 @@ class TeacherRegisterForm(CityDistrictFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._configure_district_field()
+        today = date.today()
+        configure_calendar_date_field(
+            self.fields['birth_date'],
+            max_date=today,
+            min_date=date(today.year - 100, 1, 1),
+            required=True,
+        )
+        self.fields['birth_date'].widget.attrs['autocomplete'] = 'bday'
+        self.fields['birth_date'].widget.attrs['title'] = 'Takvimden doğum tarihi seçin'
 
 
 class CourseCenterRegisterForm(forms.ModelForm):
@@ -154,27 +193,117 @@ class TeacherProfileForm(CityDistrictFormMixin, forms.ModelForm):
 
 
 class TeacherSkillForm(forms.ModelForm):
+    skill_degree = forms.IntegerField(
+        min_value=0,
+        max_value=100,
+        label='Seviye',
+        error_messages={
+            'min_value': 'Yetkinlik seviyesi 0 ile 100 arasında olmalıdır.',
+            'max_value': 'Yetkinlik seviyesi 0 ile 100 arasında olmalıdır.',
+            'invalid': 'Geçerli bir sayı girin.',
+            'required': 'Yetkinlik seviyesi zorunludur.',
+        },
+        widget=forms.NumberInput(attrs={
+            'type': 'number',
+            'min': 0,
+            'max': 100,
+            'step': 1,
+            'required': True,
+            'placeholder': '0-100',
+            'class': 'skill-degree-input',
+        }),
+    )
+
     class Meta:
         model = UserSkill
         fields = ['skill_name', 'skill_degree']
         widgets = {
             'skill_name': forms.TextInput(attrs={'required': True, 'placeholder': 'Yetkinlik adı'}),
-            'skill_degree': forms.NumberInput(attrs={'type': 'number', 'placeholder': '0-100'}),
         }
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        if not self.user and self.instance.pk:
+            self.user = self.instance.custom_user
+
+    def clean_skill_name(self):
+        skill_name = self.cleaned_data.get('skill_name', '').strip()
+        if not skill_name:
+            raise forms.ValidationError('Yetkinlik adı zorunludur.')
+        return skill_name
+
+    def clean_skill_degree(self):
+        degree = self.cleaned_data.get('skill_degree')
+        if degree is not None and (degree < 0 or degree > 100):
+            raise forms.ValidationError('Yetkinlik seviyesi 0 ile 100 arasında olmalıdır.')
+        return degree
+
+    def clean(self):
+        cleaned_data = super().clean()
+        skill_name = cleaned_data.get('skill_name')
+        if not skill_name or not self.user:
+            return cleaned_data
+
+        duplicates = UserSkill.objects.filter(
+            custom_user=self.user,
+            skill_name__iexact=skill_name,
+        )
+        if self.instance.pk:
+            duplicates = duplicates.exclude(pk=self.instance.pk)
+
+        if duplicates.exists():
+            self.add_error(
+                'skill_name',
+                'Bu yetkinlik daha önce kaydedildi. Aynı yetkinliği tekrar ekleyemezsiniz.',
+            )
+
+        return cleaned_data
 
 
 class TeacherEducationForm(forms.ModelForm):
+    is_ongoing = forms.BooleanField(
+        required=False,
+        label='',
+        widget=forms.CheckboxInput(attrs={'class': 'edu-ongoing-checkbox'}),
+    )
+
     class Meta:
         model = UserEducation
         fields = ['school_name', 'department', 'degree', 'start_date', 'end_date', 'short_description']
         widgets = {
             'school_name': forms.TextInput(attrs={'required': True}),
             'department': forms.TextInput(attrs={'required': True}),
-            'degree': forms.Select(choices=CustomUserEducationChoices.DEGREE_CHOICES, attrs={'required': True}),
-            'start_date': forms.DateInput(attrs={'type': 'date', 'required': True}),
-            'end_date': forms.DateInput(attrs={'type': 'date', 'required': False}),
+            'degree': forms.Select(
+                choices=[('', 'Seçiniz'), *CustomUserEducationChoices.DEGREE_CHOICES],
+                attrs={'required': True},
+            ),
+            'start_date': calendar_date_widget(required=True),
+            'end_date': calendar_date_widget(required=False),
             'short_description': forms.Textarea(attrs={'required': True}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        today = date.today()
+        configure_calendar_date_field(self.fields['start_date'], max_date=today, required=True)
+        configure_calendar_date_field(self.fields['end_date'], max_date=today, required=False)
+        if self.instance.pk and not self.instance.end_date:
+            self.fields['is_ongoing'].initial = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('is_ongoing'):
+            cleaned_data['end_date'] = None
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.cleaned_data.get('is_ongoing'):
+            instance.end_date = None
+        if commit:
+            instance.save()
+        return instance
 
 
 class TeacherExperienceForm(forms.ModelForm):
@@ -184,10 +313,16 @@ class TeacherExperienceForm(forms.ModelForm):
         widgets = {
             'institution_name': forms.TextInput(attrs={'required': True, 'placeholder': 'Kurum / Kurs Merkezi Adı'}),
             'department': forms.TextInput(attrs={'required': True, 'placeholder': 'Branş / Departman'}),
-            'start_date': forms.DateInput(attrs={'type': 'date', 'required': True}),
-            'end_date': forms.DateInput(attrs={'type': 'date', 'required': False}),
+            'start_date': calendar_date_widget(required=True),
+            'end_date': calendar_date_widget(required=False),
             'short_description': forms.Textarea(attrs={'required': True}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        today = date.today()
+        configure_calendar_date_field(self.fields['start_date'], max_date=today, required=True)
+        configure_calendar_date_field(self.fields['end_date'], max_date=today, required=False)
 
 
 class TeacherServiceForm(forms.ModelForm):
@@ -211,7 +346,7 @@ class TeacherWorkForm(forms.ModelForm):
         ]
         widgets = {
             'work_title': forms.TextInput(attrs={'required': True}),
-            'work_year': forms.DateInput(attrs={'required': True, 'type': 'date'}),
+            'work_year': calendar_date_widget(required=True),
             'work_service': forms.TextInput(attrs={'required': True}),
             'work_name': forms.TextInput(attrs={'required': True}),
             'work_about': forms.Textarea(attrs={'required': True}),
@@ -223,6 +358,10 @@ class TeacherWorkForm(forms.ModelForm):
             'work_image5': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
             'work_image6': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        configure_calendar_date_field(self.fields['work_year'], max_date=date.today(), required=True)
 
 
 class TeacherBlogForm(forms.ModelForm):
@@ -242,9 +381,17 @@ class TeacherCertificateForm(forms.ModelForm):
         model = UserAwards
         fields = ['award_name', 'award_date']
         widgets = {
-            'award_name': forms.TextInput(attrs={'required': True, 'placeholder': 'Sertifika/Ödül adı'}),
-            'award_date': forms.DateInput(attrs={'type': 'date', 'required': True}),
+            'award_name': forms.TextInput(attrs={
+                'required': True,
+                'placeholder': 'Sertifika/Ödül adı',
+                'maxlength': 1000,
+            }),
+            'award_date': calendar_date_widget(required=True),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        configure_calendar_date_field(self.fields['award_date'], max_date=date.today(), required=True)
 
 
 class TeacherPasswordChangeForm(PasswordChangeForm):

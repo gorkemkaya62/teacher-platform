@@ -1,0 +1,15 @@
+{% for field in teacherEducationForm %}
+  {% if field.name == 'end_date' %}
+  {% elif field.name == 'start_date' %}
+    {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+    <div class="connto-check connto-check--terms edu-ongoing-check">
+      {{ teacherEducationForm.is_ongoing }}
+      <label for="{{ teacherEducationForm.is_ongoing.id_for_label }}" class="connto-check-label">Devam ediyor</label>
+    </div>
+    <div id="education-end-date-wrap">
+      {% include 'admintemplate/includes/panel-form-field.html' with field=teacherEducationForm.end_date %}
+    </div>
+  {% else %}
+    {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+  {% endif %}
+{% endfor %}

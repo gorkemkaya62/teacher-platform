@@ -731,10 +731,18 @@ body.edu-portfolio-page .menu li a:hover {
 }
 
 body.edu-portfolio-page .theme-btn {
-  background: var(--edu-navy) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid var(--edu-border) !important;
   border-radius: var(--edu-radius) !important;
   font-weight: 600 !important;
   padding: 10px 22px !important;
+  box-shadow: var(--edu-shadow-sm) !important;
+}
+
+body.edu-portfolio-page .theme-btn:hover {
+  background: var(--edu-bg-alt) !important;
+  color: #000000 !important;
 }
 
 body.edu-portfolio-page .about-me-box,
@@ -855,6 +863,60 @@ body.edu-portfolio-page .section-heading h1 {
 body.edu-portfolio-page .about-area {
   padding-top: 40px;
   padding-bottom: 60px;
+}
+
+/* Portföy — credentials / hakkımda: beyaz ve soluk metinleri siyaha çevir */
+body.edu-portfolio-page .credential-area .credential-sidebar h2,
+body.edu-portfolio-page .credential-area .credential-sidebar p,
+body.edu-portfolio-page .credential-area .credential-content .credential-about h2,
+body.edu-portfolio-page .credential-area .credential-content .credential-about p,
+body.edu-portfolio-page .credential-area .credential-edc-exp h2,
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item h4,
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item h3,
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item h5,
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item p,
+body.edu-portfolio-page .credential-area .credential-edc-exp > p,
+body.edu-portfolio-page .credential-area .skills-wrap h2,
+body.edu-portfolio-page .credential-area .skills-wrap .skill-item .percent,
+body.edu-portfolio-page .credential-area .skills-wrap .skill-item .name,
+body.edu-portfolio-page .credential-area .skills-wrap .skill-item p,
+body.edu-portfolio-page .credential-area .skills-wrap > p {
+  color: #000000 !important;
+  opacity: 1 !important;
+}
+
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item h3,
+body.edu-portfolio-page .credential-area .skills-wrap .skill-item .name {
+  color: var(--edu-navy) !important;
+}
+
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item h4,
+body.edu-portfolio-page .credential-area .credential-edc-exp .credential-edc-exp-item h5,
+body.edu-portfolio-page .credential-area .skills-wrap .skill-item .percent,
+body.edu-portfolio-page .credential-area .skills-wrap .skill-item p {
+  color: var(--edu-text-secondary) !important;
+}
+
+body.edu-portfolio-page .credential-area .credential-sidebar .social-links li a {
+  color: var(--edu-navy) !important;
+  background: var(--edu-bg-alt) !important;
+  border-color: var(--edu-border) !important;
+}
+
+body.edu-portfolio-page .credential-area .credential-sidebar .social-links li a:hover {
+  background: var(--edu-bg-alt) !important;
+  color: #000000 !important;
+}
+
+body.edu-portfolio-page .about-area .about-details .about-details-inner h1,
+body.edu-portfolio-page .about-area .about-details .about-details-inner p,
+body.edu-portfolio-page .about-area .about-edc-exp h3,
+body.edu-portfolio-page .about-area .about-edc-exp ul li .date,
+body.edu-portfolio-page .about-area .about-edc-exp ul li h2,
+body.edu-portfolio-page .about-area .about-edc-exp ul li .type,
+body.edu-portfolio-page .about-area .about-edc-exp ul li p {
+  color: #000000 !important;
+  opacity: 1 !important;
 }
 
 body.edu-portfolio-page .connto-services-icon {
@@ -2159,6 +2221,163 @@ body.connto-auth-page.connto-chalkboard-page {
   padding-right: 44px;
 }
 
+.connto-date-field {
+  position: relative;
+}
+
+.connto-date-field .connto-date-picker {
+  width: 100%;
+  cursor: pointer;
+  padding-right: 46px;
+  caret-color: transparent;
+}
+
+.connto-date-field .connto-date-picker::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 46px;
+  height: 100%;
+  cursor: pointer;
+}
+
+.connto-date-trigger {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #2D7D6F;
+  font-size: 1.1rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.connto-date-trigger:hover {
+  color: #1f5f54;
+}
+
+.connto-field--date .connto-date-picker:invalid {
+  color: #64748b;
+}
+
+.connto-check--terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.connto-check--terms .connto-terms-checkbox,
+.connto-check--terms .edu-ongoing-checkbox {
+  margin-top: 3px;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #2D7D6F;
+  cursor: pointer;
+}
+
+.connto-check-label {
+  font-size: 0.875rem;
+  color: var(--ct-text-secondary, #64748b);
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  cursor: pointer;
+}
+
+.edu-panel-page .bor .connto-check--terms.edu-ongoing-check {
+  margin: 8px 0 18px;
+}
+
+.connto-terms-open {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--ct-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.connto-terms-open:hover {
+  color: #2D7D6F;
+  text-decoration: underline;
+}
+
+.connto-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.connto-modal--open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.connto-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.connto-modal__dialog {
+  position: relative;
+  width: min(100%, 520px);
+  max-height: min(85vh, 640px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+}
+
+.connto-modal__dialog h2 {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.connto-modal__body {
+  font-size: 0.925rem;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.connto-modal__body ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+}
+
+.connto-modal__body li + li {
+  margin-top: 8px;
+}
+
+.connto-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
 .connto-btn--glass {
   background: #2D7D6F !important;
   color: #fff !important;
@@ -2426,4 +2645,97 @@ body.connto-page .connto-filter-panel select option {
   color: #1a2e35;
   background: #fff;
   font-size: 16px;
+}
+
+/* Panel sayfaları — form ve tarih alanları */
+.edu-panel-page .bor .edu-panel-field {
+  margin-bottom: 22px;
+  width: 100%;
+}
+
+.edu-panel-page .bor .edu-panel-field label {
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+  width: 100%;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  pointer-events: auto;
+}
+
+.edu-panel-page .bor .edu-panel-field__error {
+  color: #b91c1c;
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+}
+
+.edu-panel-page .bor .edu-panel-field--date .connto-date-field {
+  display: block;
+  width: 100%;
+  max-width: none;
+  position: relative;
+}
+
+.edu-panel-page .bor input.connto-date-picker,
+.edu-panel-page .bor input[type="date"] {
+  appearance: auto !important;
+  -webkit-appearance: menulist !important;
+  -moz-appearance: menulist !important;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 44px;
+  padding: 10px 46px 10px 0 !important;
+  line-height: 1.4 !important;
+  height: auto !important;
+  color: #1a2e35 !important;
+  -webkit-text-fill-color: #1a2e35 !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #cfd8dc !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: var(--ct-font, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 16px !important;
+  cursor: pointer;
+  caret-color: transparent;
+  margin: 0;
+}
+
+.edu-panel-page .bor input.connto-date-picker:focus,
+.edu-panel-page .bor input[type="date"]:focus {
+  border-bottom: 1px solid #2D7D6F !important;
+  box-shadow: 0 1px 0 0 #2D7D6F !important;
+  outline: none;
+}
+
+.edu-panel-page .bor .connto-date-field .connto-date-picker::-webkit-calendar-picker-indicator,
+.edu-panel-page .bor .connto-date-field input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 46px;
+  height: 100%;
+  cursor: pointer;
+}
+
+.edu-panel-page .bor .connto-date-trigger {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #2D7D6F;
+  font-size: 1.05rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.edu-panel-page .bor .connto-date-trigger:hover {
+  color: #1f5f54;
 }

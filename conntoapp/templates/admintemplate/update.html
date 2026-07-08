@@ -29,7 +29,6 @@
         <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           {% for field in form %}
-            <label for="">{{ field.label }}</label>
             {% if field.name|slice:':10' == 'work_image' %}
               <div class="file-field input-field">
                 <div class="btn">
@@ -53,7 +52,21 @@
                 </div>
               </div>
             {% else %}
-              {{ field }}
+              {% if field.name == 'end_date' %}
+              {% elif field.name == 'start_date' %}
+                {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+                {% if 'is_ongoing' in form.fields %}
+                  <div class="connto-check connto-check--terms edu-ongoing-check">
+                    {{ form.is_ongoing }}
+                    <label for="{{ form.is_ongoing.id_for_label }}" class="connto-check-label">Devam ediyor</label>
+                  </div>
+                  <div id="education-end-date-wrap">
+                    {% include 'admintemplate/includes/panel-form-field.html' with field=form.end_date %}
+                  </div>
+                {% endif %}
+              {% else %}
+                {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+              {% endif %}
             {% endif %}
           {% endfor %}
           <br />
@@ -62,4 +75,9 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block js_files %}
+  <script src="{% static 'adminstatic/js/skill-degree.js' %}"></script>
+  <script src="{% static 'adminstatic/js/education-ongoing.js' %}"></script>
 {% endblock %}

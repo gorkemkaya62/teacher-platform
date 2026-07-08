@@ -212,8 +212,57 @@ class ProfileCRUDTests(TestCase):
         response = self.client.post(reverse('teacherSkillAccept'), {
             'skill_name': 'Matematik', 'skill_degree': 90,
         })
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('listingSkill'))
         self.assertTrue(UserSkill.objects.filter(custom_user=self.teacher, skill_name='Matematik').exists())
+
+    def test_add_skill_rejects_invalid_degree(self):
+        response = self.client.post(reverse('teacherSkillAccept'), {
+            'skill_name': 'Matematik', 'skill_degree': 150,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '0 ile 100 arasında')
+        self.assertFalse(UserSkill.objects.filter(custom_user=self.teacher, skill_name='Matematik').exists())
+
+    def test_add_skill_rejects_degree_from_add_items(self):
+        response = self.client.post(reverse('teacherSkillAccept'), {
+            'form_source': 'add_items',
+            'skill_name': 'Sinif Yonetimi',
+            'skill_degree': 22222,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '0 ile 100 arasında')
+        self.assertFalse(UserSkill.objects.filter(custom_user=self.teacher, skill_name='Sinif Yonetimi').exists())
+
+    def test_add_skill_rejects_duplicate_name(self):
+        UserSkill.objects.create(
+            custom_user=self.teacher, skill_name='Sinif Yonetimi', skill_degree=70,
+        )
+        response = self.client.post(reverse('teacherSkillAccept'), {
+            'form_source': 'add_items',
+            'skill_name': 'Sinif Yonetimi',
+            'skill_degree': 80,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'daha önce kaydedildi')
+        self.assertEqual(
+            UserSkill.objects.filter(custom_user=self.teacher, skill_name__iexact='Sinif Yonetimi').count(),
+            1,
+        )
+
+    def test_add_skill_rejects_duplicate_name_case_insensitive(self):
+        UserSkill.objects.create(
+            custom_user=self.teacher, skill_name='Matematik', skill_degree=70,
+        )
+        response = self.client.post(reverse('teacherSkillAccept'), {
+            'skill_name': 'matematik',
+            'skill_degree': 80,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'daha önce kaydedildi')
+        self.assertEqual(
+            UserSkill.objects.filter(custom_user=self.teacher, skill_name__iexact='Matematik').count(),
+            1,
+        )
 
     def test_idor_delete_other_users_skill(self):
         """Bilinen güvenlik sorunu: başkasının kaydı silinebilir."""
