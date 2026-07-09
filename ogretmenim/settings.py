@@ -67,8 +67,8 @@ CSRF_TRUSTED_ORIGINS = _env_list(
     'https://teacher-platform-1.onrender.com,http://127.0.0.1:8000,http://localhost:8000',
 )
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
+MEDIA_ROOT = BASE_DIR / os.environ.get('MEDIA_ROOT', 'media')
 AUTH_USER_MODEL = 'conntoapp.CustomUser'
 SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
