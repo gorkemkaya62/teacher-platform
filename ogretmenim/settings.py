@@ -30,6 +30,18 @@ def _load_env_file(path: Path) -> None:
             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
+def _env_bool(name: str, default: str = 'False') -> bool:
+    return os.environ.get(name, default).lower() in ('true', '1', 'yes')
+
+
+def _env_list(name: str, default: str = '') -> list[str]:
+    return [
+        item.strip()
+        for item in os.environ.get(name, default).split(',')
+        if item.strip()
+    ]
+
+
 _load_env_file(BASE_DIR / '.env')
 
 
@@ -43,30 +55,37 @@ SECRET_KEY = os.environ.get(
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
+DEBUG = _env_bool('DEBUG', 'True')
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get('ALLOWED_HOSTS', '').split(',')
-    if host.strip()
-]
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-AUTH_USER_MODEL = "conntoapp.CustomUser"
+ALLOWED_HOSTS = _env_list(
+    'ALLOWED_HOSTS',
+    '127.0.0.1,localhost,teacher-platform-1.onrender.com',
+)
+
+CSRF_TRUSTED_ORIGINS = _env_list(
+    'CSRF_TRUSTED_ORIGINS',
+    'https://teacher-platform-1.onrender.com,http://127.0.0.1:8000,http://localhost:8000',
+)
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+AUTH_USER_MODEL = 'conntoapp.CustomUser'
 SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 LOGIN_URL = '/adminpanel/login'
 
-SITE_NAME = 'ogretmenim.com'
-SITE_TAGLINE = 'Kurs Merkezleri ve Öğretmen Bulma Platformu'
+SITE_NAME = os.environ.get('SITE_NAME', 'ogretmenim.com')
+SITE_TAGLINE = os.environ.get(
+    'SITE_TAGLINE',
+    'Kurs Merkezleri ve Öğretmen Bulma Platformu',
+)
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_USE_TLS = _env_bool('EMAIL_USE_TLS', 'True')
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-
 
 
 # Application definition
@@ -74,7 +93,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 INSTALLED_APPS = [
     'homeapp',
     'usersiteapp',
-    'conntoapp', 
+    'conntoapp',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -99,7 +118,7 @@ ROOT_URLCONF = 'ogretmenim.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,16 +136,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ogretmenim.wsgi.application'
 
 
-# Database
+# Database — SQLite
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
+_sqlite_name = os.environ.get('SQLITE_DB_NAME', 'db.sqlite3')
+SQLITE_DB_PATH = Path(_sqlite_name)
+if not SQLITE_DB_PATH.is_absolute():
+    SQLITE_DB_PATH = BASE_DIR / SQLITE_DB_PATH
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    },
-    "OPTIONS":{
-        "timeout":20
+        'NAME': SQLITE_DB_PATH,
     }
 }
 
@@ -166,17 +187,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / 'static',
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-ALLOWED_HOSTS = ['teacher-platform-1.onrender.com', 'localhost', '127.0.0.1', '*']
