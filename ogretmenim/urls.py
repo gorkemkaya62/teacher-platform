@@ -22,7 +22,7 @@ from django.shortcuts import redirect
 
 
 urlpatterns = [
-    path('', lambda request: redirect('login'), name='root'),  # Redirect root to login
+    path('', lambda request: redirect('home'), name='root'),
     path('admin/', admin.site.urls),
     path('adminpanel/', include("conntoapp.urls")),
     path('home/', include("homeapp.urls")),

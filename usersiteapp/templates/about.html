@@ -9,7 +9,7 @@
       <div class="d-flex about-me-wrap align-items-start gap-24">
         <div data-aos="zoom-in">
           <div class="about-image-box shadow-box">
-            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
             <div class="image-inner">
               <img src="{{ user.image.url }}" alt="{{ user.fullname }}" />
             </div>
@@ -17,12 +17,12 @@
         </div>
         <div class="about-details" data-aos="zoom-in">
           <h1 class="section-heading" data-aos="fade-up">
-            <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Star" />
+            <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Yıldız" />
             Özgeçmiş
-            <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Star" />
+            <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Yıldız" />
           </h1>
           <div class="about-details-inner shadow-box">
-            <img src="{% static 'userstatic/assets/images/icon2.png' %}" alt="Star" />
+            <img src="{% static 'userstatic/assets/images/icon2.png' %}" alt="Yıldız" />
             <h1>{{ user.fullname }}</h1>
             <p><strong>Branş:</strong> {{ user.get_branch_display }} · <strong>Deneyim:</strong> {{ user.get_experience_years_display }}</p>
             <p><strong>Şehir:</strong> {{ user.get_city_display }}{% if user.district %}, {{ user.get_district_display }}{% endif %}</p>
@@ -35,12 +35,12 @@
       <div class="row mt-24">
         <div class="col-md-6" data-aos="zoom-in">
           <div class="about-edc-exp about-experience shadow-box">
-            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
             <h3>DENEYİM</h3>
             <ul>
               {% for experience in user.userexperiences.all %}
                 <li>
-                  <p class="date">{{ experience.start_date|date:'Y' }} - {% if experience.end_date %}{{ experience.end_date|date:'Y' }}{% else %}Devam{% endif %}</p>
+                  <p class="date">{{ experience.start_date|date:'Y' }} - {% if experience.end_date %}{{ experience.end_date|date:'Y' }}{% else %}Devam ediyor{% endif %}</p>
                   <h2>{{ experience.department }}</h2>
                   <p class="type">{{ experience.institution_name }}</p>
                 </li>
@@ -52,7 +52,7 @@
         </div>
         <div class="col-md-6" data-aos="zoom-in">
           <div class="about-edc-exp about-education shadow-box">
-            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
             <h3>EĞİTİM</h3>
             <ul>
               {% for education in user.usereducations.all %}

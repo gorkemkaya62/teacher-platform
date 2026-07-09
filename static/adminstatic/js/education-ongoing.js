@@ -1,10 +1,14 @@
 (function () {
   function syncEducationOngoingState(scope) {
     var root = scope || document;
-    root.querySelectorAll('form').forEach(function (form) {
-      var checkbox = form.querySelector('.edu-ongoing-checkbox');
-      var endWrap = form.querySelector('#education-end-date-wrap');
-      if (!checkbox || !endWrap) {
+    root.querySelectorAll('.edu-ongoing-checkbox').forEach(function (checkbox) {
+      var form = checkbox.closest('form');
+      if (!form) {
+        return;
+      }
+
+      var endWrap = form.querySelector('.edu-ongoing-end-date-wrap');
+      if (!endWrap) {
         return;
       }
 

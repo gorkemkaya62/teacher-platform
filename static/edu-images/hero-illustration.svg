@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 380" fill="none" role="img" aria-label="Öretmen arama illüstrasyonu">
+  <defs>
+    <linearGradient id="mintGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c8ebe6"/>
+      <stop offset="100%" stop-color="#e8f6f4"/>
+    </linearGradient>
+  </defs>
+  <!-- ground path -->
+  <path d="M80 290 C180 250, 260 310, 360 270 C460 230, 520 280, 580 250" stroke="#0f766e" stroke-width="2.5" stroke-dasharray="8 6" opacity="0.35"/>
+  <!-- platform -->
+  <ellipse cx="420" cy="285" rx="72" ry="18" fill="#c8ebe6" opacity="0.6"/>
+  <path d="M368 285 L420 258 L472 285 L420 312 Z" fill="#0f766e" opacity="0.15"/>
+  <!-- man on platform -->
+  <circle cx="420" cy="228" r="16" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <path d="M404 244 H436 V278 H404 Z" fill="#0f766e" opacity="0.85" rx="4"/>
+  <rect x="408" y="252" width="24" height="3" fill="#c8ebe6"/>
+  <!-- woman with clipboard -->
+  <circle cx="180" cy="210" r="18" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <path d="M158 228 H202 V270 H158 Z" fill="#0f766e" opacity="0.75"/>
+  <rect x="210" y="218" width="36" height="48" rx="4" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <line x1="216" y1="232" x2="240" y2="232" stroke="#c8ebe6" stroke-width="2"/>
+  <line x1="216" y1="242" x2="240" y2="242" stroke="#c8ebe6" stroke-width="2"/>
+  <line x1="216" y1="252" x2="232" y2="252" stroke="#c8ebe6" stroke-width="2"/>
+  <!-- location pins -->
+  <g transform="translate(300 170)">
+    <path d="M0 0 C-10 -18, 10 -18, 0 0 Z" fill="#0f766e"/>
+    <circle cx="0" cy="-10" r="6" fill="#fff"/>
+  </g>
+  <g transform="translate(520 190)">
+    <path d="M0 0 C-8 -14, 8 -14, 0 0 Z" fill="#0f766e" opacity="0.7"/>
+    <circle cx="0" cy="-8" r="5" fill="#fff"/>
+  </g>
+  <!-- calendar card -->
+  <rect x="480" y="120" width="56" height="52" rx="6" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <rect x="480" y="120" width="56" height="14" rx="6" fill="#0f766e"/>
+  <circle cx="494" cy="148" r="4" fill="#c8ebe6"/>
+  <circle cx="508" cy="148" r="4" fill="#c8ebe6"/>
+  <circle cx="522" cy="148" r="4" fill="#0f766e"/>
+  <circle cx="494" cy="162" r="4" fill="#c8ebe6"/>
+  <circle cx="508" cy="162" r="4" fill="#c8ebe6"/>
+  <!-- chat bubble -->
+  <rect x="88" y="118" width="72" height="44" rx="8" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <path d="M108 162 L100 178 L118 162 Z" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <line x1="100" y1="136" x2="148" y2="136" stroke="#c8ebe6" stroke-width="2"/>
+  <line x1="100" y1="148" x2="132" y2="148" stroke="#c8ebe6" stroke-width="2"/>
+  <!-- checklist -->
+  <rect x="260" y="108" width="48" height="56" rx="6" fill="#fff" stroke="#0f766e" stroke-width="2"/>
+  <polyline points="268,128 274,134 286,122" stroke="#0f766e" stroke-width="2" fill="none"/>
+  <line x1="268" y1="146" x2="296" y2="146" stroke="#c8ebe6" stroke-width="2"/>
+  <line x1="268" y1="154" x2="290" y2="154" stroke="#c8ebe6" stroke-width="2"/>
+  <!-- plant -->
+  <rect x="540" y="268" width="20" height="24" rx="3" fill="#0f766e" opacity="0.5"/>
+  <ellipse cx="550" cy="262" rx="18" ry="12" fill="#c8ebe6"/>
+  <ellipse cx="542" cy="256" rx="10" ry="8" fill="#0f766e" opacity="0.35"/>
+  <!-- decorative dots -->
+  <circle cx="60" cy="200" r="5" fill="#c8ebe6"/>
+  <circle cx="600" cy="140" r="4" fill="#c8ebe6"/>
+  <circle cx="340" cy="320" r="6" fill="#0f766e" opacity="0.2"/>
+</svg>

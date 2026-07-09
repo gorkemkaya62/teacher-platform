@@ -4,12 +4,12 @@ from django.urls import reverse
 from .forms import (
     TeacherRegisterForm, TeacherLoginForm, TeacherProfileForm, TeacherSkillForm,
     TeacherEducationForm, TeacherExperienceForm, TeacherServiceForm, TeacherWorkForm,
-    PasswordChangeForm, TeacherBlogForm, TeacherCertificateForm,
+    TeacherPasswordChangeForm, TeacherCertificateForm,
     CourseCenterRegisterForm, AdminLoginForm,
 )
 from .models import (
     CustomUser, UserSkill, UserEducation, UserExperience, UserServices,
-    UserWorks, UserBlogs, UserAwards, CourseCenter, AdminUser,
+    UserWorks, UserAwards, CourseCenter, AdminUser,
 )
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -141,7 +141,7 @@ def adminlogout(request):
         messages.success(request, "Kurs merkezi hesabından çıkış yapıldı")
     else:
         logout(request)
-        messages.success(request, "Successfully logged out")
+        messages.success(request, "Başarıyla çıkış yapıldı")
     return redirect("login")
 
 # FORGOT PASSWORD
@@ -156,16 +156,16 @@ def forgotPassword(request):
             user.save()
             
             send_mail(
-                "Forgot Password",
-                f"Hello {user.fullname},\n\nNew Password: {newPassword}\nPlease change your password when you are login.",
+                "Şifremi Unuttum",
+                f"Merhaba {user.fullname},\n\nYeni Şifreniz: {newPassword}\nLütfen giriş yaptıktan sonra şifrenizi değiştirin.",
                 "forgotpassword@ogretmenim.com",
                 [user.email],
                 fail_silently=False
             )
-            messages.success(request, "Your new password has been send to your email")
+            messages.success(request, "Yeni şifreniz e-posta adresinize gönderildi")
             return redirect("forgotPassword")
         else:
-            messages.error(request, "There is no account")
+            messages.error(request, "Bu e-posta ile kayıtlı hesap bulunamadı")
             return redirect("forgotPassword")
         
     return render(request, "admintemplate/forgot-password.html")
@@ -189,7 +189,6 @@ ADD_ITEMS_TAB_ALIASES = {
     'services': 'services',
     'certificates': 'certificates',
     'works': 'works',
-    'blogs': 'blogs',
 }
 
 
@@ -206,7 +205,6 @@ def _add_items_context(user, active_tab=None, **form_overrides):
         'teacherExperienceForm': TeacherExperienceForm(),
         'teacherServiceForm': TeacherServiceForm(),
         'teacherWorkForm': TeacherWorkForm(),
-        'teacherBlogForm': TeacherBlogForm(),
         'teacherCertificateForm': TeacherCertificateForm(),
     }
     context.update(form_overrides)
@@ -365,7 +363,7 @@ def teacherWorkAccept(request):
         return _redirect_add_items_tab('works')
 
     tab = _add_items_tab_from_post(request, 'works')
-    form = TeacherWorkForm(request.POST, request.FILES)
+    form = TeacherWorkForm(request.POST)
     if form.is_valid():
         work = form.save(commit=False)
         work.custom_user = request.user
@@ -378,28 +376,6 @@ def teacherWorkAccept(request):
         "admintemplate/add-items.html",
         _add_items_context(request.user, active_tab=tab, teacherWorkForm=form),
     )
-    
-@login_required
-def teacherBlogAccept(request):
-    if request.method != "POST":
-        return _redirect_add_items_tab('blogs')
-
-    tab = _add_items_tab_from_post(request, 'blogs')
-    form = TeacherBlogForm(request.POST, request.FILES)
-    if form.is_valid():
-        blog = form.save(commit=False)
-        blog.custom_user = request.user
-        blog.blog_date = date.today()
-        blog.save()
-        messages.success(request, "Blog yazısı kaydedildi.")
-        return _redirect_add_items_tab(tab)
-
-    return render(
-        request,
-        "admintemplate/add-items.html",
-        _add_items_context(request.user, active_tab=tab, teacherBlogForm=form),
-    )
-    
     
 # Listing Area start
 @login_required
@@ -425,10 +401,6 @@ def listingWork(request):
     return render(request, "admintemplate/listing-work.html")
 
 @login_required
-def listingBlog(request):
-    return render(request, "admintemplate/listing-blog.html")
-
-@login_required
 def listingAward(request):
     return render(request, "admintemplate/listing-award.html")
 
@@ -438,18 +410,18 @@ def listingAward(request):
 @login_required
 def updatePassword(request):
     if request.method == "POST":
-        form = PasswordChangeForm(request.user, request.POST)
+        form = TeacherPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = request.user
             form.save()
-            messages.success(request, "Success")
+            messages.success(request, "Şifreniz başarıyla güncellendi")
             login(request, user)
             return redirect("updatePassword")
         else:
-            messages.error(request, "Please check your informations")
+            messages.error(request, "Lütfen bilgilerinizi kontrol edin")
             return redirect("updatePassword")
     else:
-        form = PasswordChangeForm(request.user)
+        form = TeacherPasswordChangeForm(request.user)
         return render(request, "admintemplate/update.html", {'form':form})
 
 @login_required
@@ -528,25 +500,13 @@ def updateService(request, pk):
 def updateWork(request, pk):
     work = UserWorks.objects.filter(id = pk).first()
     if request.method == "POST":
-        form = TeacherWorkForm(request.POST, request.FILES, instance=work)
+        form = TeacherWorkForm(request.POST, instance=work)
         if form.is_valid():
             form.save()
             return redirect("listingWork")
     else:
         form = TeacherWorkForm(instance=work)
         return render(request, "admintemplate/update.html", {'form': form})
-    
-@login_required
-def updateBlog(request, pk):
-    blog = UserBlogs.objects.filter(id = pk).first()
-    if request.method == "POST":
-        form = TeacherBlogForm(request.POST, request.FILES, instance=blog)
-        if form.is_valid():
-            form.save()
-            return redirect("listingBlog")
-    else:
-        form = TeacherBlogForm(instance=blog)
-        return render(request, "admintemplate/update.html", {'form':form})
     
 # Update Area End
 
@@ -583,12 +543,6 @@ def deleteWork(request, pk):
     return redirect("listingWork")
 
 @login_required
-def deleteBlog(request, pk):
-    blog = UserBlogs.objects.filter(id = pk).first()
-    blog.delete()
-    return redirect("listingBlog")
-
-@login_required
 def deleteAward(request, pk):
     award = UserAwards.objects.filter(id = pk).first()
     award.delete()
@@ -613,12 +567,12 @@ def admin_panel_login(request):
                 admin_user = AdminUser.objects.get(username=username)
                 if admin_user.check_password(password):
                     request.session['admin_id'] = admin_user.id
-                    messages.success(request, 'Login successful!')
+                    messages.success(request, 'Giriş başarılı!')
                     return redirect('admin_dashboard')
                 else:
-                    messages.error(request, 'Invalid password!')
+                    messages.error(request, 'Geçersiz şifre!')
             except AdminUser.DoesNotExist:
-                messages.error(request, 'User not found!')
+                messages.error(request, 'Kullanıcı bulunamadı!')
     else:
         form = AdminLoginForm()
     
@@ -627,7 +581,7 @@ def admin_panel_login(request):
 def admin_logout(request):
     if 'admin_id' in request.session:
         del request.session['admin_id']
-        messages.success(request, "Logout successful")
+        messages.success(request, "Çıkış başarılı")
     return redirect('admin_panel_login')
 
 def admin_dashboard(request):
@@ -656,7 +610,6 @@ def admin_user_detail(request, user_id):
     experiences = UserExperience.objects.filter(custom_user=user)
     services = UserServices.objects.filter(custom_user=user)
     works = UserWorks.objects.filter(custom_user=user)
-    blogs = UserBlogs.objects.filter(custom_user=user)
     awards = UserAwards.objects.filter(custom_user=user)
     
     context = {
@@ -666,7 +619,6 @@ def admin_user_detail(request, user_id):
         'experiences': experiences,
         'services': services,
         'works': works,
-        'blogs': blogs,
         'awards': awards
     }
     

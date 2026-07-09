@@ -12,15 +12,15 @@
         <div class="col-md-6" data-aos="zoom-in">
           <div class="about-me-box shadow-box">
             <a class="overlay-link" href="{% url 'about' user.id %}"></a>
-            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
             <div class="img-box">
-              <img src="{{ user.image.url }}" alt="About Me" />
+              <img src="{{ user.image.url }}" alt="Hakkımda" />
             </div>
             <div class="infos">
               <h4>{{ user.get_branch_display }}</h4>
               <h1>{{ user.fullname }}</h1>
               <p>{{ user.get_branch_display }} · {{ user.get_experience_years_display }} · {{ user.get_city_display }}</p>
-              <a href="{% url "about" user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
+              <a href="{% url "about" user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
             </div>
           </div>
         </div>
@@ -29,9 +29,7 @@
           <div class="about-credentials-wrap">
             <div data-aos="zoom-in">
               <div class="banner shadow-box connto-ataturk-banner">
-                <blockquote class="connto-ataturk-banner__quote">
-                  "Öğretmenler! Yeni nesil, cumhuriyetin fedakâr öğretmen ve eğitimcileri, sizler yetiştireceksiniz. Ve yeni nesil, sizin eseriniz olacaktır."
-                </blockquote>
+                <p class="connto-ataturk-banner__quote">"Öğretmenler! yeni nesli, Cumhuriyetin fedakâr öğretmen ve eğitimcilerini, sizler yetiştireceksiniz ve yeni nesil, sizin eseriniz olacaktır."</p>
                 <img src="{% static 'userstatic/assets/images/ataturk-sign.png' %}" alt="Mustafa Kemal Atatürk imzası" class="connto-ataturk-banner__sign" />
               </div>
             </div>
@@ -40,14 +38,14 @@
               <div data-aos="zoom-in">
                 <div class="about-crenditials-box info-box shadow-box h-full">
                   <a class="overlay-link" href="{% url 'credentials' user.id %}"></a>
-                  <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
-                  <img src="{% static 'userstatic/assets/images/sign.png' %}" alt="Sign" />
+                  <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
+                  <img src="{% static 'userstatic/assets/images/sign.png' %}" alt="İmza" />
                   <div class="d-flex align-items-center justify-content-between">
                     <div class="infos">
                       <h1>Hakkımda</h1>
                     </div>
 
-                    <a href="{% url 'credentials' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
+                    <a href="{% url 'credentials' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
                   </div>
                 </div>
               </div>
@@ -55,15 +53,15 @@
               <div data-aos="zoom-in">
                 <div class="about-project-box info-box shadow-box h-full">
                   <a class="overlay-link" href="{% url 'work' user.id %}"></a>
-                  <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
-                  <img src="{% static 'userstatic/assets/images/my-works.png' %}" alt="My Works" />
+                  <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
+                  <img src="{% static 'userstatic/assets/images/my-works.png' %}" alt="Çalışmalarım" />
                   <div class="d-flex align-items-center justify-content-between">
                     <div class="infos">
                       <h4>Ders Materyalleri</h4>
                       <h1>Çalışmalarım</h1>
                     </div>
 
-                    <a href="{% url 'work' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
+                    <a href="{% url 'work' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
                   </div>
                 </div>
               </div>
@@ -75,25 +73,10 @@
       <div class="row mt-24">
         <div class="col-md-12">
           <div class="blog-service-profile-wrap d-flex gap-24">
-            <div data-aos="zoom-in">
-              <div class="about-blog-box info-box shadow-box h-full">
-                <a href="{% url "blog" user.id %}" class="overlay-link"></a>
-                <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
-                <img src="{% static 'userstatic/assets/images/gfonts.png' %}" alt="GFonts" />
-                <div class="d-flex align-items-center justify-content-between">
-                  <div class="infos">
-                    <h1>Eğitim Blogu</h1>
-                  </div>
-
-                  <a href="{% url "blog" user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
-                </div>
-              </div>
-            </div>
-
             <div data-aos="zoom-in" class="flex-1">
               <div class="about-services-box info-box shadow-box h-full">
                 <a href="{% url "services" user.id %}" class="overlay-link"></a>
-                <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+                <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
                 <div class="connto-services-icon" aria-hidden="true">
                   <svg viewBox="0 0 80 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="8" y="10" width="52" height="44" rx="6" stroke="#0c2340" stroke-width="2.5" fill="#eaf2f1"/>
@@ -110,14 +93,14 @@
                     <h1>Verdiğim Dersler</h1>
                   </div>
 
-                  <a href="{% url "services" user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
+                  <a href="{% url "services" user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
                 </div>
               </div>
             </div>
 
             <div data-aos="zoom-in">
               <div class="about-profile-box info-box shadow-box h-full">
-                <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+                <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
                 <div class="inner-profile-icons shadow-box">
                   <a><i class="iconoir-twitter"></i></a>
                   <a><i class="iconoir-linkedin"></i></a>
@@ -128,7 +111,7 @@
                     <h1>Profillerim</h1>
                   </div>
 
-                  <a href="{% url 'contact' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
+                  <a href="{% url 'contact' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
                 </div>
               </div>
             </div>
@@ -139,7 +122,7 @@
       <div class="row mt-24">
         <div class="col-md-6" data-aos="zoom-in">
           <div class="about-client-box info-box shadow-box">
-            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
+            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
             <div class="clients d-flex align-items-start gap-24 justify-content-center">
               <div class="client-item">
                 <h1>{{user.userskills.count}}</h1>
@@ -161,10 +144,10 @@
         <div class="col-md-6" data-aos="zoom-in">
           <div class="about-contact-box info-box shadow-box">
             <a class="overlay-link" href="{% url 'contact' user.id %}"></a>
-            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="BG" class="bg-img" />
-            <img src="{% static 'userstatic/assets/images/icon2.png' %}" alt="Icon" class="star-icon" />
+            <img src="{% static 'userstatic/assets/images/bg1.png' %}" alt="Arka plan" class="bg-img" />
+            <img src="{% static 'userstatic/assets/images/icon2.png' %}" alt="Simge" class="star-icon" />
             <h1>Birlikte<br /><span>çalışalım.</span></h1>
-            <a href="{% url 'contact' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Button" /></a>
+            <a href="{% url 'contact' user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
           </div>
         </div>
       </div>

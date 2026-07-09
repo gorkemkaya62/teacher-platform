@@ -7,10 +7,10 @@ from django.contrib.auth.hashers import make_password, check_password
 
 class CustomUser(AbstractUser):
     fullname = models.CharField(max_length=100, verbose_name="Ad Soyad")
-    twitter = models.CharField(max_length=100, null=True, blank=True)
-    facebook = models.CharField(max_length=100, null=True, blank=True)
-    linkedin = models.CharField(max_length=100, null=True, blank=True)
-    instagram = models.CharField(max_length=100, null=True, blank=True)
+    twitter = models.CharField(max_length=100, null=True, blank=True, verbose_name="Twitter (X)")
+    facebook = models.CharField(max_length=100, null=True, blank=True, verbose_name="Facebook")
+    linkedin = models.CharField(max_length=100, null=True, blank=True, verbose_name="LinkedIn")
+    instagram = models.CharField(max_length=100, null=True, blank=True, verbose_name="Instagram")
     gender = models.CharField(max_length=6, choices=CustomUserChoices.GENDER_CHOICES, verbose_name="Cinsiyet")
     birth_date = models.DateField(verbose_name="Doğum Tarihi")
     phone = models.CharField(max_length=12, null=True, blank=True, verbose_name="Telefon")
@@ -32,7 +32,7 @@ class CustomUser(AbstractUser):
     short_description = models.CharField(max_length=100, null=True, blank=True, verbose_name="Kısa Tanıtım")
     long_description = models.TextField(max_length=500, null=True, blank=True, verbose_name="Biyografi")
     view = models.IntegerField(default=0)
-    image = models.ImageField(upload_to="images/", default="images/default.jpg", null=False, blank=False)
+    image = models.ImageField(upload_to="images/", default="images/default.jpg", null=False, blank=False, verbose_name="Profil Fotoğrafı")
 
     class Meta:
         verbose_name = "Öğretmen"
@@ -127,30 +127,29 @@ class UserServices(models.Model):
     
 class UserWorks(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="userworks")
-    work_title = models.CharField(max_length=100)
-    work_year = models.DateField()
-    work_service = models.CharField(max_length=100)
-    work_name = models.CharField(max_length=100)
-    work_about = models.TextField(max_length=1000)
-    work_description = models.TextField(max_length=1000)
-    work_image1 = models.ImageField(upload_to="images/", default="images/default.jpg")
-    work_image2 = models.ImageField(upload_to="images/", default="images/default.jpg")
-    work_image3 = models.ImageField(upload_to="images/", default="images/default.jpg")
-    work_image4 = models.ImageField(upload_to="images/", default="images/default.jpg")
-    work_image5 = models.ImageField(upload_to="images/", default="images/default.jpg")
-    work_image6 = models.ImageField(upload_to="images/", default="images/default.jpg")
-    
+    publisher_name = models.CharField(max_length=100, verbose_name="Yayınevi Adı")
+    book_name = models.CharField(max_length=100, verbose_name="Kitap Adı")
+    publication_year = models.PositiveSmallIntegerField(verbose_name="Yayın Yılı")
+
+    class Meta:
+        verbose_name = "Ders Materyali"
+        verbose_name_plural = "Ders Materyalleri"
+
     def __str__(self):
-        return self.work_name
+        return self.book_name
     
 class UserBlogs(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="userblogs")
-    blog_title = models.CharField(max_length=100)
-    blog_date = models.DateField()
-    blog_category = models.CharField(max_length=100)
-    blog_content = models.TextField(max_length=5000)
-    blog_image = models.ImageField(upload_to="images/", default="images/default.jpg")
-    blog_view = models.SmallIntegerField(default=0)
+    blog_title = models.CharField(max_length=100, verbose_name="Blog Başlığı")
+    blog_date = models.DateField(verbose_name="Tarih")
+    blog_category = models.CharField(max_length=100, verbose_name="Kategori")
+    blog_content = models.TextField(max_length=5000, verbose_name="İçerik")
+    blog_image = models.ImageField(upload_to="images/", default="images/default.jpg", verbose_name="Görsel")
+    blog_view = models.SmallIntegerField(default=0, verbose_name="Görüntülenme")
+
+    class Meta:
+        verbose_name = "Blog Yazısı"
+        verbose_name_plural = "Blog Yazıları"
     
     def __str__(self):
         return self.blog_title

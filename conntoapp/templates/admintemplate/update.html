@@ -1,83 +1,124 @@
 {% extends 'conntoapp/adminbase/adminpanelbase.html' %}
+
 {% load static %}
 
+
+
 {% block title %}
-  Add Items
+
+  Bilgi Güncelle
+
 {% endblock %}
+
+
 
 {% block content %}
+
   <div class="sb2-2">
+
     <div class="sb2-2-2">
+
       <ul>
+
         <li>
-          <a href="#"><i class="fa fa-home" aria-hidden="true"></i> Home</a>
+
+          <a href="#"><i class="fa fa-home" aria-hidden="true"></i> Ana Sayfa</a>
+
         </li>
+
         <li class="active-bre">
-          <a href="#">Listing Skills</a>
+
+          <a href="#">Bilgi Güncelle</a>
+
         </li>
+
       </ul>
+
     </div>
+
     <div class="sb2-2-3">
+
       <div class="row">
+
         {% if messages %}
+
           <div>
+
             {% for message in messages %}
+
               <p>{{ message }}</p>
+
             {% endfor %}
+
           </div>
+
         {% endif %}
+
         <form method="POST" enctype="multipart/form-data">
+
           {% csrf_token %}
+
           {% for field in form %}
-            {% if field.name|slice:':10' == 'work_image' %}
-              <div class="file-field input-field">
-                <div class="btn">
-                  <span>File</span>
-                  <input type="file" name="{{ field.name }}" />
-                </div>
-                <div class="file-path-wrapper">
-                  <input class="file-path validate" type="text" placeholder="{{ field.value }}" />
-                  <img width="50px" height="50px" src="{{ field.value.url }}" alt="" />
-                </div>
-              </div>
-            {% elif field.name == 'blog_image' %}
-              <div class="file-field input-field">
-                <div class="btn">
-                  <span>File</span>
-                  <input type="file" name="{{ field.name }}" />
-                </div>
-                <div class="file-path-wrapper">
-                  <input class="file-path validate" type="text" placeholder="{{ field.value }}" />
-                  <img width="50px" height="50px" src="{{ field.value.url }}" alt="" />
-                </div>
-              </div>
-            {% else %}
+
               {% if field.name == 'end_date' %}
-              {% elif field.name == 'start_date' %}
-                {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
-                {% if 'is_ongoing' in form.fields %}
-                  <div class="connto-check connto-check--terms edu-ongoing-check">
-                    {{ form.is_ongoing }}
-                    <label for="{{ form.is_ongoing.id_for_label }}" class="connto-check-label">Devam ediyor</label>
-                  </div>
-                  <div id="education-end-date-wrap">
-                    {% include 'admintemplate/includes/panel-form-field.html' with field=form.end_date %}
-                  </div>
+
+                {% if 'is_ongoing' not in form.fields %}
+
+                  {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+
                 {% endif %}
-              {% else %}
+
+              {% elif field.name == 'start_date' %}
+
                 {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+
+                {% if 'is_ongoing' in form.fields %}
+
+                  <div class="connto-check connto-check--terms edu-ongoing-check">
+
+                    {{ form.is_ongoing }}
+
+                    <label for="{{ form.is_ongoing.id_for_label }}" class="connto-check-label">Devam ediyor</label>
+
+                  </div>
+
+                  <div class="edu-ongoing-end-date-wrap">
+
+                    {% include 'admintemplate/includes/panel-form-field.html' with field=form.end_date %}
+
+                  </div>
+
+                {% endif %}
+
+              {% else %}
+
+                {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
+
               {% endif %}
-            {% endif %}
+
           {% endfor %}
+
           <br />
-          <button type="submit" class="btn btn-primary">UPDATE</button>
+
+          <button type="submit" class="btn btn-primary">GÜNCELLE</button>
+
         </form>
+
       </div>
+
     </div>
+
   </div>
+
 {% endblock %}
 
+
+
 {% block js_files %}
+
   <script src="{% static 'adminstatic/js/skill-degree.js' %}"></script>
+
   <script src="{% static 'adminstatic/js/education-ongoing.js' %}"></script>
+
 {% endblock %}
+

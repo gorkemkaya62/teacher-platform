@@ -132,7 +132,7 @@
                                     <td>{{ experience.institution_name }}</td>
                                     <td>{{ experience.department }}</td>
                                     <td>{{ experience.start_date }}</td>
-                                    <td>{{ experience.end_date|default:"-" }}</td>
+                                    <td>{% if experience.end_date %}{{ experience.end_date }}{% else %}Devam ediyor{% endif %}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -171,43 +171,30 @@
 
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5>Çalışmalar</h5>
+                    <h5>Ders Materyalleri</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        {% for work in works %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <img src="{{ work.work_image1.url }}" class="card-img-top" alt="{{ work.work_title }}">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ work.work_title }}</h5>
-                                    <p class="card-text">{{ work.work_about }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Blog Yazıları</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for blog in blogs %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                <img src="{{ blog.blog_image.url }}" class="card-img-top" alt="{{ blog.blog_title }}">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ blog.blog_title }}</h5>
-                                    <p class="card-text">{{ blog.blog_content|truncatewords:30 }}</p>
-                                    <p class="card-text"><small class="text-muted">{{ blog.blog_date }} - {{ blog.blog_view }} görüntülenme</small></p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Yayınevi Adı</th>
+                                    <th>Kitap Adı</th>
+                                    <th>Yayın Yılı</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for work in works %}
+                                <tr>
+                                    <td>{{ work.publisher_name }}</td>
+                                    <td>{{ work.book_name }}</td>
+                                    <td>{{ work.publication_year }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3">Henüz materyal eklenmemiş.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

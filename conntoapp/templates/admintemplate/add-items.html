@@ -31,7 +31,6 @@
         <li><a data-toggle="tab" href="#Services"><i class="fa fa-user"></i><span>Verdiği Dersler</span></a></li>
         <li><a data-toggle="tab" href="#Certificates"><i class="fa fa-trophy"></i><span>Sertifikalar</span></a></li>
         <li><a data-toggle="tab" href="#Works"><i class="fa fa-briefcase"></i><span>Ders Materyalleri</span></a></li>
-        <li><a data-toggle="tab" href="#Blogs"><i class="fa fa-font"></i><span>Blog</span></a></li>
       </ul>
 
       <div class="tab-content">
@@ -106,9 +105,7 @@
               {% csrf_token %}
               <input type="hidden" name="form_source" value="add_items">
               <input type="hidden" name="active_tab" value="experiences">
-              {% for field in teacherExperienceForm %}
-                {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
-              {% endfor %}
+              {% include 'admintemplate/includes/experience-form-fields.html' %}
               <button type="submit" class="btn btn-primary">KAYDET</button>
             </form>
           </div>
@@ -128,39 +125,15 @@
         </div>
 
         <div id="Works" class="tab-pane fade">
-          <div class="inn-title"><h4>Ders Materyalleri</h4><p>Projelerinizi ve materyallerinizi ekleyin.</p></div>
+          <div class="inn-title"><h4>Ders Materyalleri</h4><p>Yayınevi adı, kitap adı ve yayın yılı bilgilerini ekleyin.</p></div>
           <div class="bor">
-            <form method="POST" action="{% url 'teacherWorkAccept' %}" enctype="multipart/form-data">
+            <form method="POST" action="{% url 'teacherWorkAccept' %}">
               {% csrf_token %}
               <input type="hidden" name="form_source" value="add_items">
               <input type="hidden" name="active_tab" value="works">
               {% for field in teacherWorkForm %}
-                {% if 'work_image' not in field.name %}
-                  {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
-                {% endif %}
+                {% include 'admintemplate/includes/panel-form-field.html' with field=field %}
               {% endfor %}
-              <div class="file-field input-field"><div class="btn"><span>Görsel 1</span>{{ teacherWorkForm.work_image1 }}</div></div>
-              <div class="file-field input-field"><div class="btn"><span>Görsel 2</span>{{ teacherWorkForm.work_image2 }}</div></div>
-              <div class="file-field input-field"><div class="btn"><span>Görsel 3</span>{{ teacherWorkForm.work_image3 }}</div></div>
-              <div class="file-field input-field"><div class="btn"><span>Görsel 4</span>{{ teacherWorkForm.work_image4 }}</div></div>
-              <div class="file-field input-field"><div class="btn"><span>Görsel 5</span>{{ teacherWorkForm.work_image5 }}</div></div>
-              <div class="file-field input-field"><div class="btn"><span>Görsel 6</span>{{ teacherWorkForm.work_image6 }}</div></div>
-              <button type="submit" class="btn btn-primary">KAYDET</button>
-            </form>
-          </div>
-        </div>
-
-        <div id="Blogs" class="tab-pane fade">
-          <div class="inn-title"><h4>Blog</h4><p>Eğitim içeriklerinizi paylaşın.</p></div>
-          <div class="bor">
-            <form method="POST" action="{% url 'teacherBlogAccept' %}" enctype="multipart/form-data">
-              {% csrf_token %}
-              <input type="hidden" name="form_source" value="add_items">
-              <input type="hidden" name="active_tab" value="blogs">
-              {% for field in teacherBlogForm %}
-                {% if field.name != 'blog_image' %}<label>{{ field.label }}</label>{{ field }}{% endif %}
-              {% endfor %}
-              <div class="file-field input-field"><div class="btn"><span>Görsel</span>{{ teacherBlogForm.blog_image }}</div></div>
               <button type="submit" class="btn btn-primary">KAYDET</button>
             </form>
           </div>
@@ -201,7 +174,6 @@
         services: '#Services',
         certificates: '#Certificates',
         works: '#Works',
-        blogs: '#Blogs',
       };
       var params = new URLSearchParams(window.location.search);
       var activeTab = params.get('tab') || '{{ active_tab|default:"" }}';

@@ -2,7 +2,7 @@ from django import forms
 from datetime import date
 from .models import (
     CustomUser, UserSkill, UserEducation, UserExperience,
-    UserServices, UserWorks, UserBlogs, UserAwards, CourseCenter, AdminUser,
+    UserServices, UserWorks, UserAwards, CourseCenter, AdminUser,
 )
 from .choices import CustomUserChoices, CustomUserEducationChoices, TeacherChoices
 from .district_data import get_district_choices, is_valid_district
@@ -102,6 +102,13 @@ class TeacherRegisterForm(CityDistrictFormMixin, forms.ModelForm):
         )
         self.fields['birth_date'].widget.attrs['autocomplete'] = 'bday'
         self.fields['birth_date'].widget.attrs['title'] = 'Takvimden doğum tarihi seçin'
+        self.fields['fullname'].label = 'Ad Soyad'
+        self.fields['password'].label = 'Şifre'
+        self.fields['email'].label = 'E-posta'
+        self.fields['gender'].label = 'Cinsiyet'
+        self.fields['birth_date'].label = 'Doğum Tarihi'
+        self.fields['branch'].label = 'Branş'
+        self.fields['city'].label = 'Şehir'
 
 
 class CourseCenterRegisterForm(forms.ModelForm):
@@ -307,6 +314,12 @@ class TeacherEducationForm(forms.ModelForm):
 
 
 class TeacherExperienceForm(forms.ModelForm):
+    is_ongoing = forms.BooleanField(
+        required=False,
+        label='',
+        widget=forms.CheckboxInput(attrs={'class': 'edu-ongoing-checkbox'}),
+    )
+
     class Meta:
         model = UserExperience
         fields = ['institution_name', 'department', 'start_date', 'end_date', 'short_description']
@@ -323,6 +336,22 @@ class TeacherExperienceForm(forms.ModelForm):
         today = date.today()
         configure_calendar_date_field(self.fields['start_date'], max_date=today, required=True)
         configure_calendar_date_field(self.fields['end_date'], max_date=today, required=False)
+        if self.instance.pk and not self.instance.end_date:
+            self.fields['is_ongoing'].initial = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('is_ongoing'):
+            cleaned_data['end_date'] = None
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.cleaned_data.get('is_ongoing'):
+            instance.end_date = None
+        if commit:
+            instance.save()
+        return instance
 
 
 class TeacherServiceForm(forms.ModelForm):
@@ -336,44 +365,46 @@ class TeacherServiceForm(forms.ModelForm):
 
 
 class TeacherWorkForm(forms.ModelForm):
+    publication_year = forms.TypedChoiceField(
+        label='Yayın Yılı',
+        choices=[],
+        coerce=int,
+        empty_value=None,
+        widget=forms.Select(attrs={
+            'required': True,
+            'class': 'browser-default connto-panel-select',
+        }),
+    )
+
     class Meta:
         model = UserWorks
-        fields = [
-            'work_title', 'work_year', 'work_service', 'work_name',
-            'work_about', 'work_description',
-            'work_image1', 'work_image2', 'work_image3',
-            'work_image4', 'work_image5', 'work_image6',
-        ]
+        fields = ['publisher_name', 'book_name', 'publication_year']
         widgets = {
-            'work_title': forms.TextInput(attrs={'required': True}),
-            'work_year': calendar_date_widget(required=True),
-            'work_service': forms.TextInput(attrs={'required': True}),
-            'work_name': forms.TextInput(attrs={'required': True}),
-            'work_about': forms.Textarea(attrs={'required': True}),
-            'work_description': forms.Textarea(attrs={'required': True}),
-            'work_image1': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
-            'work_image2': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
-            'work_image3': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
-            'work_image4': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
-            'work_image5': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
-            'work_image6': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
+            'publisher_name': forms.TextInput(attrs={
+                'required': True,
+                'placeholder': 'Yayınevi adı',
+            }),
+            'book_name': forms.TextInput(attrs={
+                'required': True,
+                'placeholder': 'Kitap adı',
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        configure_calendar_date_field(self.fields['work_year'], max_date=date.today(), required=True)
+        current_year = date.today().year
+        self.fields['publication_year'].choices = [
+            ('', 'Seçiniz'),
+            *[(str(year), str(year)) for year in range(current_year, current_year - 100, -1)],
+        ]
+        if self.instance.pk and self.instance.publication_year:
+            self.fields['publication_year'].initial = str(self.instance.publication_year)
 
-
-class TeacherBlogForm(forms.ModelForm):
-    class Meta:
-        model = UserBlogs
-        fields = ['blog_title', 'blog_category', 'blog_content', 'blog_image']
-        widgets = {
-            'blog_title': forms.TextInput(attrs={'required': True}),
-            'blog_category': forms.TextInput(attrs={'required': True}),
-            'blog_content': forms.Textarea(attrs={'required': True}),
-            'blog_image': forms.FileInput(attrs={'required': True, 'accept': 'image/*'}),
-        }
+    def clean_publication_year(self):
+        value = self.cleaned_data.get('publication_year')
+        if value in (None, ''):
+            raise forms.ValidationError('Yayın yılı seçiniz.')
+        return int(value)
 
 
 class TeacherCertificateForm(forms.ModelForm):
@@ -395,22 +426,23 @@ class TeacherCertificateForm(forms.ModelForm):
 
 
 class TeacherPasswordChangeForm(PasswordChangeForm):
-    class Meta:
-        model = CustomUser
-        fields = ['old_password', 'new_password1', 'new_password2']
-        widgets = {
-            'old_password': forms.PasswordInput(attrs={'type': 'password', 'required': True}),
-            'new_password1': forms.PasswordInput(attrs={'type': 'password', 'required': True}),
-            'new_password2': forms.PasswordInput(attrs={'type': 'password', 'required': True}),
-        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['old_password'].label = 'Mevcut Şifre'
+        self.fields['new_password1'].label = 'Yeni Şifre'
+        self.fields['new_password2'].label = 'Yeni Şifre (Tekrar)'
 
 
 class AdminLoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={
+    username = forms.CharField(
+        label='Kullanıcı Adı',
+        widget=forms.TextInput(attrs={
         'class': 'form-control',
         'placeholder': 'Kullanıcı adınızı girin',
     }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
+    password = forms.CharField(
+        label='Şifre',
+        widget=forms.PasswordInput(attrs={
         'class': 'form-control',
         'placeholder': 'Şifrenizi girin',
     }))

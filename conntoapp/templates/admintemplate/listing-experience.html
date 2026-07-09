@@ -44,7 +44,7 @@
                         <td>{{ experience.institution_name }}</td>
                         <td>{{ experience.department }}</td>
                         <td>{{ experience.start_date }}</td>
-                        <td>{{ experience.end_date }}</td>
+                        <td>{% if experience.end_date %}{{ experience.end_date }}{% else %}Devam ediyor{% endif %}</td>
                         <td>{{ experience.short_description }}</td>
                         <td><a href="{% url 'updateExperience' experience.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
                         <td><a href="#" onclick="confirmDelete('{% url 'deleteExperience' experience.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>

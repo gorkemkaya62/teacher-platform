@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="{% static 'homestatic/assets/css/external.css' %}" rel="stylesheet" />
     <link href="{% static 'homestatic/assets/css/bootstrap.min.css' %}" rel="stylesheet" />
-    <link href="{% static 'edu-theme.css' %}?v=20" rel="stylesheet" />
+    <link href="{% static 'edu-theme.css' %}?v=27" rel="stylesheet" />
     {% block css_files %}{% endblock css_files %}
     <title>{% block title %}{{ SITE_NAME }}{% endblock title %}</title>
   </head>
@@ -42,7 +42,6 @@
               <a href="{% url 'adminlogout' %}" class="connto-btn connto-btn--outline connto-btn--sm">Çıkış</a>
             {% else %}
               <a href="{% url 'login' %}" class="connto-btn connto-btn--outline connto-btn--sm">Giriş</a>
-              <a href="{% url 'register' %}" class="connto-btn connto-btn--primary connto-btn--sm">Üye Ol</a>
             {% endif %}
           </div>
 
@@ -63,16 +62,6 @@
       <main class="connto-main">
         {% block content %}{% endblock content %}
       </main>
-
-      {% block show_cta %}
-      <section class="connto-cta">
-        <div class="container text-center">
-          <h3>Öğretmen profilinizi oluşturun</h3>
-          <p>Kurs merkezleri sizi kolayca bulsun — kayıt ücretsiz.</p>
-          <a href="{% url 'register' %}" class="connto-btn connto-btn--primary connto-btn--lg">Hemen Kayıt Ol</a>
-        </div>
-      </section>
-      {% endblock %}
 
       <footer class="connto-footer">
         <div class="container">

@@ -27,7 +27,6 @@ urlpatterns = [
     path('add-teacher-experience', views.teacherExperienceAccept, name="teacherExperienceAccept"),
     path('add-teacher-service', views.teacherServiceAccept, name="teacherServiceAccept"),
     path('add-teacher-work', views.teacherWorkAccept, name="teacherWorkAccept"),
-    path('add-teacher-blog', views.teacherBlogAccept, name="teacherBlogAccept"),
     path('add-teacher-certificate', views.teacherCertificateAccept, name="teacherCertificateAccept"),
 
     # Listing Area
@@ -36,7 +35,6 @@ urlpatterns = [
     path('listing-experience', views.listingExperience, name="listingExperience"),
     path('listing-service', views.listingService, name="listingService"),
     path('listing-work', views.listingWork, name="listingWork"),
-    path('listing-blog', views.listingBlog, name="listingBlog"),
     path('listing-award', views.listingAward, name="listingAward"),
 
     # Update Area
@@ -45,7 +43,6 @@ urlpatterns = [
     path('updateExperience/<int:pk>', views.updateExperience, name="updateExperience"),
     path('updateService/<int:pk>', views.updateService, name="updateService"),
     path('updateWork/<int:pk>', views.updateWork, name="updateWork"),
-    path('updateBlog/<int:pk>', views.updateBlog, name="updateBlog"),
     path('updateAward/<int:pk>', views.updateAward, name="updateAward"),
 
     # Delete Area
@@ -54,6 +51,5 @@ urlpatterns = [
     path('deleteExperience/<int:pk>', views.deleteExperience, name="deleteExperience"),
     path('deleteService/<int:pk>', views.deleteService, name="deleteService"),
     path('deleteWork/<int:pk>', views.deleteWork, name="deleteWork"),
-    path('deleteBlog/<int:pk>', views.deleteBlog, name="deleteBlog"),
     path('deleteAward/<int:pk>', views.deleteAward, name="deleteAward"),
 ]

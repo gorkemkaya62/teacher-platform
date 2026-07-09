@@ -1,4 +1,4 @@
-{% for field in teacherEducationForm %}
+{% for field in teacherExperienceForm %}
 
   {% if field.name == 'end_date' %}
 
@@ -8,15 +8,15 @@
 
     <div class="connto-check connto-check--terms edu-ongoing-check">
 
-      {{ teacherEducationForm.is_ongoing }}
+      {{ teacherExperienceForm.is_ongoing }}
 
-      <label for="{{ teacherEducationForm.is_ongoing.id_for_label }}" class="connto-check-label">Devam ediyor</label>
+      <label for="{{ teacherExperienceForm.is_ongoing.id_for_label }}" class="connto-check-label">Devam ediyor</label>
 
     </div>
 
     <div class="edu-ongoing-end-date-wrap">
 
-      {% include 'admintemplate/includes/panel-form-field.html' with field=teacherEducationForm.end_date %}
+      {% include 'admintemplate/includes/panel-form-field.html' with field=teacherExperienceForm.end_date %}
 
     </div>
 

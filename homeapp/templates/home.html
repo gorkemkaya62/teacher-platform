@@ -6,13 +6,16 @@
 {% block content %}
   <section class="connto-hero-banner">
     <div class="container">
-      <div class="row">
-        <div class="col-md-7">
+      <div class="row connto-hero-row">
+        <div class="col-md-7 connto-hero-copy">
           <p class="connto-eyebrow">Kurs Merkezleri & Öğretmenler</p>
-          <h1>Doğru öğretmeni<br>birkaç tıkla bulun</h1>
+          <h1>Doğru öğretmeni birkaç tıkla bulun</h1>
           <p class="connto-lead">Branş, deneyim ve konuma göre filtreleyin; profilleri karşılaştırın ve iletişime geçin.</p>
+          <div class="connto-hero-banner__visual">
+            <img src="{% static 'edu-images/hero-illustration.png' %}" alt="Öğretmen arama süreci illüstrasyonu" class="connto-hero-illustration" />
+          </div>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-5 connto-hero-search-col">
           <div class="connto-card connto-search-panel">
             <h2>Öğretmen Ara</h2>
             <form method="GET" action="{% url 'search' %}">
@@ -65,37 +68,18 @@
     </div>
   </section>
 
-  <section class="connto-section">
+  <section class="connto-section connto-section--branches">
     <div class="container">
       <h2 class="connto-section__title">Popüler Branşlar</h2>
-      <div class="row">
-        {% for service in most_searched_services %}
+      <div class="row connto-branch-grid">
+        {% for branch in popular_branches %}
           <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col">
-            <div class="connto-chip-card"><i class="fa fa-book"></i><span>{{ service.service_name }}</span></div>
+            <a href="{% url 'search' %}?branch={{ branch.value }}" class="connto-chip-card">
+              <i class="fa fa-book"></i>
+              <span>{{ branch.label }}</span>
+            </a>
           </div>
-        {% empty %}
-          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-calculator"></i><span>Matematik</span></div></div>
-          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-language"></i><span>İngilizce</span></div></div>
-          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-flask"></i><span>Fen</span></div></div>
-          <div class="col-xs-6 col-sm-4 col-md-2 connto-branch-col"><div class="connto-chip-card"><i class="fa fa-pencil"></i><span>Türkçe</span></div></div>
         {% endfor %}
-      </div>
-    </div>
-  </section>
-
-  <section class="connto-section connto-section--muted">
-    <div class="container">
-      <h2 class="connto-section__title">Nasıl Çalışır?</h2>
-      <div class="row">
-        <div class="col-sm-4">
-          <div class="connto-step-card"><span class="connto-step-card__num">1</span><h3>Ara & Filtrele</h3><p>Branş ve konuma göre öğretmenleri listeleyin.</p></div>
-        </div>
-        <div class="col-sm-4">
-          <div class="connto-step-card"><span class="connto-step-card__num">2</span><h3>Profili İncele</h3><p>Eğitim, sertifika ve deneyim bilgilerini görün.</p></div>
-        </div>
-        <div class="col-sm-4">
-          <div class="connto-step-card"><span class="connto-step-card__num">3</span><h3>İletişime Geç</h3><p>Size uygun öğretmenle doğrudan iletişim kurun.</p></div>
-        </div>
       </div>
     </div>
   </section>

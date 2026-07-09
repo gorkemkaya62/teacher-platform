@@ -27,11 +27,9 @@
                 <table class="table table-hover">
                   <thead>
                     <tr>
-                      <th>Görsel</th>
-                      <th>Ad</th>
-                      <th>Başlık</th>
-                      <th>Ders</th>
-                      <th>Yıl</th>
+                      <th>Yayınevi Adı</th>
+                      <th>Kitap Adı</th>
+                      <th>Yayın Yılı</th>
                       <th>Düzenle</th>
                       <th>Sil</th>
                     </tr>
@@ -39,16 +37,14 @@
                   <tbody>
                     {% for work in user.userworks.all %}
                       <tr>
-                        <td><span class="list-img"><img src="{{ work.work_image1.url }}" alt="" /></span></td>
-                        <td><span class="list-enq-name">{{ work.work_name }}</span></td>
-                        <td>{{ work.work_title }}</td>
-                        <td>{{ work.work_service }}</td>
-                        <td>{{ work.work_year|date:'Y' }}</td>
+                        <td>{{ work.publisher_name }}</td>
+                        <td>{{ work.book_name }}</td>
+                        <td>{{ work.publication_year }}</td>
                         <td><a href="{% url 'updateWork' work.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
                         <td><a href="#" onclick="confirmDelete('{% url 'deleteWork' work.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
                       </tr>
                     {% empty %}
-                      <tr><td colspan="7">Henüz materyal eklenmemiş.</td></tr>
+                      <tr><td colspan="5">Henüz materyal eklenmemiş.</td></tr>
                     {% endfor %}
                   </tbody>
                 </table>

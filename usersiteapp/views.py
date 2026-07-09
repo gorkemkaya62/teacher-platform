@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from conntoapp.models import CustomUser, UserWorks, UserBlogs
+from conntoapp.models import CustomUser, UserWorks
 from django.urls import reverse
 
 # Create your views here.
@@ -29,28 +29,13 @@ def work(request, pk):
     user = getUser(pk)
     return render(request, "works.html", {'user':user})
 
-def workDetails(request, pk, workName):
+def workDetails(request, pk, workId):
     user = getUser(pk)
-    work = UserWorks.objects.filter(work_name = workName).first()
-    return render(request, "work-detail.html", {'user':user, 'work':work})
-
-def blog(request, pk):
-    user = getUser(pk)
-    mostViewBlogs = user.userblogs.all().order_by('-blog_view')[:5]
-    return render(request, "blog.html", {'user':user, 'mostViewBlogs':mostViewBlogs})
-
-def blogDetails(request, pk, blogId):
-    user = getUser(pk)
-    blog = UserBlogs.objects.filter(id = blogId).first()
-    blog.blog_view = blog.blog_view + 1
-    blog.save()
-    mostViewBlogs = user.userblogs.all().order_by('-blog_view')[:5]
-
-    return render(request, "blog-detail.html", {'user':user ,'blog':blog, 'mostViewBlogs':mostViewBlogs})
+    work = get_object_or_404(UserWorks, id=workId, custom_user=user)
+    return render(request, "work-detail.html", {'user': user, 'work': work})
 
 
 def getUser(pk):
     user = CustomUser.objects.filter(id = pk).first()
     return user
 
-    

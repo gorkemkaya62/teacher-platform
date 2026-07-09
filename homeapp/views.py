@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from conntoapp.models import CustomUser, UserServices
+from conntoapp.models import CustomUser
 from django.db.models import Q
 from django.contrib import messages
 from conntoapp.choices import TeacherChoices, CustomUserChoices
@@ -7,17 +7,21 @@ from conntoapp.choices import TeacherChoices, CustomUserChoices
 # Create your views here.
 
 def home(request):
-    most_searched_services = (
-        UserServices.objects.values("service_name")
-        .distinct()
-        .order_by("-service_search_count")[:6]
-    )
+    popular_branch_keys = [
+        'bilgisayar', 'matematik', 'ingilizce', 'turkce', 'fizik', 'kimya',
+    ]
+    branch_map = dict(TeacherChoices.BRANCH_CHOICES)
+    popular_branches = [
+        {'value': key, 'label': branch_map[key]}
+        for key in popular_branch_keys
+        if key in branch_map
+    ]
     context = {
         'branches': TeacherChoices.BRANCH_CHOICES,
         'experiences': TeacherChoices.EXPERIENCE_CHOICES,
         'cities': CustomUserChoices.TURKISH_CITIES,
         'genders': CustomUserChoices.GENDER_CHOICES,
-        'most_searched_services': most_searched_services,
+        'popular_branches': popular_branches,
         'selected_branch': request.GET.get('branch', ''),
         'selected_experience': request.GET.get('experience', ''),
         'selected_city': request.GET.get('city', ''),
