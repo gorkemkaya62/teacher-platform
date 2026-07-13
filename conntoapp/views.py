@@ -15,11 +15,13 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.views.decorators.csrf import ensure_csrf_cookie
 from datetime import date
 import string
 import random
 from django.core.mail import send_mail
 from .district_data import get_district_choices
+from .user_presence import get_active_user_snapshot
 
 
 
@@ -136,10 +138,15 @@ def district_choices_api(request):
 
 def adminlogout(request):
     if 'course_center_id' in request.session:
+        course_center_id = request.session.get('course_center_id')
+        if course_center_id:
+            CourseCenter.objects.filter(pk=course_center_id).update(last_seen=None)
         del request.session['course_center_id']
         del request.session['is_course_center']
         messages.success(request, "Kurs merkezi hesabından çıkış yapıldı")
     else:
+        if request.user.is_authenticated:
+            CustomUser.objects.filter(pk=request.user.pk).update(last_seen=None)
         logout(request)
         messages.success(request, "Başarıyla çıkış yapıldı")
     return redirect("login")
@@ -552,10 +559,13 @@ def deleteAward(request, pk):
 
 @login_required
 def loginout(request):
+    if request.user.is_authenticated:
+        CustomUser.objects.filter(pk=request.user.pk).update(last_seen=None)
     logout(request)
     messages.success(request, "Başarıyla çıkış yapıldı")
     return redirect("login")
 
+@ensure_csrf_cookie
 def admin_panel_login(request):
     if request.method == 'POST':
         form = AdminLoginForm(request.POST)
@@ -590,15 +600,30 @@ def admin_dashboard(request):
         
     users = CustomUser.objects.all()
     course_centers = CourseCenter.objects.all()
+    presence = get_active_user_snapshot()
 
     context = {
         'users': users,
         'course_centers': course_centers,
         'total_users': users.count(),
         'total_course_centers': course_centers.count(),
+        'active_teachers': presence['active_teachers'],
+        'active_course_centers': presence['active_course_centers'],
+        'active_teacher_ids': {int(user_id) for user_id in presence['teachers']},
+        'active_course_center_ids': {
+            int(course_center_id)
+            for course_center_id in presence['course_centers']
+        },
     }
     
     return render(request, "admintemplate/admin-dashboard.html", context)
+
+
+def admin_active_users_api(request):
+    if 'admin_id' not in request.session:
+        return JsonResponse({'error': 'unauthorized'}, status=403)
+
+    return JsonResponse(get_active_user_snapshot())
 
 def admin_user_detail(request, user_id):
     if 'admin_id' not in request.session:

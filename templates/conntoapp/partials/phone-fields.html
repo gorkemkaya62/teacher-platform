@@ -1,0 +1,23 @@
+<div class="connto-field connto-field--phone">
+  <label for="{{ number_field.id_for_label }}">{{ number_field.label }}</label>
+  <div class="connto-phone-field__row">
+    <div class="connto-phone-field__code">
+      <span class="connto-phone-field__code-label" aria-hidden="true">Ülke Kodu</span>
+      {{ code_field }}
+    </div>
+    <div class="connto-phone-field__number">
+      {{ number_field }}
+    </div>
+  </div>
+  {% if code_field.errors %}
+    {% for error in code_field.errors %}
+      <p class="connto-field__error">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+  {% if number_field.errors %}
+    {% for error in number_field.errors %}
+      <p class="connto-field__error">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+  <p class="connto-phone-field__hint">Numarayı başında 0 olmadan girin.</p>
+</div>

@@ -12,9 +12,9 @@ def _load_districts():
 
 def get_district_choices(city_slug):
     if not city_slug:
-        return [("", "Önce şehir seçin")]
+        return [("", "Seçiniz")]
     districts = _load_districts().get(city_slug, [])
-    return [("", "İlçe seçin")] + districts
+    return [("", "Seçiniz")] + districts
 
 
 def get_district_label(city_slug, district_slug):

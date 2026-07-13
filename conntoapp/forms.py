@@ -6,6 +6,15 @@ from .models import (
 )
 from .choices import CustomUserChoices, CustomUserEducationChoices, TeacherChoices
 from .district_data import get_district_choices, is_valid_district
+from .image_utils import normalize_profile_image
+from .phone_data import (
+    COUNTRY_DIAL_CODE_CHOICES,
+    DEFAULT_COUNTRY_CODE,
+    format_international_phone,
+    split_international_phone,
+    validate_national_number,
+)
+from .widgets import PhoneCountryCodeWidget
 from django.contrib.auth.forms import PasswordChangeForm
 
 
@@ -47,18 +56,30 @@ class CityDistrictFormMixin:
         return None
 
     def _configure_district_field(self):
+        city = self._selected_city()
+        initial_district = ""
+        if self.data.get("district"):
+            initial_district = self.data.get("district")
+        elif self.instance and getattr(self.instance, "pk", None) and self.instance.district:
+            initial_district = self.instance.district
+
+        district_attrs = {
+            "required": True,
+            "id": "id_district",
+            "class": "browser-default city-district-select",
+            "data-selected-district": initial_district,
+        }
+        if not city:
+            district_attrs["disabled"] = "disabled"
+
         self.fields["district"] = forms.ChoiceField(
-            choices=get_district_choices(self._selected_city()),
+            choices=get_district_choices(city),
             required=True,
             label="İlçe",
-            widget=forms.Select(attrs={
-                "required": True,
-                "id": "id_district",
-                "class": "browser-default city-district-select",
-            }),
+            widget=forms.Select(attrs=district_attrs),
         )
-        if self.instance and getattr(self.instance, "pk", None) and self.instance.district:
-            self.fields["district"].initial = self.instance.district
+        if initial_district:
+            self.fields["district"].initial = initial_district
 
     def clean(self):
         cleaned_data = super().clean()
@@ -69,9 +90,75 @@ class CityDistrictFormMixin:
         return cleaned_data
 
 
+class PhoneNumberFormMixin:
+    def _inject_phone_fields(self, *, required=True):
+        self.fields['phone_country_code'] = forms.ChoiceField(
+            choices=COUNTRY_DIAL_CODE_CHOICES,
+            initial=DEFAULT_COUNTRY_CODE,
+            label='Ülke Kodu',
+            widget=PhoneCountryCodeWidget(attrs={
+                'class': 'connto-phone-code-native browser-default',
+                'aria-label': 'Ülke kodu',
+            }),
+        )
+        self.fields['phone_number'] = forms.CharField(
+            label='Telefon',
+            max_length=15,
+            widget=forms.TextInput(attrs={
+                'type': 'tel',
+                'inputmode': 'numeric',
+                'autocomplete': 'tel-national',
+                'class': 'connto-phone-number',
+                'placeholder': '5XX XXX XX XX',
+                'pattern': '[1-9][0-9]*',
+                'title': 'Telefon numarasını başında 0 olmadan girin',
+            }),
+        )
+        self._configure_phone_fields(required=required)
+
+    def _configure_phone_fields(self, *, required=True, stored_phone=None):
+        if stored_phone is None:
+            if getattr(self.instance, 'pk', None):
+                stored_phone = getattr(self.instance, 'phone', None)
+            elif self.initial.get('phone'):
+                stored_phone = self.initial.get('phone')
+
+        code, number = split_international_phone(stored_phone)
+        self.fields['phone_country_code'].initial = code
+        self.fields['phone_number'].initial = number
+        self.fields['phone_country_code'].label = ''
+        self._phone_required = required
+
+        if required:
+            self.fields['phone_number'].required = True
+            self.fields['phone_country_code'].required = True
+            self.fields['phone_number'].widget.attrs['required'] = True
+            self.fields['phone_country_code'].widget.attrs['required'] = True
+        else:
+            self.fields['phone_number'].required = False
+            self.fields['phone_number'].widget.attrs.pop('required', None)
+
+    def clean_phone_number(self):
+        value = self.cleaned_data.get('phone_number', '')
+        required = getattr(self, '_phone_required', True)
+        try:
+            return validate_national_number(value, required=required)
+        except ValueError as exc:
+            raise forms.ValidationError(str(exc)) from exc
+
+    def get_formatted_phone(self):
+        national_number = self.cleaned_data.get('phone_number', '')
+        if not national_number:
+            return ''
+        return format_international_phone(
+            self.cleaned_data.get('phone_country_code'),
+            national_number,
+        )
+
+
 # Öğretmen Kayıt / Giriş Formları
 
-class TeacherRegisterForm(CityDistrictFormMixin, forms.ModelForm):
+class TeacherRegisterForm(PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ["fullname", "password", "email", "gender", "birth_date", "branch", "city", "district"]
@@ -93,6 +180,7 @@ class TeacherRegisterForm(CityDistrictFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._configure_district_field()
+        self._inject_phone_fields(required=True)
         today = date.today()
         configure_calendar_date_field(
             self.fields['birth_date'],
@@ -109,6 +197,13 @@ class TeacherRegisterForm(CityDistrictFormMixin, forms.ModelForm):
         self.fields['birth_date'].label = 'Doğum Tarihi'
         self.fields['branch'].label = 'Branş'
         self.fields['city'].label = 'Şehir'
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.phone = self.get_formatted_phone()
+        if commit:
+            user.save()
+        return user
 
 
 class CourseCenterRegisterForm(forms.ModelForm):
@@ -167,12 +262,12 @@ class TeacherLoginForm(forms.Form):
 
 # Öğretmen Profil Formları
 
-class TeacherProfileForm(CityDistrictFormMixin, forms.ModelForm):
+class TeacherProfileForm(PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = [
             "branch", "experience_years", "city", "district", "gender",
-            "twitter", "instagram", "linkedin", "facebook", "phone",
+            "twitter", "instagram", "linkedin", "facebook",
             "short_description", "long_description", "image",
         ]
         widgets = {
@@ -190,13 +285,23 @@ class TeacherProfileForm(CityDistrictFormMixin, forms.ModelForm):
             'facebook': forms.TextInput(attrs={'required': False}),
             'short_description': forms.TextInput(attrs={'required': True, 'placeholder': 'Kısa tanıtım'}),
             'long_description': forms.Textarea(attrs={'required': True, 'placeholder': 'Biyografi ve eğitim özeti'}),
-            'phone': forms.NumberInput(attrs={'type': 'number'}),
             'image': forms.FileInput(attrs={"accept": "image/*"}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._configure_district_field()
+        self._inject_phone_fields(required=False)
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.phone = self.get_formatted_phone() or None
+        image = self.files.get('image')
+        if image is not None:
+            user.image = normalize_profile_image(image)
+        if commit:
+            user.save()
+        return user
 
 
 class TeacherSkillForm(forms.ModelForm):
@@ -287,11 +392,12 @@ class TeacherEducationForm(forms.ModelForm):
             ),
             'start_date': calendar_date_widget(required=True),
             'end_date': calendar_date_widget(required=False),
-            'short_description': forms.Textarea(attrs={'required': True}),
+            'short_description': forms.Textarea(attrs={'placeholder': 'İsteğe bağlı'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['short_description'].required = False
         today = date.today()
         configure_calendar_date_field(self.fields['start_date'], max_date=today, required=True)
         configure_calendar_date_field(self.fields['end_date'], max_date=today, required=False)

@@ -1,0 +1,120 @@
+{% extends 'conntoapp/homebase/homebase.html' %}
+
+{% block title %}Kurs Merkezi Profilim — {{ SITE_NAME }}{% endblock %}
+
+{% block content %}
+<section class="connto-page-head">
+  <div class="container">
+    <h1>Kurs Merkezi Profilim</h1>
+    <p>Üyelik bilgileriniz ve profil fotoğrafınız</p>
+  </div>
+</section>
+
+<section class="connto-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+        {% if messages %}
+          {% for message in messages %}
+            <p class="connto-alert{% if message.tags == 'success' %} connto-alert--success{% endif %}">{{ message }}</p>
+          {% endfor %}
+        {% endif %}
+
+        <div class="connto-card connto-course-center-profile">
+          <form
+            method="POST"
+            enctype="multipart/form-data"
+            id="course-center-photo-form"
+            class="connto-course-center-profile__photo-form"
+          >
+            {% csrf_token %}
+            <input
+              type="file"
+              name="image"
+              id="course-center-image"
+              accept="image/*"
+              class="connto-profile-photo-input"
+              hidden
+            />
+          </form>
+
+          <div class="connto-course-center-profile__header">
+            <button
+              type="button"
+              class="connto-profile-photo-edit"
+              id="course-center-photo-trigger"
+              aria-label="Profil fotoğrafını değiştir"
+              title="Profil fotoğrafını değiştir"
+            >
+              {% if course_center.has_custom_image %}
+                <img
+                  class="connto-course-center-profile__photo"
+                  src="{{ course_center.image.url }}"
+                  alt="{{ course_center.center_name }}"
+                />
+              {% else %}
+                <span class="connto-course-center-profile__avatar" aria-hidden="true">
+                  {{ course_center.center_name|slice:":1"|upper }}
+                </span>
+              {% endif %}
+              <span class="connto-profile-photo-edit__overlay" aria-hidden="true">
+                <i class="fa fa-pencil"></i>
+              </span>
+            </button>
+            <div>
+              <h2>{{ course_center.center_name }}</h2>
+              <p>{{ course_center.center_type }}</p>
+            </div>
+          </div>
+
+          <dl class="connto-profile-details">
+            <div class="connto-profile-details__row">
+              <dt>Kurs Merkezi Adı</dt>
+              <dd>{{ course_center.center_name }}</dd>
+            </div>
+            <div class="connto-profile-details__row">
+              <dt>Kurs Türü</dt>
+              <dd>{{ course_center.center_type }}</dd>
+            </div>
+            <div class="connto-profile-details__row">
+              <dt>Öğretmen Kapasitesi</dt>
+              <dd>{{ course_center.teacher_capacity }}</dd>
+            </div>
+            <div class="connto-profile-details__row">
+              <dt>E-posta</dt>
+              <dd>{{ course_center.email }}</dd>
+            </div>
+          </dl>
+
+          <div class="connto-course-center-profile__actions">
+            <a href="{% url 'home' %}" class="connto-btn connto-btn--outline">Ana Sayfaya Dön</a>
+            <a href="{% url 'search' %}" class="connto-btn connto-btn--primary">Öğretmen Ara</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block js_files %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var trigger = document.getElementById('course-center-photo-trigger');
+  var input = document.getElementById('course-center-image');
+  var form = document.getElementById('course-center-photo-form');
+
+  if (!trigger || !input || !form) return;
+
+  trigger.addEventListener('click', function () {
+    input.click();
+  });
+
+  input.addEventListener('change', function () {
+    if (input.files && input.files.length > 0) {
+      form.submit();
+    }
+  });
+});
+</script>
+{% endblock %}

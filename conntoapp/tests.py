@@ -1,7 +1,8 @@
-from datetime import date
+from datetime import date, timedelta
 from django.test import TestCase, Client
 from django.urls import reverse, NoReverseMatch
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from conntoapp.models import (
     CourseCenter, AdminUser, UserSkill, UserEducation,
     UserExperience, UserServices, UserAwards,
@@ -104,6 +105,55 @@ class CourseCenterAuthTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(CourseCenter.objects.filter(email='yeni@kurs.com').exists())
 
+    def test_course_center_profile_requires_login(self):
+        response = self.client.get(reverse('course_center_profile'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_course_center_profile_shows_registration_info(self):
+        session = self.client.session
+        session['course_center_id'] = self.cc.id
+        session['is_course_center'] = True
+        session.save()
+
+        response = self.client.get(reverse('course_center_profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test Kurs')
+        self.assertContains(response, 'Dil Kursu')
+        self.assertContains(response, '10')
+        self.assertContains(response, 'kurs@test.com')
+        self.assertContains(response, 'course-center-photo-trigger')
+        self.assertContains(response, 'fa-pencil')
+        self.assertNotContains(response, 'Fotoğrafı Güncelle')
+        self.assertNotContains(response, 'sifre')
+
+    def test_course_center_profile_upload_photo(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from PIL import Image
+        import io
+
+        session = self.client.session
+        session['course_center_id'] = self.cc.id
+        session['is_course_center'] = True
+        session.save()
+
+        image_io = io.BytesIO()
+        Image.new('RGB', (120, 120), color='teal').save(image_io, format='JPEG')
+        image_io.seek(0)
+        upload = SimpleUploadedFile(
+            'profile.jpg',
+            image_io.read(),
+            content_type='image/jpeg',
+        )
+
+        response = self.client.post(
+            reverse('course_center_profile'),
+            {'image': upload},
+        )
+        self.assertRedirects(response, reverse('course_center_profile'))
+
+        self.cc.refresh_from_db()
+        self.assertTrue(self.cc.has_custom_image)
+
 
 class TeacherSearchTests(TestCase):
     def setUp(self):
@@ -111,28 +161,83 @@ class TeacherSearchTests(TestCase):
         User.objects.create_user(
             username='m1@test.com', email='m1@test.com', password='p',
             fullname='Matematik Öğretmen', gender='MALE', birth_date=date(1985, 5, 5),
-            branch='matematik', experience_years='5-10', city='ankara',
+            branch='matematik', experience_years='5-10', city='ankara', district='cankaya',
         )
         User.objects.create_user(
             username='f1@test.com', email='f1@test.com', password='p',
             fullname='Fizik Öğretmen', gender='FEMALE', birth_date=date(1988, 3, 3),
-            branch='fizik', experience_years='3-5', city='istanbul',
+            branch='fizik', experience_years='3-5', city='istanbul', district='kadikoy',
         )
 
     def test_home_page_loads(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'ogretmenim.com')
+        self.assertContains(response, 'id="search-district"')
+        self.assertContains(response, 'city-district.js')
 
-    def test_search_no_filter_redirects(self):
+    def test_search_by_district(self):
+        response = self.client.get(reverse('search'), {
+            'city': 'ankara',
+            'district': 'cankaya',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Matematik Öğretmen')
+        self.assertNotContains(response, 'Fizik Öğretmen')
+
+    def test_search_listing_has_district_filter(self):
+        response = self.client.get(reverse('search'), {'branch': 'matematik'})
+        self.assertContains(response, 'id="filter-district"')
+        self.assertContains(response, 'data-selected-district')
+
+    def test_search_without_filters_lists_all_teachers(self):
         response = self.client.get(reverse('search'))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Matematik Öğretmen')
+        self.assertContains(response, 'Fizik Öğretmen')
 
     def test_search_by_branch(self):
         response = self.client.get(reverse('search'), {'branch': 'matematik'})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Matematik Öğretmen')
         self.assertNotContains(response, 'Fizik Öğretmen')
+        self.assertContains(response, 'fa-lock')
+        self.assertContains(response, 'connto-teacher-card connto-teacher-card--guest')
+        self.assertContains(response, 'connto-teacher-card__blurred')
+        self.assertContains(response, 'connto-filter-panel__lock')
+        self.assertContains(response, 'connto-map-btn__lock')
+        self.assertContains(response, 'connto-directory__toolbar--guest')
+        self.assertNotContains(response, 'öğretmen bulundu')
+        self.assertNotContains(response, 'data-target="#mapModal"')
+        self.assertNotContains(response, '>Profil</a>')
+
+    def test_search_shows_profile_for_course_center(self):
+        cc = CourseCenter.objects.create(
+            center_name='Test Kurs',
+            center_type='Dil Kursu',
+            teacher_capacity=10,
+            email='kurs@test.com',
+        )
+        cc.set_password('kurspass123')
+        cc.save()
+        session = self.client.session
+        session['course_center_id'] = cc.id
+        session['is_course_center'] = True
+        session.save()
+
+        response = self.client.get(reverse('search'), {'branch': 'matematik'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '>Profil</a>')
+        self.assertNotContains(response, 'connto-teacher-card connto-teacher-card--guest')
+        self.assertNotContains(response, 'connto-filter-panel__lock')
+        self.assertNotContains(response, 'connto-map-btn__lock')
+        self.assertContains(response, 'öğretmen bulundu')
+        self.assertContains(response, 'data-target="#mapModal"')
+
+    def test_get_user_redirects_guest_to_register(self):
+        teacher = User.objects.get(email='m1@test.com')
+        response = self.client.get(reverse('getUser', kwargs={'pk': teacher.id}))
+        self.assertRedirects(response, f"{reverse('register')}?type=course_center")
 
     def test_search_combined_filters(self):
         response = self.client.get(reverse('search'), {
@@ -162,28 +267,70 @@ class UsersiteTests(TestCase):
             short_description='Deneyimli öğretmen',
             long_description='Uzun biyografi metni.',
         )
+        self.cc = CourseCenter.objects.create(
+            center_name='Test Kurs',
+            center_type='Dil Kursu',
+            teacher_capacity=10,
+            email='kurs@test.com',
+        )
+        self.cc.set_password('kurspass123')
+        self.cc.save()
 
-    def test_usersite_index(self):
+    def _login_as_course_center(self):
+        session = self.client.session
+        session['course_center_id'] = self.cc.id
+        session['is_course_center'] = True
+        session.save()
+
+    def test_usersite_index_redirects_guest_to_register(self):
+        response = self.client.get(reverse('usersite_home', kwargs={'pk': self.teacher.id}))
+        self.assertRedirects(response, f"{reverse('register')}?type=course_center")
+
+    def test_usersite_index_for_course_center(self):
+        self._login_as_course_center()
+
         response = self.client.get(reverse('usersite_home', kwargs={'pk': self.teacher.id}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Public Öğretmen')
         self.assertContains(response, 'ogretmenim.com')
 
+    def test_usersite_index_for_teacher_own_profile(self):
+        self.client.login(username='public@test.com', password='p')
+
+        response = self.client.get(reverse('usersite_home', kwargs={'pk': self.teacher.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Public Öğretmen')
+
+    def test_usersite_index_redirects_teacher_to_add_items_for_other_profile(self):
+        other_teacher = User.objects.create_user(
+            username='other@test.com', email='other@test.com', password='p',
+            fullname='Diğer Öğretmen', gender='FEMALE', birth_date=date(1991, 3, 3),
+            branch='matematik', city='ankara',
+        )
+        self.client.login(username='public@test.com', password='p')
+
+        response = self.client.get(reverse('usersite_home', kwargs={'pk': other_teacher.id}))
+        self.assertRedirects(response, reverse('addItems'))
+
     def test_usersite_about(self):
+        self._login_as_course_center()
         response = self.client.get(reverse('about', kwargs={'pk': self.teacher.id}))
         self.assertEqual(response.status_code, 200)
 
     def test_usersite_credentials(self):
+        self._login_as_course_center()
         response = self.client.get(reverse('credentials', kwargs={'pk': self.teacher.id}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Uzun biyografi metni')
 
     def test_usersite_invalid_pk_renders_with_none_user(self):
         """Bilinen sorun: geçersiz pk ile user=None, template patlayabilir."""
+        self._login_as_course_center()
         response = self.client.get(reverse('usersite_home', kwargs={'pk': 99999}))
         self.assertIn(response.status_code, [200, 500])
 
     def test_get_user_increments_view(self):
+        self._login_as_course_center()
         initial = self.teacher.view
         self.client.get(reverse('getUser', kwargs={'pk': self.teacher.id}))
         self.teacher.refresh_from_db()
@@ -292,9 +439,127 @@ class PlatformAdminTests(TestCase):
         self.assertRedirects(response, reverse('admin_dashboard'))
         self.assertIn('admin_id', self.client.session)
 
+    def test_admin_login_post_requires_valid_csrf(self):
+        client = Client(enforce_csrf_checks=True)
+        login_url = reverse('admin_panel_login')
+        response = client.get(login_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'csrfmiddlewaretoken')
+
+        bad_post = client.post(login_url, {
+            'username': 'admin',
+            'password': 'admin123',
+            'csrfmiddlewaretoken': 'invalid-token',
+        })
+        self.assertEqual(bad_post.status_code, 403)
+
+        good_post = client.post(login_url, {
+            'username': 'admin',
+            'password': 'admin123',
+            'csrfmiddlewaretoken': response.cookies['csrftoken'].value,
+        })
+        self.assertRedirects(good_post, reverse('admin_dashboard'))
+
     def test_admin_dashboard_requires_session(self):
         response = self.client.get(reverse('admin_dashboard'))
         self.assertEqual(response.status_code, 302)
+
+
+class UserPresenceTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin = AdminUser.objects.create(
+            username='admin', email='admin@ogretmenim.com',
+        )
+        self.admin.set_password('admin123')
+        self.admin.save()
+
+        self.teacher = User.objects.create_user(
+            username='teacher@test.com',
+            email='teacher@test.com',
+            password='teacherpass',
+            fullname='Aktif Öğretmen',
+            gender='MALE',
+            birth_date=date(1990, 1, 1),
+            branch='matematik',
+            city='ankara',
+        )
+        self.course_center = CourseCenter.objects.create(
+            center_name='Aktif Kurs',
+            center_type='Dil Kursu',
+            teacher_capacity=20,
+            email='aktif@kurs.com',
+        )
+        self.course_center.set_password('kurspass123')
+        self.course_center.save()
+
+    def _login_admin(self):
+        session = self.client.session
+        session['admin_id'] = self.admin.id
+        session.save()
+
+    def test_teacher_request_updates_last_seen(self):
+        self.client.login(username='teacher@test.com', password='teacherpass')
+        self.client.get(reverse('addItems'))
+
+        self.teacher.refresh_from_db()
+        self.assertIsNotNone(self.teacher.last_seen)
+        self.assertLessEqual(
+            timezone.now() - self.teacher.last_seen,
+            timedelta(minutes=1),
+        )
+
+    def test_course_center_request_updates_last_seen(self):
+        session = self.client.session
+        session['course_center_id'] = self.course_center.id
+        session['is_course_center'] = True
+        session.save()
+
+        self.client.get(reverse('home'))
+
+        self.course_center.refresh_from_db()
+        self.assertIsNotNone(self.course_center.last_seen)
+
+    def test_admin_dashboard_shows_active_counts_and_dots(self):
+        now = timezone.now()
+        CustomUser = User
+        CustomUser.objects.filter(pk=self.teacher.pk).update(last_seen=now)
+        CourseCenter.objects.filter(pk=self.course_center.pk).update(last_seen=now)
+
+        self._login_admin()
+        response = self.client.get(reverse('admin_dashboard'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Aktif Öğretmen')
+        self.assertContains(response, 'Aktif Kurs Merkezi')
+        self.assertContains(response, 'presence-dot--active')
+        self.assertContains(response, 'id="active-teachers-count"')
+        self.assertContains(response, 'id="active-course-centers-count"')
+
+    def test_admin_active_users_api_returns_snapshot(self):
+        now = timezone.now()
+        User.objects.filter(pk=self.teacher.pk).update(last_seen=now)
+
+        self._login_admin()
+        response = self.client.get(reverse('admin_active_users_api'))
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['active_teachers'], 1)
+        self.assertEqual(data['active_course_centers'], 0)
+        self.assertTrue(data['teachers'][str(self.teacher.id)])
+
+    def test_admin_active_users_api_requires_session(self):
+        response = self.client.get(reverse('admin_active_users_api'))
+        self.assertEqual(response.status_code, 403)
+
+    def test_logout_clears_teacher_presence(self):
+        User.objects.filter(pk=self.teacher.pk).update(last_seen=timezone.now())
+        self.client.login(username='teacher@test.com', password='teacherpass')
+        self.client.get(reverse('logout'))
+
+        self.teacher.refresh_from_db()
+        self.assertIsNone(self.teacher.last_seen)
 
 
 class ModelTests(TestCase):
@@ -322,6 +587,21 @@ class ModelTests(TestCase):
             short_description='Deneyim açıklaması',
         )
         self.assertEqual(str(exp), 'ABC Kurs Merkezi')
+
+    def test_normalize_profile_image_crops_to_square(self):
+        from io import BytesIO
+        from PIL import Image
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from conntoapp.image_utils import normalize_profile_image, PROFILE_IMAGE_SIZE
+
+        buffer = BytesIO()
+        Image.new('RGB', (600, 400), color='red').save(buffer, format='JPEG')
+        buffer.seek(0)
+        upload = SimpleUploadedFile('wide.jpg', buffer.read(), content_type='image/jpeg')
+
+        normalized = normalize_profile_image(upload)
+        result = Image.open(normalized)
+        self.assertEqual(result.size, (PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE))
 
 
 class CityDistrictTests(TestCase):
@@ -360,8 +640,27 @@ class CityDistrictTests(TestCase):
             'branch': 'matematik',
             'city': 'ankara',
             'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
         })
         self.assertTrue(form.is_valid(), form.errors)
+
+    def test_register_form_rejects_phone_starting_with_zero(self):
+        from conntoapp.forms import TeacherRegisterForm
+        form = TeacherRegisterForm(data={
+            'fullname': 'Yeni Ogretmen',
+            'password': 'testpass123',
+            'email': 'zero@test.com',
+            'gender': 'MALE',
+            'birth_date': '1995-05-10',
+            'branch': 'matematik',
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '05321234567',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('phone_number', form.errors)
 
     def test_register_form_rejects_invalid_district_for_city(self):
         from conntoapp.forms import TeacherRegisterForm
@@ -374,6 +673,8 @@ class CityDistrictTests(TestCase):
             'branch': 'matematik',
             'city': 'ankara',
             'district': 'kadikoy',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
         })
         self.assertFalse(form.is_valid())
         self.assertIn('district', form.errors)
@@ -388,12 +689,25 @@ class CityDistrictTests(TestCase):
             'branch': 'fizik',
             'city': 'izmir',
             'district': 'karsiyaka',
+            'phone_country_code': '+90',
+            'phone_number': '5329876543',
             'checkBox': 'on',
         })
         self.assertRedirects(response, reverse('login'))
         user = User.objects.get(email='ilce@test.com')
         self.assertEqual(user.city, 'izmir')
         self.assertEqual(user.district, 'karsiyaka')
+        self.assertEqual(user.phone, '+905329876543')
+
+    def test_register_page_has_phone_country_selector(self):
+        response = self.client.get(reverse('register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'phone_country_code')
+        self.assertContains(response, 'connto-phone-country-picker')
+        self.assertContains(response, 'flagcdn.com')
+        self.assertContains(response, '+90')
+        self.assertContains(response, 'Numarayı başında 0 olmadan girin')
+        self.assertContains(response, 'phone-field.js')
 
     def test_register_page_has_district_field_and_script(self):
         response = self.client.get(reverse('register'))

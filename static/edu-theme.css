@@ -1426,8 +1426,9 @@ body.connto-page .wrapper {
 .connto-header__inner {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 14px 24px;
+  gap: 24px;
+  padding: 10px 24px;
+  min-height: 80px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -1440,6 +1441,113 @@ body.connto-page .wrapper {
   text-decoration: none !important;
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+.connto-site-logo {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none !important;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.connto-site-logo__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.connto-site-logo:hover .connto-site-logo__img {
+  opacity: 0.88;
+}
+
+/* Marketplace-style logo sizing (Trendyol / Hepsiburada / Sahibinden scale) */
+.connto-site-logo--header {
+  flex: 0 0 auto;
+  min-width: 140px;
+}
+
+.connto-site-logo--header .connto-site-logo__img {
+  width: 160px;
+  height: auto;
+  max-width: none;
+  max-height: none;
+}
+
+.connto-site-logo--auth-topbar {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.connto-site-logo--auth-topbar .connto-site-logo__img {
+  width: 150px;
+  height: auto;
+}
+
+.connto-site-logo--auth {
+  display: flex;
+  justify-content: center;
+}
+
+.connto-site-logo--auth .connto-site-logo__img {
+  width: 200px;
+  height: auto;
+}
+
+.connto-site-logo--panel {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.connto-site-logo--panel .connto-site-logo__img {
+  width: 120px;
+  height: auto;
+}
+
+body.edu-panel-page .sb2-12 {
+  text-align: center;
+}
+
+.connto-site-logo--portfolio .connto-site-logo__img {
+  width: 150px;
+  height: auto;
+}
+
+.connto-site-logo--footer {
+  display: inline-flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.connto-site-logo--footer .connto-site-logo__img {
+  width: 140px;
+  height: auto;
+}
+
+.connto-site-logo--admin .connto-site-logo__img {
+  width: 140px;
+  height: auto;
+}
+
+.connto-site-logo--auth-card {
+  display: inline-flex;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.connto-site-logo--auth-card .connto-site-logo__img {
+  width: 170px;
+  height: auto;
 }
 
 .connto-logo:hover {
@@ -1645,6 +1753,199 @@ body.connto-page .wrapper {
   font-weight: 600;
   color: var(--ct-text);
   margin-bottom: 8px;
+}
+
+.connto-phone-field__row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.connto-phone-field__code {
+  flex: 0 0 132px;
+  max-width: 38%;
+  position: relative;
+}
+
+.connto-phone-country-picker {
+  position: relative;
+  width: 100%;
+}
+
+.connto-phone-country-picker .connto-phone-code-native,
+.connto-phone-country-picker .select-wrapper,
+.connto-phone-country-picker .select-dropdown,
+.edu-panel-page .bor .connto-phone-country-picker select.connto-phone-code-native {
+  display: none !important;
+}
+
+.connto-phone-country-picker__trigger {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px;
+  border: 1px solid var(--ct-border);
+  border-radius: 10px;
+  background: #fafcfc;
+  color: var(--ct-text);
+  font-family: var(--ct-font);
+  font-size: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.connto-phone-country-picker__trigger:hover,
+.connto-phone-country-picker--open .connto-phone-country-picker__trigger {
+  border-color: var(--ct-teal);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.connto-phone-country-picker__flag {
+  width: 28px;
+  height: 21px;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
+}
+
+.connto-phone-country-picker__dial {
+  font-weight: 600;
+  flex: 1;
+  text-align: left;
+}
+
+.connto-phone-country-picker__trigger .fa {
+  font-size: 12px;
+  color: var(--ct-text-muted);
+}
+
+.connto-phone-country-picker__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--ct-border);
+  border-radius: 12px;
+  box-shadow: var(--ct-shadow);
+}
+
+.connto-phone-country-picker__list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.connto-phone-country-picker__list li:hover,
+.connto-phone-country-picker__list li[aria-selected="true"] {
+  background: var(--ct-mint);
+}
+
+.connto-phone-country-picker__list img {
+  width: 24px;
+  height: 18px;
+  object-fit: cover;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+
+.connto-phone-country-picker__option-code {
+  font-weight: 600;
+  color: var(--ct-text);
+}
+
+.connto-phone-field__number {
+  flex: 1;
+  min-width: 0;
+}
+
+.connto-phone-field__code-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.connto-phone-field__hint,
+.connto-field__error {
+  margin: 8px 0 0;
+  font-size: 13px;
+}
+
+.connto-phone-field__hint {
+  color: var(--ct-text-muted);
+}
+
+.connto-field__error {
+  color: #b91c1c;
+}
+
+.connto-field--phone .connto-phone-code-native,
+.connto-field--phone .connto-phone-number {
+  width: 100%;
+}
+
+.edu-panel-page .bor .connto-field--phone .connto-phone-number {
+  appearance: auto !important;
+  -webkit-appearance: none !important;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 44px;
+  padding: 10px 0 !important;
+  line-height: 1.4 !important;
+  height: auto !important;
+  color: #1a2e35 !important;
+  -webkit-text-fill-color: #1a2e35 !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #cfd8dc !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-family: var(--ct-font, 'Plus Jakarta Sans', sans-serif) !important;
+  font-size: 16px !important;
+  margin: 0;
+}
+
+.edu-panel-page .bor .connto-field--phone .connto-phone-number:focus {
+  border-bottom: 1px solid #2D7D6F !important;
+  box-shadow: 0 1px 0 0 #2D7D6F !important;
+  outline: none;
+}
+
+.edu-panel-page .bor .connto-phone-country-picker__trigger {
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+@media (max-width: 575px) {
+  .connto-phone-field__row {
+    flex-direction: column;
+  }
+
+  .connto-phone-field__code {
+    flex: 1 1 auto;
+    max-width: none;
+  }
 }
 
 .connto-field input[type="text"],
@@ -1933,6 +2234,17 @@ body.connto-page .connto-select option[value=""] {
   padding: 32px 0 48px;
 }
 
+.connto-directory > .container > .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.connto-filter-panel {
+  position: sticky;
+  top: 88px;
+}
+
 .connto-filter-panel h3 {
   font-size: 18px;
   font-weight: 700;
@@ -1954,12 +2266,20 @@ body.connto-page .connto-select option[value=""] {
   color: var(--ct-text-muted);
 }
 
+.connto-directory__toolbar--guest {
+  justify-content: flex-end;
+}
+
 .connto-teacher-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
   margin-left: -10px;
   margin-right: -10px;
 }
 
 .connto-teacher-grid > [class*="col-"] {
+  display: flex;
   padding-left: 10px;
   padding-right: 10px;
   margin-bottom: 20px;
@@ -1971,10 +2291,35 @@ body.connto-page .connto-select option[value=""] {
   border-radius: var(--ct-radius-lg);
   padding: 24px 20px;
   text-align: center;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.connto-teacher-card__blurred {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.connto-teacher-card--guest .connto-teacher-card__blurred {
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.connto-teacher-card__lock,
+.connto-filter-panel__lock,
+.connto-teacher-card > .connto-btn.connto-btn--block {
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .connto-teacher-card:hover {
@@ -1982,13 +2327,82 @@ body.connto-page .connto-select option[value=""] {
   transform: translateY(-2px);
 }
 
+/* Profil fotoğrafları — oran korunur, asla ezilmez */
+.connto-avatar {
+  --connto-avatar-size: 80px;
+  width: var(--connto-avatar-size);
+  height: var(--connto-avatar-size);
+  min-width: var(--connto-avatar-size);
+  min-height: var(--connto-avatar-size);
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  border: 3px solid var(--ct-mint);
+  background: #e8edf2;
+}
+
+.connto-avatar--xs {
+  --connto-avatar-size: 28px;
+  margin: 0;
+  border-width: 2px;
+}
+
+.connto-avatar--sm {
+  --connto-avatar-size: 32px;
+  margin: 0;
+  border-width: 2px;
+}
+
+.connto-avatar--md {
+  --connto-avatar-size: 44px;
+  margin: 0;
+  border-width: 2px;
+}
+
+.connto-avatar--lg {
+  --connto-avatar-size: 80px;
+}
+
+.connto-avatar--xl {
+  --connto-avatar-size: 75px;
+  margin: 0 auto 25px;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.15);
+}
+
+.connto-avatar__img,
+.connto-avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  aspect-ratio: 1 / 1;
+  object-fit: cover !important;
+  object-position: center center !important;
+  display: block;
+}
+
 .connto-teacher-card__photo {
   width: 80px;
   height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+  max-width: none !important;
+  max-height: none !important;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: cover !important;
+  object-position: center center !important;
   margin: 0 auto 14px;
   border: 3px solid var(--ct-mint);
+  flex-shrink: 0;
+  display: block;
+  aspect-ratio: 1 / 1;
 }
 
 .connto-teacher-card h4 {
@@ -2021,6 +2435,270 @@ body.connto-page .connto-select option[value=""] {
   line-height: 1.5;
   margin: 0 0 16px;
   flex: 1;
+}
+
+.connto-teacher-card__lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.connto-filter-panel__lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none !important;
+  cursor: pointer;
+  opacity: 0.92;
+}
+
+.connto-map-btn__lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none !important;
+  cursor: pointer;
+  opacity: 0.92;
+}
+
+.connto-filter-panel__lock:hover,
+.connto-map-btn__lock:hover {
+  opacity: 1;
+}
+
+.connto-filter-panel__lock i,
+.connto-map-btn__lock i {
+  font-size: 15px;
+}
+
+.connto-teacher-card__lock i {
+  font-size: 16px;
+}
+
+.connto-teacher-card__favorite {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--ct-border);
+  border-radius: 50%;
+  background: #fff;
+  color: #cbd5e1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, transform 0.15s;
+  font-size: 18px;
+  padding: 0;
+}
+
+.connto-teacher-card__favorite:hover,
+.connto-teacher-card__favorite.is-active {
+  color: #f59e0b;
+  border-color: #fcd34d;
+  transform: scale(1.05);
+}
+
+.connto-teacher-card__rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+}
+
+.connto-star-rating {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.connto-star-rating__star {
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  padding: 0;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s, transform 0.15s;
+}
+
+.connto-star-rating__star.is-active {
+  color: #f59e0b;
+}
+
+.connto-star-rating__star.is-muted {
+  color: #fde68a;
+}
+
+.connto-star-rating__star:hover:not(:disabled) {
+  color: #f59e0b;
+  transform: scale(1.08);
+}
+
+.connto-star-rating__star:disabled {
+  cursor: default;
+}
+
+.connto-teacher-card__rating-text {
+  font-size: 14px;
+  color: var(--ct-text-muted);
+}
+
+.connto-course-center-profile {
+  padding: 28px;
+}
+
+.connto-course-center-profile__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ct-border);
+}
+
+.connto-course-center-profile__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--ct-teal);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.connto-course-center-profile__photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--ct-mint);
+  flex-shrink: 0;
+}
+
+.connto-course-center-profile__photo-form {
+  display: none;
+}
+
+.connto-profile-photo-edit {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.connto-profile-photo-edit:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.35);
+  outline-offset: 3px;
+}
+
+.connto-profile-photo-edit__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.connto-profile-photo-edit__overlay i {
+  font-size: 1.1rem;
+}
+
+.connto-profile-photo-edit:hover .connto-profile-photo-edit__overlay,
+.connto-profile-photo-edit:focus-visible .connto-profile-photo-edit__overlay {
+  opacity: 1;
+}
+
+.connto-alert--success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.connto-user-chip__photo {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.connto-course-center-profile__header h2 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--ct-text) !important;
+}
+
+.connto-course-center-profile__header p {
+  margin: 0;
+  color: var(--ct-text-muted);
+  font-size: 15px;
+}
+
+.connto-profile-details {
+  margin: 0 0 24px;
+}
+
+.connto-profile-details__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ct-border);
+}
+
+.connto-profile-details__row:last-child {
+  border-bottom: none;
+}
+
+.connto-profile-details__row dt {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ct-text-secondary);
+  font-size: 15px;
+}
+
+.connto-profile-details__row dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ct-text);
+  text-align: right;
+  font-size: 15px;
+}
+
+.connto-course-center-profile__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.connto-directory__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .connto-empty-state {
@@ -2089,6 +2767,47 @@ body.connto-auth-page.connto-chalkboard-page {
   background: #1a1a1a url("/static/edu-images/chalkboard-bg.svg") center / cover fixed !important;
 }
 
+.connto-auth-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+}
+
+.connto-auth-home-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff !important;
+  text-decoration: none !important;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--ct-radius-pill);
+  padding: 10px 18px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.connto-auth-home-logo i {
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+.connto-auth-home-logo:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
+}
+
 .connto-auth {
   min-height: 100vh;
   display: flex;
@@ -2115,9 +2834,10 @@ body.connto-auth-page.connto-chalkboard-page {
 }
 
 .connto-auth-logo {
-  width: 56px;
-  height: 56px;
+  width: auto;
+  height: auto;
   margin: 0 auto 16px;
+  text-align: center;
 }
 
 .connto-auth-logo svg {
@@ -2541,11 +3261,27 @@ body.connto-auth-page.connto-chalkboard-page {
 
   .connto-header__inner {
     flex-wrap: wrap;
-    padding: 12px 16px;
+    padding: 10px 16px;
+    min-height: 72px;
+    gap: 16px;
+  }
+
+  .connto-site-logo--header {
+    min-width: 120px;
+  }
+
+  .connto-site-logo--header .connto-site-logo__img {
+    width: 140px;
   }
 
   .connto-user-chip__email {
     display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .connto-site-logo--header .connto-site-logo__img {
+    width: 120px;
   }
 }
 
@@ -2918,8 +3654,103 @@ body.edu-panel-page .sb2-1 .logo {
   font-size: 1.25rem !important;
 }
 
+body.edu-panel-page .sb1-1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 59px;
+  position: relative;
+}
+
+body.edu-panel-page .sb1 > .row > .edu-panel-header-brand {
+  width: 20%;
+  flex: 0 0 20%;
+  max-width: 20%;
+}
+
+body.edu-panel-page .sb1-1 .connto-site-logo--panel {
+  margin: 0 auto;
+}
+
+body.edu-panel-page .sb1-1 .atab-menu,
+body.edu-panel-page .sb1-1 .btn-close-menu {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+body.edu-panel-page .sb1 > .row {
+  display: flex;
+  align-items: center;
+  min-height: 59px;
+}
+
+body.edu-panel-page .sb1 > .row > [class*="col-"]:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 body.edu-panel-page .top-user-pro {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  float: right;
+  min-height: 40px;
+  padding: 6px 14px !important;
+  color: #ffffff !important;
   font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-decoration: none !important;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+body.edu-panel-page .top-user-pro__label {
+  display: inline-block;
+  line-height: 1;
+  position: relative;
+  top: 1px;
+}
+
+body.edu-panel-page .top-user-pro:hover,
+body.edu-panel-page .top-user-pro:focus {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+body.edu-panel-page .top-user-pro .connto-avatar {
+  margin: 0;
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+body.edu-panel-page .sb2-12 .connto-avatar--xl {
+  margin: 0 auto 25px;
+}
+
+body.edu-panel-page .list-img .connto-avatar,
+body.edu-panel-page .list-img img {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+}
+
+body.edu-panel-page .top-user-pro i {
+  color: #ffffff !important;
+  opacity: 0.95;
+  line-height: 1;
+  position: relative;
+  top: 1px;
 }
 
 body.edu-panel-page .sb2-12 ul li.active-bre a,
@@ -3051,4 +3882,301 @@ body.edu-superadmin-page .stats-value {
 
 .connto-cta p {
   font-size: 16px !important;
+}
+
+/* ══════════════════════════════════════
+   MOBILE — taşma önleme ve simetrik düzen
+   ══════════════════════════════════════ */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
+body.connto-page,
+body.connto-auth-page,
+body.edu-panel-page,
+body.edu-portfolio-page {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body.connto-page .wrapper,
+body.connto-page #wrapper {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body.connto-page img:not(.connto-site-logo__img):not(.connto-hero-illustration):not(.connto-avatar__img):not(.connto-teacher-card__photo),
+body.connto-page video,
+body.connto-page svg,
+body.connto-page iframe,
+body.edu-portfolio-page img:not(.connto-avatar__img),
+body.edu-portfolio-page video {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 991px) {
+  body.edu-portfolio-page .header-area .navbar .menu {
+    display: none;
+  }
+
+  body.edu-portfolio-page .header-area .show-menu {
+    display: flex;
+  }
+
+  body.edu-portfolio-page .header-area .gx-row > .theme-btn {
+    display: none;
+  }
+
+  body.edu-portfolio-page .header-area .gx-row {
+    flex-wrap: nowrap;
+    gap: 16px;
+  }
+
+  body.edu-portfolio-page .about-area .about-credentials-wrap > .gx-row > * {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  body.edu-portfolio-page .about-area .about-image-box {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  body.connto-page .container,
+  body.connto-page .container-fluid {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  body.connto-page.connto-chalkboard-page,
+  body.connto-auth-page.connto-chalkboard-page {
+    background-attachment: scroll !important;
+  }
+
+  .connto-page-head {
+    padding: 24px 0 20px;
+  }
+
+  .connto-page-head h1 {
+    font-size: 1.5rem;
+    word-break: break-word;
+  }
+
+  .connto-page-head p {
+    font-size: 15px;
+  }
+
+  .connto-directory {
+    padding: 20px 0 32px;
+  }
+
+  .connto-filter-panel {
+    position: static;
+    margin-bottom: 20px;
+  }
+
+  .connto-card {
+    padding: 16px;
+  }
+
+  .connto-course-center-profile {
+    padding: 16px;
+  }
+
+  .connto-course-center-profile__header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .connto-course-center-profile__actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .connto-course-center-profile__actions .connto-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .connto-profile-details__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .connto-profile-details__row dd {
+    text-align: left;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  .connto-teacher-card h4,
+  .connto-teacher-card__meta,
+  .connto-teacher-card__desc {
+    word-break: break-word;
+  }
+
+  .connto-hero-illustration {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .connto-header__inner {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .connto-header__actions {
+    margin-left: auto;
+    min-width: 0;
+  }
+
+  .connto-header-toggle {
+    margin-left: 0;
+  }
+
+  .connto-site-logo--header .connto-site-logo__img {
+    max-width: 100%;
+  }
+
+  .connto-directory__toolbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .connto-directory__toolbar-actions .connto-btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  body.connto-auth-page .connto-auth {
+    padding: 88px 16px 32px;
+    align-items: flex-start;
+    min-height: auto;
+  }
+
+  body.connto-auth-page .connto-auth-topbar {
+    padding: 12px 16px;
+  }
+
+  .connto-auth-card--wide {
+    width: 100%;
+  }
+
+  .connto-terms-open {
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .connto-modal__dialog {
+    width: calc(100% - 24px);
+    margin: 12px auto;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+
+  body.edu-portfolio-page .header-area .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  body.edu-portfolio-page .about-area .about-me-box {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 32px 20px;
+  }
+
+  body.edu-portfolio-page .about-area .about-me-box .img-box {
+    width: 180px;
+    height: 180px;
+  }
+
+  body.edu-panel-page .sb2-2 {
+    padding: 88px 12px 24px !important;
+  }
+
+  body.edu-panel-page .sb1-1 {
+    padding: 10px 12px !important;
+  }
+
+  body.edu-panel-page .top-user-pro {
+    float: none;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+  }
+
+  body.edu-panel-page .top-user-pro .connto-avatar--xs {
+    --connto-avatar-size: 32px;
+  }
+
+  body.edu-panel-page .bor {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body.edu-panel-page .bor form label {
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 575px) {
+  .connto-header__inner {
+    padding: 8px 12px;
+    min-height: 64px;
+    gap: 8px;
+  }
+
+  .connto-site-logo--header {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+
+  .connto-site-logo--header .connto-site-logo__img {
+    width: 112px;
+  }
+
+  .connto-user-chip {
+    padding: 4px 8px 4px 4px;
+  }
+
+  .connto-user-chip__avatar,
+  .connto-user-chip__photo {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .connto-btn--sm {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .connto-teacher-grid > [class*="col-"] {
+    width: 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  .connto-auth-tabs-wrap {
+    gap: 8px;
+  }
+
+  .connto-auth-tab {
+    padding: 10px 8px;
+  }
 }

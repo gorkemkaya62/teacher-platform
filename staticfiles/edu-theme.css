@@ -1933,6 +1933,17 @@ body.connto-page .connto-select option[value=""] {
   padding: 32px 0 48px;
 }
 
+.connto-directory > .container > .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.connto-filter-panel {
+  position: sticky;
+  top: 88px;
+}
+
 .connto-filter-panel h3 {
   font-size: 18px;
   font-weight: 700;
@@ -1955,11 +1966,15 @@ body.connto-page .connto-select option[value=""] {
 }
 
 .connto-teacher-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
   margin-left: -10px;
   margin-right: -10px;
 }
 
 .connto-teacher-grid > [class*="col-"] {
+  display: flex;
   padding-left: 10px;
   padding-right: 10px;
   margin-bottom: 20px;
@@ -1971,10 +1986,33 @@ body.connto-page .connto-select option[value=""] {
   border-radius: var(--ct-radius-lg);
   padding: 24px 20px;
   text-align: center;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.connto-teacher-card__blurred {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.connto-teacher-card--guest .connto-teacher-card__blurred {
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.connto-teacher-card__lock,
+.connto-teacher-card > .connto-btn.connto-btn--block {
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .connto-teacher-card:hover {
@@ -2021,6 +2059,17 @@ body.connto-page .connto-select option[value=""] {
   line-height: 1.5;
   margin: 0 0 16px;
   flex: 1;
+}
+
+.connto-teacher-card__lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.connto-teacher-card__lock i {
+  font-size: 16px;
 }
 
 .connto-empty-state {
@@ -2087,6 +2136,47 @@ body.connto-chalkboard-page {
 
 body.connto-auth-page.connto-chalkboard-page {
   background: #1a1a1a url("/static/edu-images/chalkboard-bg.svg") center / cover fixed !important;
+}
+
+.connto-auth-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+}
+
+.connto-auth-home-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff !important;
+  text-decoration: none !important;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--ct-radius-pill);
+  padding: 10px 18px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.connto-auth-home-logo i {
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+.connto-auth-home-logo:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+  transform: translateY(-1px);
 }
 
 .connto-auth {

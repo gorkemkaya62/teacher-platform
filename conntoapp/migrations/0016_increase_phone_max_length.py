@@ -1,0 +1,16 @@
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('conntoapp', '0015_user_last_seen'),
+    ]
+
+    operations = [
+        migrations.AlterField(
+            model_name='customuser',
+            name='phone',
+            field=models.CharField(blank=True, max_length=20, null=True, verbose_name='Telefon'),
+        ),
+    ]

@@ -52,6 +52,19 @@
                 </select>
               </div>
               <div class="connto-field">
+                <label for="search-district">İlçe</label>
+                <select
+                  name="district"
+                  id="search-district"
+                  class="connto-select"
+                  disabled
+                  data-include-all="true"
+                  data-selected-district="{{ selected_district }}"
+                >
+                  <option value="">Seçiniz</option>
+                </select>
+              </div>
+              <div class="connto-field">
                 <label for="search-gender">Cinsiyet</label>
                 <select name="gender" id="search-gender" class="connto-select">
                   <option value="" {% if not selected_gender %}selected{% endif %}>Seçiniz</option>
@@ -83,4 +96,9 @@
       </div>
     </div>
   </section>
+{% endblock %}
+
+{% block js_files %}
+  <script src="{% static 'adminstatic/js/city-district.js' %}"></script>
+  <script>initCityDistrictSelect('#search-city', '#search-district');</script>
 {% endblock %}

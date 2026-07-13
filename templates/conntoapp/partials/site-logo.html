@@ -1,0 +1,30 @@
+{% load static %}
+
+<a
+
+  href="{% if user.is_authenticated %}{% url 'addItems' %}{% else %}{% url 'home' %}{% endif %}"
+
+  class="connto-site-logo{% if logo_class %} {{ logo_class }}{% endif %}"
+
+  title="{% if user.is_authenticated %}Profil düzenlemeye git{% else %}Ana sayfaya git{% endif %}"
+
+  aria-label="{% if user.is_authenticated %}Profil düzenlemeye git{% else %}Ana sayfaya git{% endif %}"
+
+>
+
+  <img
+
+    src="{% static 'edu-images/ogretmenim-logo.png' %}"
+
+    alt="{{ SITE_NAME }}"
+
+    class="connto-site-logo__img"
+
+    width="160"
+
+    height="81"
+
+  />
+
+</a>
+

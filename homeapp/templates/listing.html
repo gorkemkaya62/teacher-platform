@@ -9,12 +9,71 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
 <style>
   .map-container { display: flex; height: 560px; gap: 16px; }
-  #map { flex: 1; border-radius: 12px; }
-  .experts-sidebar { width: 280px; background: #fff; border-radius: 12px; border: 1px solid var(--ct-border); overflow: hidden; }
+  #map { flex: 1; border-radius: 12px; min-width: 0; }
+  .experts-sidebar { width: 280px; flex-shrink: 0; background: #fff; border-radius: 12px; border: 1px solid var(--ct-border); overflow: hidden; }
   .experts-sidebar .header { padding: 14px 16px; background: var(--ct-teal); color: #fff; font-weight: 600; }
+  .experts-sidebar .map-sidebar-hint {
+    margin: 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ct-text-muted);
+    border-bottom: 1px solid var(--ct-border);
+    background: #f8fafb;
+  }
+  .map-sidebar-empty {
+    margin: 0;
+    padding: 16px;
+    font-size: 14px;
+    color: var(--ct-text-muted);
+  }
   .expert-card { padding: 12px 16px; border-bottom: 1px solid var(--ct-border); display: flex; gap: 10px; align-items: center; }
-  .expert-card img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+  .expert-card--locked { position: relative; }
+  .expert-card__lock { margin-left: auto; color: var(--ct-teal); font-size: 16px; flex-shrink: 0; }
+  .expert-card__blurred { display: flex; gap: 10px; align-items: center; flex: 1; min-width: 0; }
+  .connto-teacher-card--guest .connto-teacher-card__blurred,
+  .expert-card--locked .expert-card__blurred {
+    filter: blur(6px);
+    user-select: none;
+    pointer-events: none;
+  }
+  .expert-card .connto-avatar {
+    margin: 0;
+  }
+  .expert-card img,
+  .expert-card .connto-avatar__img {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 50%;
+    object-fit: cover !important;
+    object-position: center center !important;
+    aspect-ratio: 1 / 1;
+  }
   .expert-popup .btn { background: var(--ct-teal); color: #fff; padding: 6px 14px; border-radius: 8px; display: inline-block; margin-top: 8px; }
+  @media (max-width: 767px) {
+    #mapModal .modal-dialog {
+      width: auto;
+      margin: 10px;
+    }
+    .map-container {
+      flex-direction: column;
+      height: auto;
+    }
+    #map {
+      width: 100%;
+      min-height: 260px;
+      height: 42vh;
+    }
+    .experts-sidebar {
+      width: 100%;
+      max-height: 220px;
+    }
+    .experts-list {
+      overflow-y: auto;
+      max-height: 170px;
+    }
+  }
 </style>
 {% endblock %}
 
@@ -61,6 +120,19 @@
               </select>
             </div>
             <div class="connto-field">
+              <label for="filter-district">İlçe</label>
+              <select
+                name="district"
+                id="filter-district"
+                class="connto-select form-control"
+                disabled
+                data-include-all="true"
+                data-selected-district="{{ selected_district }}"
+              >
+                <option value="">Seçiniz</option>
+              </select>
+            </div>
+            <div class="connto-field">
               <label for="filter-gender">Cinsiyet</label>
               <select name="gender" id="filter-gender" class="connto-select form-control">
                 <option value="" {% if not selected_gender %}selected{% endif %}>Seçiniz</option>
@@ -69,36 +141,78 @@
                 {% endfor %}
               </select>
             </div>
-            <button type="submit" class="connto-btn connto-btn--primary connto-btn--block">Uygula</button>
+            {% if is_course_center_view %}
+              <button type="submit" class="connto-btn connto-btn--primary connto-btn--block">Uygula</button>
+            {% else %}
+              <a
+                href="{% url 'register' %}?type=course_center"
+                class="connto-btn connto-btn--primary connto-btn--block connto-filter-panel__lock connto-lock-btn"
+                data-register-url="{% url 'register' %}?type=course_center"
+                title="Filtrelemek için üye olun"
+                aria-label="Filtrelemek için üye olun"
+              >
+                <i class="fa fa-lock"></i>
+                <span>Uygula</span>
+              </a>
+            {% endif %}
           </form>
         </div>
       </aside>
 
       <div class="col-md-9">
-        <div class="connto-directory__toolbar">
-          <span>{{ users|length }} öğretmen bulundu</span>
-          <button class="connto-btn connto-btn--outline connto-btn--sm" data-toggle="modal" data-target="#mapModal">
-            <i class="fa fa-map-marker"></i> Haritada Göster
-          </button>
+        <div class="connto-directory__toolbar{% if not is_course_center_view %} connto-directory__toolbar--guest{% endif %}">
+          {% if is_course_center_view %}
+            <span>{{ teacher_cards|length }} öğretmen bulundu</span>
+          {% endif %}
+          <div class="connto-directory__toolbar-actions">
+            {% if is_course_center_view %}
+              <button class="connto-btn connto-btn--outline connto-btn--sm" data-toggle="modal" data-target="#mapModal">
+                <i class="fa fa-map-marker"></i> Haritada Göster
+              </button>
+            {% else %}
+              <a
+                href="{% url 'register' %}?type=course_center"
+                class="connto-btn connto-btn--outline connto-btn--sm connto-map-btn__lock connto-lock-btn"
+                data-register-url="{% url 'register' %}?type=course_center"
+                title="Haritayı görmek için üye olun"
+                aria-label="Haritayı görmek için üye olun"
+              >
+                <i class="fa fa-lock"></i>
+                <span>Haritada Göster</span>
+              </a>
+            {% endif %}
+          </div>
         </div>
 
         <div class="row connto-teacher-grid">
-          {% for user in users %}
+          {% for card in teacher_cards %}
+            {% with user=card.teacher %}
             <div class="col-sm-6 col-lg-4">
-              <div class="connto-teacher-card">
-                <img class="connto-teacher-card__photo" src="{{ user.image.url }}" alt="{{ user.fullname }}" />
-                <h4>{{ user.fullname }}</h4>
-                <p class="connto-teacher-card__branch">{{ user.get_branch_display }}</p>
-                <p class="connto-teacher-card__meta">
-                  <i class="fa fa-map-marker"></i> {{ user.get_city_display }}
-                  · {{ user.get_experience_years_display }}
-                </p>
-                {% if user.short_description %}
-                  <p class="connto-teacher-card__desc">{{ user.short_description|truncatechars:80 }}</p>
+              <div class="connto-teacher-card{% if not is_course_center_view %} connto-teacher-card--guest{% endif %}" data-teacher-id="{{ user.id }}">
+                <div class="connto-teacher-card__blurred">
+                  <span class="connto-avatar connto-avatar--lg">
+                    <img class="connto-avatar__img" src="{{ user.image.url }}" alt="{{ user.fullname }}" />
+                  </span>
+                  <h4>{{ user.fullname }}</h4>
+                  <p class="connto-teacher-card__branch">{{ user.get_branch_display }}</p>
+                  <p class="connto-teacher-card__meta">
+                    <i class="fa fa-map-marker"></i> {{ user.get_city_display }}
+                    · {{ user.get_experience_years_display }}
+                  </p>
+                  {% if user.short_description %}
+                    <p class="connto-teacher-card__desc">{{ user.short_description|truncatechars:80 }}</p>
+                  {% endif %}
+                </div>
+                {% if is_course_center_view %}
+                  <a href="{% url 'getUser' user.id %}" target="_blank" class="connto-btn connto-btn--primary connto-btn--sm connto-btn--block">Profil</a>
+                {% else %}
+                  <a href="{% url 'register' %}?type=course_center" class="connto-btn connto-btn--primary connto-btn--sm connto-btn--block connto-teacher-card__lock connto-lock-btn" data-register-url="{% url 'register' %}?type=course_center" title="Profili görmek için üye olun" aria-label="Profili görmek için üye olun">
+                    <i class="fa fa-lock"></i>
+                  </a>
                 {% endif %}
-                <a href="{% url 'getUser' user.id %}" target="_blank" class="connto-btn connto-btn--primary connto-btn--sm connto-btn--block">Profil</a>
               </div>
             </div>
+            {% endwith %}
           {% empty %}
             <div class="col-xs-12">
               <div class="connto-card connto-empty-state">
@@ -114,7 +228,10 @@
   </div>
 </section>
 
-<div class="modal fade" id="mapModal" tabindex="-1" role="dialog">
+{{ map_teachers|json_script:"map-teachers-data" }}
+{{ city_coordinates|json_script:"city-coordinates-data" }}
+
+<div class="modal fade" id="mapModal" tabindex="-1" role="dialog" data-course-center-view="{% if is_course_center_view %}true{% else %}false{% endif %}">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content connto-card" style="border:none;">
       <div class="modal-header">
@@ -125,20 +242,9 @@
         <div class="map-container">
           <div id="map"></div>
           <div class="experts-sidebar">
-            <div class="header">Arama Sonuçları</div>
-            <div class="experts-list">
-              {% for user in users %}
-              <a target="_blank" href="{% url 'getUser' user.id %}">
-                <div class="expert-card" data-city="{{ user.city }}">
-                  <img src="{{ user.image.url }}" alt="{{ user.fullname }}">
-                  <div>
-                    <strong>{{ user.fullname }}</strong><br>
-                    <small>{{ user.get_city_display }} · {{ user.get_branch_display }}</small>
-                  </div>
-                </div>
-              </a>
-              {% endfor %}
-            </div>
+            <div class="header" id="mapSidebarTitle">Arama Sonuçları</div>
+            <p class="map-sidebar-hint" id="mapSidebarHint">Yakınlaştırın ve bir şehrin üzerine gelerek o şehirdeki öğretmenleri görün.</p>
+            <div class="experts-list" id="mapExpertsList"></div>
           </div>
         </div>
       </div>
@@ -148,49 +254,20 @@
 {% endblock %}
 
 {% block js_files %}
+<script src="{% static 'adminstatic/js/city-district.js' %}"></script>
+<script>initCityDistrictSelect('#filter-city', '#filter-district');</script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="{% static 'homestatic/assets/js/teacher-interactions.js' %}?v=5"></script>
+<script src="{% static 'homestatic/assets/js/teacher-map.js' %}?v=1"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-    const cityCoordinates = {
-        'Istanbul': [41.0082, 28.9784], 'Ankara': [39.9334, 32.8597], 'Izmir': [38.4192, 27.1287],
-        'Bursa': [40.1885, 29.0610], 'Antalya': [36.8969, 30.7133], 'Adana': [37.0000, 35.3213],
-        'Gaziantep': [37.0662, 37.3833], 'Konya': [37.8719, 32.4843], 'Mersin': [36.8000, 34.6333],
-    };
-    let map = null;
-    let markers = L.markerClusterGroup();
-    let cityMarkers = {};
-    let allTeachers = [];
-    $('#mapModal').on('shown.bs.modal', function () {
-        if (!map) {
-            map = L.map('map').setView([39.9334, 32.8597], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
-            {% for user in users %}
-            allTeachers.push({
-                id: '{{ user.id }}', name: '{{ user.fullname }}',
-                city: capitalizeFirstLetter('{{ user.city }}'),
-                branch: '{{ user.get_branch_display }}',
-                image: '{{ user.image.url }}',
-                profileUrl: '{% url "getUser" user.id %}'
-            });
-            {% endfor %}
-            const byCity = {};
-            allTeachers.forEach(t => { (byCity[t.city] = byCity[t.city] || []).push(t); });
-            Object.entries(byCity).forEach(([city, list]) => {
-                if (cityCoordinates[city]) {
-                    const m = L.marker(cityCoordinates[city]);
-                    m.bindPopup('<b>' + city + '</b><br>' + list.length + ' öğretmen');
-                    markers.addLayer(m);
-                    cityMarkers[city] = m;
-                }
-            });
-            map.addLayer(markers);
-        }
-        setTimeout(() => map.invalidateSize(), 100);
+document.addEventListener('DOMContentLoaded', function () {
+  var modal = document.getElementById('mapModal');
+  if (modal && window.initTeacherMap) {
+    window.initTeacherMap({
+      isCourseCenterView: modal.dataset.courseCenterView === 'true',
     });
+  }
 });
 </script>
 {% endblock %}

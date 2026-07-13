@@ -4,7 +4,7 @@
   <head>
     <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600|Quicksand:300,400,500" rel="stylesheet" />
     <link rel="stylesheet" href="{% static 'adminstatic/css/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'adminstatic/css/style.css' %}" />
@@ -12,26 +12,28 @@
     <link rel="stylesheet" href="{% static 'adminstatic/css/bootstrap.css' %}" />
     <link rel="stylesheet" href="{% static 'adminstatic/css/materialize.css' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'edu-theme.css' %}?v=27" />
+    <link rel="stylesheet" href="{% static 'edu-theme.css' %}?v=49" />
     {% block css_files %}{% endblock %}
   </head>
   <body class="edu-panel-page">
     <div class="container-fluid sb1">
       <div class="row">
-        <div class="col-md-2 col-sm-3 col-xs-6 sb1-1">
+        <div class="col-md-2 col-sm-3 col-xs-6 sb1-1 edu-panel-header-brand">
           <a href="#" class="btn-close-menu"><i class="fa fa-times"></i></a>
           <a href="#" class="atab-menu"><i class="fa fa-bars tab-menu"></i></a>
-          <a href="{% url 'addItems' %}" class="logo" style="font-weight: 700; font-size: 1.2rem; color: #fff; text-decoration: none;">{{ SITE_NAME }}</a>
+          {% include 'conntoapp/partials/site-logo.html' with logo_class='connto-site-logo--panel' %}
         </div>
         <div class="col-md-6 col-sm-6 mob-hide"></div>
         <div class="col-md-2 tab-hide"></div>
         <div class="col-md-2 col-sm-3 col-xs-6">
           <a class="waves-effect dropdown-button top-user-pro" href="#" data-activates="top-menu">
-            <img src="{{ user.image.url }}" alt="" />Hesabım <i class="fa fa-angle-down"></i>
+            <span class="connto-avatar connto-avatar--xs">
+              <img class="connto-avatar__img" src="{{ user.image.url }}" alt="" />
+            </span><span class="top-user-pro__label">Hesabım</span><i class="fa fa-angle-down"></i>
           </a>
           <ul id="top-menu" class="dropdown-content top-menu-sty">
             <li>
-              <a target="_blank" href="{% url 'usersite_home' user.id %}" class="waves-effect">
+              <a href="{% url 'usersite_home' user.id %}" class="waves-effect">
                 <i class="fa fa-home"></i> Profil Sitem
               </a>
             </li>
@@ -54,7 +56,11 @@
         <div class="sb2-1">
           <div class="sb2-12">
             <ul>
-              <li><img src="{{ user.image.url }}" alt="" /></li>
+              <li>
+                <span class="connto-avatar connto-avatar--xl">
+                  <img class="connto-avatar__img" src="{{ user.image.url }}" alt="{{ user.fullname }}" />
+                </span>
+              </li>
               <li><h5>{{ user.fullname }} <span>{{ user.email }}</span></h5></li>
             </ul>
           </div>

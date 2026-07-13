@@ -6,12 +6,8 @@
 {% block content %}
 <div class="connto-auth">
   <div class="connto-glass-card connto-auth-card connto-auth-card--wide">
-    <div class="connto-auth-logo" aria-hidden="true">
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="24" cy="24" r="24" fill="#2D7D6F"/>
-        <path d="M14 18h20v2H14zM14 22h14v2H14zM14 26h18v2H14z" fill="#fff" opacity="0.9"/>
-        <path d="M30 14l6 6-6 6v-4h-4v-4h4v-4z" fill="#fff"/>
-      </svg>
+    <div class="connto-auth-logo">
+      {% include 'conntoapp/partials/site-logo.html' with logo_class='connto-site-logo--auth' %}
     </div>
 
     <h1>Üye Ol</h1>
@@ -38,19 +34,24 @@
       {% csrf_token %}
       <div id="user_form">
         {% for field in form %}
-          <div class="connto-field{% if field.name == 'birth_date' %} connto-field--date{% endif %}">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {% if field.name == 'birth_date' %}
-              <div class="connto-date-field">
+          {% if field.name == 'phone_country_code' %}
+            {% include 'conntoapp/partials/phone-fields.html' with code_field=form.phone_country_code number_field=form.phone_number %}
+          {% elif field.name == 'phone_number' %}
+          {% else %}
+            <div class="connto-field{% if field.name == 'birth_date' %} connto-field--date{% endif %}">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if field.name == 'birth_date' %}
+                <div class="connto-date-field">
+                  {{ field }}
+                  <button type="button" class="connto-date-trigger" aria-label="Takvimden tarih seç" tabindex="-1">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              {% else %}
                 {{ field }}
-                <button type="button" class="connto-date-trigger" aria-label="Takvimden tarih seç" tabindex="-1">
-                  <i class="fa fa-calendar" aria-hidden="true"></i>
-                </button>
-              </div>
-            {% else %}
-              {{ field }}
-            {% endif %}
-          </div>
+              {% endif %}
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
       <div class="connto-check connto-check--terms">
@@ -126,6 +127,11 @@
       });
     });
 
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('type') === 'course_center') {
+      setRegisterType('course_center');
+    }
+
     var termsModal = document.getElementById('terms-modal');
     var termsConfirmBtn = document.getElementById('terms-modal-confirm');
     var pendingTermsCheckbox = null;
@@ -184,5 +190,6 @@
 
 {% block js_files %}
   <script src="{% static 'adminstatic/js/city-district.js' %}"></script>
+  <script src="{% static 'adminstatic/js/phone-field.js' %}"></script>
   <script>initCityDistrictSelect('#id_city', '#id_district');</script>
 {% endblock %}

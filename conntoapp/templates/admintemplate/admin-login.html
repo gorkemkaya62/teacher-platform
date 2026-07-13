@@ -1,43 +1,108 @@
-{% extends 'admintemplate/base.html' %}
-
-{% block title %}Yönetim Girişi{% endblock %}
-
-{% block content %}
-<div class="container">
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-6">
-            <div class="card shadow-lg border-0">
-                <div class="card-header text-white" style="background: var(--edu-navy, #0c2340);">
-                    <h3 class="text-center mb-0"><i class="fas fa-graduation-cap me-2"></i>{{ SITE_NAME }} — Yönetim</h3>
-                </div>
-                <div class="card-body p-4">
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                    
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="mb-4">
-                            <label for="username" class="form-label">Kullanıcı Adı</label>
-                            {{ form.username }}
-                        </div>
-                        <div class="mb-4">
-                            <label for="password" class="form-label">Şifre</label>
-                            {{ form.password }}
-                        </div>
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
-                            <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg">Kullanıcı Girişine Dön</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
+{% extends 'admintemplate/base.html' %}
+
+
+
+{% block title %}Yönetim Girişi{% endblock %}
+
+
+
+{% block content %}
+
+<div class="container">
+
+    <div class="row justify-content-center mt-5">
+
+        <div class="col-md-6">
+
+            <div class="card shadow-lg border-0">
+
+                <div class="card-header text-white text-center" style="background: var(--edu-navy, #0c2340);">
+                    <div class="mb-2">
+                        {% include 'conntoapp/partials/site-logo.html' with logo_class='connto-site-logo--auth-card' %}
+                    </div>
+                    <h3 class="mb-0">Yönetim</h3>
+                </div>
+
+                <div class="card-body p-4">
+
+                    {% if messages %}
+
+                        {% for message in messages %}
+
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+
+                                {{ message }}
+
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                    
+
+                    <form method="POST" action="{% url 'admin_panel_login' %}">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+
+                            <label for="username" class="form-label">Kullanıcı Adı</label>
+
+                            {{ form.username }}
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label for="password" class="form-label">Şifre</label>
+
+                            {{ form.password }}
+
+                        </div>
+
+                        <div class="d-grid gap-2">
+
+                            <button type="submit" class="btn btn-primary btn-lg">Giriş Yap</button>
+
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg">Kullanıcı Girişine Dön</a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var form = document.querySelector('form[action*="adminpanel/login"]');
+  if (!form) return;
+
+  function getCsrfCookie() {
+    var match = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+
+  form.addEventListener('submit', function () {
+    var token = getCsrfCookie();
+    var input = form.querySelector('input[name="csrfmiddlewaretoken"]');
+    if (token && input) {
+      input.value = token;
+    }
+  });
+});
+</script>
+{% endblock %}
+

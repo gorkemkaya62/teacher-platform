@@ -6,12 +6,8 @@
 {% block content %}
 <div class="connto-auth">
   <div class="connto-glass-card connto-auth-card">
-    <div class="connto-auth-logo" aria-hidden="true">
-      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="24" cy="24" r="24" fill="#2D7D6F"/>
-        <path d="M14 18h20v2H14zM14 22h14v2H14zM14 26h18v2H14z" fill="#fff" opacity="0.9"/>
-        <path d="M30 14l6 6-6 6v-4h-4v-4h4v-4z" fill="#fff"/>
-      </svg>
+    <div class="connto-auth-logo">
+      {% include 'conntoapp/partials/site-logo.html' with logo_class='connto-site-logo--auth' %}
     </div>
 
     <h1>Giriş Yap</h1>

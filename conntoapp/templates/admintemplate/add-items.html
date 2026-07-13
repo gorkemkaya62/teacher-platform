@@ -46,7 +46,10 @@
                 <input type="hidden" name="form_source" value="add_items">
                 <input type="hidden" name="active_tab" value="profile">
                 {% for field in teacherProfileForm %}
-                  {% if field.name != 'image' %}
+                  {% if field.name == 'phone_country_code' %}
+                    {% include 'conntoapp/partials/phone-fields.html' with code_field=teacherProfileForm.phone_country_code number_field=teacherProfileForm.phone_number %}
+                  {% elif field.name == 'phone_number' %}
+                  {% elif field.name != 'image' %}
                     <br><label>{{ field.label }}</label>{{ field }}
                   {% endif %}
                 {% endfor %}
@@ -160,6 +163,7 @@
 
 {% block js_files %}
   <script src="{% static 'adminstatic/js/city-district.js' %}"></script>
+  <script src="{% static 'adminstatic/js/phone-field.js' %}"></script>
   <script src="{% static 'adminstatic/js/skill-degree.js' %}"></script>
   <script src="{% static 'adminstatic/js/education-ongoing.js' %}"></script>
   <script>

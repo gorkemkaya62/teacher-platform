@@ -1,0 +1,55 @@
+<div class="connto-phone-country-picker" data-phone-country-picker>
+  <select
+    name="{{ widget.name }}"
+    {% include "django/forms/widgets/attrs.html" %}
+    hidden
+    aria-hidden="true"
+    tabindex="-1"
+  >
+    {% for group_name, group_choices, group_index in widget.optgroups %}
+      {% if group_name %}<optgroup label="{{ group_name }}">{% endif %}
+      {% for option in group_choices %}
+        <option
+          value="{{ option.value|stringformat:'s' }}"
+          {% if option.selected %} selected{% endif %}
+        >{{ option.label }}</option>
+      {% endfor %}
+      {% if group_name %}</optgroup>{% endif %}
+    {% endfor %}
+  </select>
+
+  <button
+    type="button"
+    class="connto-phone-country-picker__trigger"
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-label="Ülke kodu seç"
+  >
+    <img
+      class="connto-phone-country-picker__flag"
+      src="{{ widget.selected_flag }}"
+      width="28"
+      height="21"
+      alt=""
+    />
+    <span class="connto-phone-country-picker__dial">{{ widget.selected_code }}</span>
+    <i class="fa fa-chevron-down" aria-hidden="true"></i>
+  </button>
+
+  <ul class="connto-phone-country-picker__list" role="listbox" hidden>
+    {% for group_name, group_choices, group_index in widget.optgroups %}
+      {% for option in group_choices %}
+        <li
+          role="option"
+          data-code="{{ option.value }}"
+          data-iso="{{ option.attrs.data_iso }}"
+          data-flag="{{ option.attrs.data_flag }}"
+          {% if option.selected %} aria-selected="true"{% endif %}
+        >
+          <img src="{{ option.attrs.data_flag }}" width="24" height="18" alt="" />
+          <span class="connto-phone-country-picker__option-code">{{ option.value }}</span>
+        </li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+</div>

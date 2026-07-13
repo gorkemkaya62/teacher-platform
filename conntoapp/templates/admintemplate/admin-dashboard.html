@@ -1,158 +1,517 @@
 {% extends 'admintemplate/base.html' %}
 
+
+
 {% block title %}Yönetim — {{ SITE_NAME }}{% endblock %}
 
+
+
 {% block content %}
+
 <div class="container">
+
     <div class="row mb-4">
+
         <div class="col-md-6">
+
             <h2 class="mb-0">Kontrol Paneli</h2>
+
+            <p class="text-muted mb-0 mt-1">Aktif kullanıcılar anlık olarak güncellenir</p>
+
         </div>
+
     </div>
+
+
 
     {% if messages %}
+
         {% for message in messages %}
+
             <div class="alert alert-{{ message.tags }}">
+
                 {{ message }}
+
             </div>
+
         {% endfor %}
+
     {% endif %}
 
+
+
     <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card stats-card h-100">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col">
-                            <div class="stats-title">Toplam Öğretmen</div>
-                            <div class="stats-value">{{ total_users }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-users stats-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
+
             <div class="card stats-card h-100">
+
                 <div class="card-body">
+
                     <div class="row align-items-center">
+
                         <div class="col">
-                            <div class="stats-title">Toplam Kurs Merkezi</div>
-                            <div class="stats-value">{{ total_course_centers }}</div>
+
+                            <div class="stats-title">Toplam Öğretmen</div>
+
+                            <div class="stats-value">{{ total_users }}</div>
+
                         </div>
+
                         <div class="col-auto">
-                            <i class="fas fa-building stats-icon"></i>
+
+                            <i class="fas fa-users stats-icon"></i>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card stats-card stats-card--active h-100">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col">
+
+                            <div class="stats-title">Aktif Öğretmen</div>
+
+                            <div class="stats-value" id="active-teachers-count">{{ active_teachers }}</div>
+
+                        </div>
+
+                        <div class="col-auto">
+
+                            <i class="fas fa-circle stats-icon stats-icon--active"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card stats-card h-100">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col">
+
+                            <div class="stats-title">Toplam Kurs Merkezi</div>
+
+                            <div class="stats-value">{{ total_course_centers }}</div>
+
+                        </div>
+
+                        <div class="col-auto">
+
+                            <i class="fas fa-building stats-icon"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="col-xl-3 col-md-6 mb-4">
+
+            <div class="card stats-card stats-card--active h-100">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        <div class="col">
+
+                            <div class="stats-title">Aktif Kurs Merkezi</div>
+
+                            <div class="stats-value" id="active-course-centers-count">{{ active_course_centers }}</div>
+
+                        </div>
+
+                        <div class="col-auto">
+
+                            <i class="fas fa-circle stats-icon stats-icon--active"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
+
 
     <div class="row">
+
         <div class="col-md-12">
+
             <div class="card">
+
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Öğretmenler <div class="stats-value">{{ total_users }}</div></h5>
-                    
+
+                    <h5 class="mb-0">Öğretmenler <span class="text-muted fw-normal">({{ total_users }})</span></h5>
+
                 </div>
+
                 <div class="card-body">
+
                     <div class="table-responsive">
+
                         <table class="table table-hover">
+
                             <thead>
+
                                 <tr>
+
                                     <th>ID</th>
+
                                     <th>Ad Soyad</th>
+
                                     <th>E-posta</th>
+
                                     <th>Şehir</th>
+
                                     <th>Branş</th>
+
                                     <th>Cinsiyet</th>
+
                                     <th>İşlemler</th>
-                                    
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 {% for user in users %}
+
                                 <tr>
+
                                     <td>{{ user.id }}</td>
+
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ user.image.url }}" alt="{{ user.fullname }}" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <span
+
+                                                class="presence-dot{% if user.id in active_teacher_ids %} presence-dot--active{% endif %}"
+
+                                                data-presence-type="teacher"
+
+                                                data-presence-id="{{ user.id }}"
+
+                                                title="{% if user.id in active_teacher_ids %}Şu an aktif{% else %}Çevrimdışı{% endif %}"
+
+                                                aria-label="{% if user.id in active_teacher_ids %}Şu an aktif{% else %}Çevrimdışı{% endif %}"
+
+                                            ></span>
+
+                                            <img src="{{ user.image.url }}" alt="{{ user.fullname }}" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+
                                             {{ user.fullname }}
+
                                         </div>
+
                                     </td>
+
                                     <td>{{ user.email }}</td>
+
                                     <td>{{ user.get_city_display }}</td>
+
                                     <td>{{ user.get_branch_display }}</td>
+
                                     <td>{{ user.get_gender_display }}</td>
+
                                     <td>
+
                                         <a href="{% url 'admin_user_detail' user.id %}" class="btn btn-info btn-sm">
+
                                             <i class="fas fa-eye me-1"></i>
+
                                             Detay
+
                                         </a>
+
                                         <a href="{% url 'admin_delete_user' user.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu öğretmeni silmek istediğinize emin misiniz?')">
+
                                             <i class="fas fa-trash me-1"></i>
+
                                             Sil
+
                                         </a>
+
                                     </td>
+
                                 </tr>
+
                                 {% endfor %}
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
+
+
     <div class="row mt-4">
+
         <div class="col-md-12">
+
             <div class="card">
+
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Kurs Merkezleri</h5>
+
+                    <h5 class="mb-0">Kurs Merkezleri <span class="text-muted fw-normal">({{ total_course_centers }})</span></h5>
+
                 </div>
+
                 <div class="card-body">
+
                     <div class="table-responsive">
+
                         <table class="table table-hover">
+
                             <thead>
+
                                 <tr>
+
                                     <th>ID</th>
+
                                     <th>Kurs Merkezi Adı</th>
+
                                     <th>Kurs Türü</th>
+
                                     <th>Kapasite</th>
+
                                     <th>E-posta</th>
+
                                     <th>İşlemler</th>
+
                                 </tr>
+
                             </thead>
+
                             <tbody>
+
                                 {% for course_center in course_centers %}
+
                                 <tr>
+
                                     <td>{{ course_center.id }}</td>
-                                    <td>{{ course_center.center_name }}</td>
-                                    <td>{{ course_center.center_type }}</td>
-                                    <td>{{ course_center.teacher_capacity }}</td>
-                                    <td>{{ course_center.email }}</td>
+
                                     <td>
-                                        <a href="{% url 'admin_course_center_detail' course_center.id %}" class="btn btn-info btn-sm">
-                                            <i class="fas fa-eye me-1"></i>
-                                            Detay
-                                        </a>
-                                        <a href="{% url 'admin_delete_course_center' course_center.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu kurs merkezini silmek istediğinize emin misiniz?')">
-                                            <i class="fas fa-trash me-1"></i>
-                                            Sil
-                                        </a>
+
+                                        <div class="d-flex align-items-center gap-2">
+
+                                            <span
+
+                                                class="presence-dot{% if course_center.id in active_course_center_ids %} presence-dot--active{% endif %}"
+
+                                                data-presence-type="course_center"
+
+                                                data-presence-id="{{ course_center.id }}"
+
+                                                title="{% if course_center.id in active_course_center_ids %}Şu an aktif{% else %}Çevrimdışı{% endif %}"
+
+                                                aria-label="{% if course_center.id in active_course_center_ids %}Şu an aktif{% else %}Çevrimdışı{% endif %}"
+
+                                            ></span>
+
+                                            {{ course_center.center_name }}
+
+                                        </div>
+
                                     </td>
+
+                                    <td>{{ course_center.center_type }}</td>
+
+                                    <td>{{ course_center.teacher_capacity }}</td>
+
+                                    <td>{{ course_center.email }}</td>
+
+                                    <td>
+
+                                        <a href="{% url 'admin_course_center_detail' course_center.id %}" class="btn btn-info btn-sm">
+
+                                            <i class="fas fa-eye me-1"></i>
+
+                                            Detay
+
+                                        </a>
+
+                                        <a href="{% url 'admin_delete_course_center' course_center.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Bu kurs merkezini silmek istediğinize emin misiniz?')">
+
+                                            <i class="fas fa-trash me-1"></i>
+
+                                            Sil
+
+                                        </a>
+
+                                    </td>
+
                                 </tr>
+
                                 {% endfor %}
+
                             </tbody>
+
                         </table>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
-{% endblock %} 
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    var activeUsersUrl = "{% url 'admin_active_users_api' %}";
+
+    var teachersCountEl = document.getElementById('active-teachers-count');
+
+    var courseCentersCountEl = document.getElementById('active-course-centers-count');
+
+
+
+    function setPresenceDot(dot, isActive) {
+
+        dot.classList.toggle('presence-dot--active', isActive);
+
+        dot.title = isActive ? 'Şu an aktif' : 'Çevrimdışı';
+
+        dot.setAttribute('aria-label', isActive ? 'Şu an aktif' : 'Çevrimdışı');
+
+    }
+
+
+
+    function refreshActiveUsers() {
+
+        fetch(activeUsersUrl, {
+
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+
+            credentials: 'same-origin',
+
+        })
+
+            .then(function (response) {
+
+                if (!response.ok) return null;
+
+                return response.json();
+
+            })
+
+            .then(function (data) {
+
+                if (!data) return;
+
+
+
+                if (teachersCountEl) {
+
+                    teachersCountEl.textContent = data.active_teachers;
+
+                }
+
+                if (courseCentersCountEl) {
+
+                    courseCentersCountEl.textContent = data.active_course_centers;
+
+                }
+
+
+
+                document.querySelectorAll('[data-presence-type="teacher"]').forEach(function (dot) {
+
+                    var id = dot.getAttribute('data-presence-id');
+
+                    setPresenceDot(dot, Boolean(data.teachers && data.teachers[id]));
+
+                });
+
+
+
+                document.querySelectorAll('[data-presence-type="course_center"]').forEach(function (dot) {
+
+                    var id = dot.getAttribute('data-presence-id');
+
+                    setPresenceDot(dot, Boolean(data.course_centers && data.course_centers[id]));
+
+                });
+
+            })
+
+            .catch(function () {});
+
+    }
+
+
+
+    refreshActiveUsers();
+
+    setInterval(refreshActiveUsers, 5000);
+
+});
+
+</script>
+
+{% endblock %}
+
+

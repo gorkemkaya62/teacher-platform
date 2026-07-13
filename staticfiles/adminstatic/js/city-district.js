@@ -18,7 +18,7 @@
     refreshMaterialSelect(districtSelect);
 
     if (!city) {
-      districtSelect.innerHTML = '<option value="">Önce şehir seçin</option>';
+      districtSelect.innerHTML = '<option value="">Seçiniz</option>';
       districtSelect.disabled = true;
       refreshMaterialSelect(districtSelect);
       return;
@@ -32,7 +32,7 @@
         return response.json();
       })
       .then(function (data) {
-        var options = '<option value="">İlçe seçin</option>';
+        var options = '<option value="">Seçiniz</option>';
         data.districts.forEach(function (item) {
           var selected =
             selectedDistrict && selectedDistrict === item.value ? " selected" : "";
@@ -75,6 +75,9 @@
       jQuery(citySelect).off("change.cityDistrict").on("change.cityDistrict", onCityChange);
     }
 
-    populateDistricts(citySelect, districtSelect, districtSelect.value);
+    var initialDistrict =
+      districtSelect.getAttribute("data-selected-district") || districtSelect.value;
+
+    populateDistricts(citySelect, districtSelect, initialDistrict);
   };
 })();

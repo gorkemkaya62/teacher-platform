@@ -13,7 +13,7 @@ class CustomUser(AbstractUser):
     instagram = models.CharField(max_length=100, null=True, blank=True, verbose_name="Instagram")
     gender = models.CharField(max_length=6, choices=CustomUserChoices.GENDER_CHOICES, verbose_name="Cinsiyet")
     birth_date = models.DateField(verbose_name="Doğum Tarihi")
-    phone = models.CharField(max_length=12, null=True, blank=True, verbose_name="Telefon")
+    phone = models.CharField(max_length=20, null=True, blank=True, verbose_name="Telefon")
     branch = models.CharField(
         max_length=50,
         choices=TeacherChoices.BRANCH_CHOICES,
@@ -32,6 +32,7 @@ class CustomUser(AbstractUser):
     short_description = models.CharField(max_length=100, null=True, blank=True, verbose_name="Kısa Tanıtım")
     long_description = models.TextField(max_length=500, null=True, blank=True, verbose_name="Biyografi")
     view = models.IntegerField(default=0)
+    last_seen = models.DateTimeField(null=True, blank=True, verbose_name="Son Aktiflik")
     image = models.ImageField(upload_to="images/", default="images/default.jpg", null=False, blank=False, verbose_name="Profil Fotoğrafı")
 
     class Meta:
@@ -54,6 +55,14 @@ class CourseCenter(models.Model):
     teacher_capacity = models.IntegerField(verbose_name="Öğretmen Kapasitesi")
     email = models.EmailField(unique=True, null=True, blank=True, verbose_name="E-posta")
     password = models.CharField(max_length=128, null=True, blank=True)
+    last_seen = models.DateTimeField(null=True, blank=True, verbose_name="Son Aktiflik")
+    image = models.ImageField(
+        upload_to="course_centers/",
+        default="images/default.jpg",
+        null=False,
+        blank=False,
+        verbose_name="Profil Fotoğrafı",
+    )
 
     class Meta:
         verbose_name = "Kurs Merkezi"
@@ -65,8 +74,73 @@ class CourseCenter(models.Model):
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
 
+    @property
+    def has_custom_image(self):
+        return bool(self.image and self.image.name != "images/default.jpg")
+
     def __str__(self):
         return self.center_name
+
+
+class TeacherRating(models.Model):
+    teacher = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='ratings',
+        verbose_name='Öğretmen',
+    )
+    course_center = models.ForeignKey(
+        CourseCenter,
+        on_delete=models.CASCADE,
+        related_name='teacher_ratings',
+        verbose_name='Kurs Merkezi',
+    )
+    score = models.PositiveSmallIntegerField(verbose_name='Puan')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Öğretmen Puanı'
+        verbose_name_plural = 'Öğretmen Puanları'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['teacher', 'course_center'],
+                name='unique_teacher_rating_per_center',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.course_center} → {self.teacher} ({self.score})'
+
+
+class TeacherFavorite(models.Model):
+    teacher = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='favorited_by',
+        verbose_name='Öğretmen',
+    )
+    course_center = models.ForeignKey(
+        CourseCenter,
+        on_delete=models.CASCADE,
+        related_name='favorite_teachers',
+        verbose_name='Kurs Merkezi',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Favori Öğretmen'
+        verbose_name_plural = 'Favori Öğretmenler'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['teacher', 'course_center'],
+                name='unique_teacher_favorite_per_center',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.course_center} ★ {self.teacher}'
+
 
 class UserSkill(models.Model):
     custom_user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="userskills")
@@ -87,7 +161,7 @@ class UserEducation(models.Model):
     department = models.CharField(max_length=100, verbose_name="Bölüm")
     start_date = models.DateField(verbose_name="Başlangıç")
     end_date = models.DateField(null=True, blank=True, verbose_name="Bitiş")
-    short_description = models.TextField(max_length=500, verbose_name="Açıklama")
+    short_description = models.TextField(max_length=500, blank=True, default='', verbose_name="Açıklama")
 
     class Meta:
         verbose_name = "Eğitim"

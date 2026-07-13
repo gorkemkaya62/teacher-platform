@@ -4,13 +4,13 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="{{ SITE_TAGLINE }}" />
     <link href="{% static 'homestatic/assets/images/favicon/favicon.png' %}" rel="icon" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="{% static 'homestatic/assets/css/external.css' %}" rel="stylesheet" />
     <link href="{% static 'homestatic/assets/css/bootstrap.min.css' %}" rel="stylesheet" />
-    <link href="{% static 'edu-theme.css' %}?v=27" rel="stylesheet" />
+    <link href="{% static 'edu-theme.css' %}?v=49" rel="stylesheet" />
     {% block css_files %}{% endblock css_files %}
     <title>{% block title %}{{ SITE_NAME }}{% endblock title %}</title>
   </head>
@@ -19,7 +19,7 @@
     <div id="wrapper" class="wrapper clearfix">
       <header class="connto-header">
         <div class="container-fluid connto-header__inner">
-          <a class="connto-logo" href="{% url 'home' %}">{{ SITE_NAME|upper }}</a>
+          {% include 'conntoapp/partials/site-logo.html' with logo_class='connto-site-logo--header' %}
 
           <form class="connto-header-search" method="GET" action="{% url 'search' %}">
             <i class="fa fa-search"></i>
@@ -39,6 +39,18 @@
                 <span class="connto-user-chip__email">{{ user.email }}</span>
               </a>
             {% elif is_course_center_view %}
+              <a href="{% url 'course_center_profile' %}" class="connto-user-chip">
+                {% if current_course_center.has_custom_image %}
+                  <img
+                    class="connto-user-chip__photo"
+                    src="{{ current_course_center.image.url }}"
+                    alt="{{ current_course_center.center_name }}"
+                  />
+                {% else %}
+                  <span class="connto-user-chip__avatar">{{ current_course_center.center_name|slice:":1"|upper }}</span>
+                {% endif %}
+                <span class="connto-user-chip__email">{{ current_course_center.center_name }}</span>
+              </a>
               <a href="{% url 'adminlogout' %}" class="connto-btn connto-btn--outline connto-btn--sm">Çıkış</a>
             {% else %}
               <a href="{% url 'login' %}" class="connto-btn connto-btn--outline connto-btn--sm">Giriş</a>
@@ -54,6 +66,10 @@
 
         <div class="collapse connto-mobile-nav" id="connto-mobile-nav">
           <a href="{% url 'home' %}">Ana Sayfa</a>
+          {% if is_course_center_view %}
+            <a href="{% url 'course_center_profile' %}">Profilim</a>
+            <a href="{% url 'adminlogout' %}">Çıkış</a>
+          {% endif %}
           <a href="{% url 'login' %}">Giriş Yap</a>
           <a href="{% url 'register' %}">Üye Ol</a>
         </div>

@@ -72,7 +72,13 @@ MEDIA_ROOT = BASE_DIR / os.environ.get('MEDIA_ROOT', 'media')
 AUTH_USER_MODEL = 'conntoapp.CustomUser'
 SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 LOGIN_URL = '/adminpanel/login'
+
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 SITE_NAME = os.environ.get('SITE_NAME', 'ogretmenim.com')
 SITE_TAGLINE = os.environ.get(
@@ -109,6 +115,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'conntoapp.middleware.ActiveUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

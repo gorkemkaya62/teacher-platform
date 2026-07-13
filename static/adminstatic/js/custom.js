@@ -14,7 +14,7 @@ $(document).ready(function() {
     });
 
     //MATERIAL SELECT BOX
-    $('select').material_select();
+    $('select').not('.connto-phone-code-native').material_select();
 
     //MATERIAL COLLAPSIBLE
     $('.collapsible').collapsible();

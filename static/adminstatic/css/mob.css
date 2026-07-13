@@ -76,8 +76,22 @@
         display: none;
     }
     .top-user-pro {
-        float: right;
-        padding: 18px 0px;
+        float: none;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 12px 0 !important;
+        font-size: 14px;
+    }
+
+    .top-user-pro img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .sb2-2 {
+        padding: 88px 12px 24px !important;
     }
     .db-2 ul li {
         width: 100%;
@@ -94,9 +108,47 @@
         margin-right: 0px;
         text-align: center;
     }
+
+    ul.nav-tabs.tab-list {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+        float: none;
+        width: 100%;
+    }
+
+    ul.nav-tabs.tab-list > li {
+        float: none;
+        flex: 0 0 auto;
+    }
 }
 /*-------------------------------------------------------*/
 /* When the browser is between 0px and 481px wide,below css will be applied.
 /*-------------------------------------------------------*/
 
-@media screen and (max-width: 481px) {}
+@media screen and (max-width: 481px) {
+    .sb2-2 {
+        padding: 88px 10px 20px !important;
+    }
+
+    .sb1-1 {
+        padding: 8px 10px !important;
+    }
+
+    .top-user-pro {
+        font-size: 13px;
+        padding: 10px 0 !important;
+    }
+
+    .top-user-pro img {
+        width: 28px;
+        height: 28px;
+        margin-right: 4px;
+    }
+
+    .connto-site-logo--panel .connto-site-logo__img {
+        width: 110px;
+    }
+}
