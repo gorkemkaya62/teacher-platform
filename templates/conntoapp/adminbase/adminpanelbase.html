@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{% static 'adminstatic/css/bootstrap.css' %}" />
     <link rel="stylesheet" href="{% static 'adminstatic/css/materialize.css' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'edu-theme.css' %}?v=49" />
+    <link rel="stylesheet" href="{% static 'edu-theme.css' %}?v=55" />
     {% block css_files %}{% endblock %}
   </head>
   <body class="edu-panel-page">
@@ -27,9 +27,7 @@
         <div class="col-md-2 tab-hide"></div>
         <div class="col-md-2 col-sm-3 col-xs-6">
           <a class="waves-effect dropdown-button top-user-pro" href="#" data-activates="top-menu">
-            <span class="connto-avatar connto-avatar--xs">
-              <img class="connto-avatar__img" src="{{ user.image.url }}" alt="" />
-            </span><span class="top-user-pro__label">Hesabım</span><i class="fa fa-angle-down"></i>
+            <span class="top-user-pro__label">Hesabım</span><i class="fa fa-angle-down"></i>
           </a>
           <ul id="top-menu" class="dropdown-content top-menu-sty">
             <li>
@@ -65,14 +63,14 @@
             </ul>
           </div>
           <div class="sb2-13">
-            <ul class="collapsible">
-              <li><a href="{% url 'addItems' %}"><i class="fa fa-address-card"></i> Profil Düzenle</a></li>
-              <li><a href="{% url 'listingSkill' %}"><i class="fa fa-heart"></i> Yetkinliklerim</a></li>
-              <li><a href="{% url 'listingEducation' %}"><i class="fa fa-info"></i> Eğitimlerim</a></li>
-              <li><a href="{% url 'listingExperience' %}"><i class="fa fa-check"></i> Deneyimlerim</a></li>
-              <li><a href="{% url 'listingService' %}"><i class="fa fa-user"></i> Verdiğim Dersler</a></li>
-              <li><a href="{% url 'listingAward' %}"><i class="fa fa-trophy"></i> Sertifikalarım</a></li>
-              <li><a href="{% url 'listingWork' %}"><i class="fa fa-book"></i> Materyallerim</a></li>
+            <ul class="collapsible edu-panel-nav">
+              <li{% if request.resolver_match.url_name == 'addItems' %} class="active"{% endif %}><a href="{% url 'addItems' %}"><i class="fa fa-address-card"></i> Profil Düzenle</a></li>
+              <li{% if request.resolver_match.url_name == 'listingSkill' %} class="active"{% endif %}><a href="{% url 'listingSkill' %}"><i class="fa fa-heart"></i> Yetkinliklerim</a></li>
+              <li{% if request.resolver_match.url_name == 'listingEducation' %} class="active"{% endif %}><a href="{% url 'listingEducation' %}"><i class="fa fa-info"></i> Eğitimlerim</a></li>
+              <li{% if request.resolver_match.url_name == 'listingExperience' %} class="active"{% endif %}><a href="{% url 'listingExperience' %}"><i class="fa fa-check"></i> Deneyimlerim</a></li>
+              <li{% if request.resolver_match.url_name == 'listingService' %} class="active"{% endif %}><a href="{% url 'listingService' %}"><i class="fa fa-user"></i> Verdiğim Dersler</a></li>
+              <li{% if request.resolver_match.url_name == 'listingAward' %} class="active"{% endif %}><a href="{% url 'listingAward' %}"><i class="fa fa-trophy"></i> Sertifikalarım</a></li>
+              <li{% if request.resolver_match.url_name == 'listingWork' %} class="active"{% endif %}><a href="{% url 'listingWork' %}"><i class="fa fa-book"></i> Materyallerim</a></li>
             </ul>
           </div>
         </div>
@@ -102,6 +100,7 @@
     <script src="{% static 'adminstatic/js/materialize.min.js' %}"></script>
     <script src="{% static 'adminstatic/js/custom.js' %}"></script>
     <script src="{% static 'adminstatic/js/date-picker.js' %}"></script>
+    {% include 'conntoapp/partials/flash-popup.html' %}
     {% block js_files %}{% endblock %}
   </body>
 </html>

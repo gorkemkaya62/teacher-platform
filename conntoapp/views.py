@@ -47,7 +47,7 @@ def adminlogin(request):
                     if course_center.check_password(password):
                         request.session['course_center_id'] = course_center.id
                         request.session['is_course_center'] = True
-                        messages.success(request, "Kurs merkezi olarak başarıyla giriş yapıldı")
+                        messages.success(request, "Kurs merkezi olarak başarıyla giriş yapıldı", extra_tags="popup")
                         return redirect("/home/")
                     else:
                         messages.error(request, "Kurs merkezi hesabı için geçersiz şifre")
@@ -58,7 +58,7 @@ def adminlogin(request):
                     user = CustomUser.objects.get(email=email)
                     if user.check_password(password):
                         login(request, user)
-                        messages.success(request, "Başarıyla giriş yapıldı")
+                        messages.success(request, "Başarıyla giriş yapıldı", extra_tags="popup")
                         return redirect("addItems")
                     else:
                         messages.error(request, "Öğretmen hesabı için geçersiz şifre")
@@ -112,10 +112,10 @@ def adminregister(request):
                     messages.error(request, str(e))
                     return redirect("register")
             else:
-                for field, errors in user_form.errors.items():
-                    for error in errors:
-                        messages.error(request, f"{error}")
-                return redirect("register")
+                return render(request, "admintemplate/register.html", {
+                    'form': user_form,
+                    'course_center_form': CourseCenterRegisterForm(),
+                })
     else:
         user_form = TeacherRegisterForm()
         course_center_form = CourseCenterRegisterForm()
@@ -247,7 +247,7 @@ def teacherProfileAccept(request):
     form = TeacherProfileForm(request.POST, request.FILES, instance=request.user)
     if form.is_valid():
         form.save()
-        messages.success(request, "Profil bilgileri kaydedildi.")
+        messages.success(request, "Profil bilgileriniz başarıyla güncellendi.", extra_tags="popup")
         return _redirect_add_items_tab(tab)
 
     return render(

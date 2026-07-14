@@ -69,6 +69,25 @@ class TeacherAuthTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Öğretmen Profili')
 
+    def test_teacher_profile_save_shows_success_popup(self):
+        self.client.login(username='teacher@test.com', password='testpass123')
+        response = self.client.post(reverse('teacherProfileAccept'), {
+            'active_tab': 'profile',
+            'branch': 'matematik',
+            'experience_years': '3-5',
+            'works_full_time': 'on',
+            'city': 'ankara',
+            'district': 'cankaya',
+            'gender': 'MALE',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+            'short_description': 'Matematik öğretmeni',
+            'long_description': 'Deneyimli matematik öğretmeni.',
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Profil bilgileriniz başarıyla güncellendi.')
+        self.assertContains(response, 'Swal.fire')
+
 
 class CourseCenterAuthTests(TestCase):
     def setUp(self):
@@ -125,6 +144,8 @@ class CourseCenterAuthTests(TestCase):
         self.assertContains(response, 'fa-pencil')
         self.assertNotContains(response, 'Fotoğrafı Güncelle')
         self.assertNotContains(response, 'sifre')
+        self.assertContains(response, 'href="/home/#ogretmen-ara"')
+        self.assertNotContains(response, 'href="/home/searching"')
 
     def test_course_center_profile_upload_photo(self):
         from django.core.files.uploadedfile import SimpleUploadedFile
@@ -161,12 +182,20 @@ class TeacherSearchTests(TestCase):
         User.objects.create_user(
             username='m1@test.com', email='m1@test.com', password='p',
             fullname='Matematik Öğretmen', gender='MALE', birth_date=date(1985, 5, 5),
-            branch='matematik', experience_years='5-10', city='ankara', district='cankaya',
+            branch='matematik', experience_years='5-10', work_schedule='tam_zamanli',
+            city='ankara', district='cankaya',
         )
         User.objects.create_user(
             username='f1@test.com', email='f1@test.com', password='p',
             fullname='Fizik Öğretmen', gender='FEMALE', birth_date=date(1988, 3, 3),
-            branch='fizik', experience_years='3-5', city='istanbul', district='kadikoy',
+            branch='fizik', experience_years='3-5', work_schedule='yari_zamanli',
+            city='istanbul', district='kadikoy',
+        )
+        User.objects.create_user(
+            username='e1@test.com', email='e1@test.com', password='p',
+            fullname='Esnek Öğretmen', gender='MALE', birth_date=date(1990, 1, 1),
+            branch='ingilizce', experience_years='1-3', work_schedule='her_ikisi',
+            city='izmir', district='karsiyaka',
         )
 
     def test_home_page_loads(self):
@@ -174,6 +203,8 @@ class TeacherSearchTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'ogretmenim.com')
         self.assertContains(response, 'id="search-district"')
+        self.assertContains(response, 'id="search-works-full-time"')
+        self.assertContains(response, 'id="search-works-part-time"')
         self.assertContains(response, 'city-district.js')
 
     def test_search_by_district(self):
@@ -195,6 +226,37 @@ class TeacherSearchTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Matematik Öğretmen')
         self.assertContains(response, 'Fizik Öğretmen')
+        self.assertContains(response, 'Esnek Öğretmen')
+
+    def test_search_by_work_schedule_tam_zamanli(self):
+        response = self.client.get(reverse('search'), {'works_full_time': 'on'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Matematik Öğretmen')
+        self.assertContains(response, 'Esnek Öğretmen')
+        self.assertNotContains(response, 'Fizik Öğretmen')
+
+    def test_search_by_work_schedule_yari_zamanli(self):
+        response = self.client.get(reverse('search'), {'works_part_time': 'on'})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Fizik Öğretmen')
+        self.assertContains(response, 'Esnek Öğretmen')
+        self.assertNotContains(response, 'Matematik Öğretmen')
+
+    def test_search_by_work_schedule_both_checked(self):
+        response = self.client.get(reverse('search'), {
+            'works_full_time': 'on',
+            'works_part_time': 'on',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Matematik Öğretmen')
+        self.assertContains(response, 'Fizik Öğretmen')
+        self.assertContains(response, 'Esnek Öğretmen')
+
+    def test_search_listing_has_work_schedule_filter(self):
+        response = self.client.get(reverse('search'))
+        self.assertContains(response, 'id="filter-works-full-time"')
+        self.assertContains(response, 'id="filter-works-part-time"')
+        self.assertContains(response, 'connto-work-schedule-checks')
 
     def test_search_by_branch(self):
         response = self.client.get(reverse('search'), {'branch': 'matematik'})
@@ -573,6 +635,20 @@ class ModelTests(TestCase):
         self.assertEqual(user.get_branch_display(), 'Matematik')
         self.assertEqual(user.get_city_display(), 'Ankara')
 
+    def test_work_schedule_profile_display(self):
+        user = User.objects.create_user(
+            username='w@test.com', email='w@test.com', password='p',
+            fullname='Work User', gender='MALE', birth_date=date(1980, 1, 1),
+            branch='matematik', city='ankara', work_schedule='her_ikisi',
+        )
+        self.assertEqual(user.get_work_schedule_profile_display(), 'Tam Zamanlı · Yarı Zamanlı')
+
+        user.work_schedule = 'tam_zamanli'
+        self.assertEqual(user.get_work_schedule_profile_display(), 'Tam Zamanlı')
+
+        user.work_schedule = 'yari_zamanli'
+        self.assertEqual(user.get_work_schedule_profile_display(), 'Yarı Zamanlı')
+
     def test_experience_institution_name(self):
         user = User.objects.create_user(
             username='e@test.com', email='e@test.com', password='p',
@@ -638,6 +714,7 @@ class CityDistrictTests(TestCase):
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
+            'works_full_time': True,
             'city': 'ankara',
             'district': 'cankaya',
             'phone_country_code': '+90',
@@ -654,6 +731,7 @@ class CityDistrictTests(TestCase):
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
+            'works_full_time': True,
             'city': 'ankara',
             'district': 'cankaya',
             'phone_country_code': '+90',
@@ -671,6 +749,7 @@ class CityDistrictTests(TestCase):
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
+            'works_full_time': True,
             'city': 'ankara',
             'district': 'kadikoy',
             'phone_country_code': '+90',
@@ -687,6 +766,7 @@ class CityDistrictTests(TestCase):
             'gender': 'MALE',
             'birth_date': '1990-01-01',
             'branch': 'fizik',
+            'works_part_time': True,
             'city': 'izmir',
             'district': 'karsiyaka',
             'phone_country_code': '+90',
@@ -697,7 +777,64 @@ class CityDistrictTests(TestCase):
         user = User.objects.get(email='ilce@test.com')
         self.assertEqual(user.city, 'izmir')
         self.assertEqual(user.district, 'karsiyaka')
+        self.assertEqual(user.work_schedule, 'yari_zamanli')
         self.assertEqual(user.phone, '+905329876543')
+
+    def test_register_form_requires_work_schedule(self):
+        from conntoapp.forms import TeacherRegisterForm
+        form = TeacherRegisterForm(data={
+            'fullname': 'Yeni Ogretmen',
+            'password': 'testpass123',
+            'email': 'schedule@test.com',
+            'gender': 'MALE',
+            'birth_date': '1995-05-10',
+            'branch': 'matematik',
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('works_full_time', form.errors)
+        self.assertEqual(form.errors['works_full_time'], ['required'])
+
+    def test_register_form_accepts_both_work_schedules(self):
+        from conntoapp.forms import TeacherRegisterForm
+        form = TeacherRegisterForm(data={
+            'fullname': 'Esnek Ogretmen',
+            'password': 'testpass123',
+            'email': 'esnek@test.com',
+            'gender': 'MALE',
+            'birth_date': '1995-05-10',
+            'branch': 'matematik',
+            'works_full_time': True,
+            'works_part_time': True,
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        user = form.save()
+        self.assertEqual(user.work_schedule, 'her_ikisi')
+
+    def test_register_post_requires_work_schedule_selection(self):
+        response = self.client.post(reverse('register'), {
+            'fullname': 'Eksik Ogretmen',
+            'password': 'testpass123',
+            'email': 'eksik@test.com',
+            'gender': 'MALE',
+            'birth_date': '1990-01-01',
+            'branch': 'matematik',
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321112233',
+            'checkBox': 'on',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'connto-work-schedule-field--error')
+        self.assertContains(response, 'Lütfen bilgileri eksiksiz doldurunuz.')
 
     def test_register_page_has_phone_country_selector(self):
         response = self.client.get(reverse('register'))

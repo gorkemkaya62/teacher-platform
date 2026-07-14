@@ -26,6 +26,12 @@ class CustomUser(AbstractUser):
         default='0-1',
         verbose_name="Deneyim Süresi",
     )
+    work_schedule = models.CharField(
+        max_length=20,
+        choices=TeacherChoices.WORK_SCHEDULE_CHOICES,
+        default='her_ikisi',
+        verbose_name="Çalışma Şekli",
+    )
     city = models.CharField(max_length=30, choices=CustomUserChoices.TURKISH_CITIES, verbose_name="Şehir")
     district = models.CharField(max_length=50, null=True, blank=True, verbose_name="İlçe")
     job = models.CharField(max_length=20, blank=True, default='')
@@ -47,6 +53,14 @@ class CustomUser(AbstractUser):
         if not self.district:
             return ""
         return get_district_label(self.city, self.district)
+
+    def get_work_schedule_profile_display(self):
+        labels = []
+        if self.work_schedule in ('tam_zamanli', 'her_ikisi'):
+            labels.append('Tam Zamanlı')
+        if self.work_schedule in ('yari_zamanli', 'her_ikisi'):
+            labels.append('Yarı Zamanlı')
+        return ' · '.join(labels)
 
 
 class CourseCenter(models.Model):

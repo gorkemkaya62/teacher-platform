@@ -18,6 +18,58 @@ from .widgets import PhoneCountryCodeWidget
 from django.contrib.auth.forms import PasswordChangeForm
 
 
+def work_schedule_to_flags(work_schedule):
+    return {
+        'works_full_time': work_schedule in ('tam_zamanli', 'her_ikisi'),
+        'works_part_time': work_schedule in ('yari_zamanli', 'her_ikisi'),
+    }
+
+
+def flags_to_work_schedule(works_full_time, works_part_time):
+    if works_full_time and works_part_time:
+        return 'her_ikisi'
+    if works_full_time:
+        return 'tam_zamanli'
+    if works_part_time:
+        return 'yari_zamanli'
+    return ''
+
+
+class WorkScheduleCheckboxMixin:
+    def _inject_work_schedule_fields(self):
+        self.fields['works_full_time'] = forms.BooleanField(
+            required=False,
+            label='Tam Zamanlı',
+        )
+        self.fields['works_part_time'] = forms.BooleanField(
+            required=False,
+            label='Yarı Zamanlı',
+        )
+        self._init_work_schedule_checkboxes()
+
+    def _init_work_schedule_checkboxes(self):
+        if getattr(self, 'instance', None) and getattr(self.instance, 'pk', None):
+            flags = work_schedule_to_flags(self.instance.work_schedule)
+            self.fields['works_full_time'].initial = flags['works_full_time']
+            self.fields['works_part_time'].initial = flags['works_part_time']
+
+    def _clean_work_schedule_checkboxes(self, cleaned_data):
+        works_full_time = cleaned_data.get('works_full_time')
+        works_part_time = cleaned_data.get('works_part_time')
+        if not works_full_time and not works_part_time:
+            self.add_error('works_full_time', 'required')
+            return cleaned_data
+        cleaned_data['work_schedule'] = flags_to_work_schedule(
+            works_full_time,
+            works_part_time,
+        )
+        return cleaned_data
+
+    def _apply_work_schedule_to_instance(self, instance):
+        instance.work_schedule = self.cleaned_data['work_schedule']
+        return instance
+
+
 def calendar_date_widget(required=True):
     attrs = {
         'type': 'date',
@@ -158,7 +210,7 @@ class PhoneNumberFormMixin:
 
 # Öğretmen Kayıt / Giriş Formları
 
-class TeacherRegisterForm(PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
+class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ["fullname", "password", "email", "gender", "birth_date", "branch", "city", "district"]
@@ -197,10 +249,16 @@ class TeacherRegisterForm(PhoneNumberFormMixin, CityDistrictFormMixin, forms.Mod
         self.fields['birth_date'].label = 'Doğum Tarihi'
         self.fields['branch'].label = 'Branş'
         self.fields['city'].label = 'Şehir'
+        self._inject_work_schedule_fields()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return self._clean_work_schedule_checkboxes(cleaned_data)
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.phone = self.get_formatted_phone()
+        self._apply_work_schedule_to_instance(user)
         if commit:
             user.save()
         return user
@@ -262,7 +320,7 @@ class TeacherLoginForm(forms.Form):
 
 # Öğretmen Profil Formları
 
-class TeacherProfileForm(PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
+class TeacherProfileForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = [
@@ -292,10 +350,16 @@ class TeacherProfileForm(PhoneNumberFormMixin, CityDistrictFormMixin, forms.Mode
         super().__init__(*args, **kwargs)
         self._configure_district_field()
         self._inject_phone_fields(required=False)
+        self._inject_work_schedule_fields()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return self._clean_work_schedule_checkboxes(cleaned_data)
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.phone = self.get_formatted_phone() or None
+        self._apply_work_schedule_to_instance(user)
         image = self.files.get('image')
         if image is not None:
             user.image = normalize_profile_image(image)

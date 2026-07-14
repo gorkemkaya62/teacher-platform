@@ -16,7 +16,9 @@
       <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
         {% if messages %}
           {% for message in messages %}
+            {% if 'popup' not in message.tags %}
             <p class="connto-alert{% if message.tags == 'success' %} connto-alert--success{% endif %}">{{ message }}</p>
+            {% endif %}
           {% endfor %}
         {% endif %}
 
@@ -88,7 +90,7 @@
 
           <div class="connto-course-center-profile__actions">
             <a href="{% url 'home' %}" class="connto-btn connto-btn--outline">Ana Sayfaya Dön</a>
-            <a href="{% url 'search' %}" class="connto-btn connto-btn--primary">Öğretmen Ara</a>
+            <a href="{% url 'home' %}#ogretmen-ara" class="connto-btn connto-btn--primary">Öğretmen Ara</a>
           </div>
         </div>
       </div>

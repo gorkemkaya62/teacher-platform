@@ -16,12 +16,14 @@
           </div>
         </div>
         <div class="col-md-5 connto-hero-search-col">
-          <div class="connto-card connto-search-panel">
+          <div id="ogretmen-ara" class="connto-card connto-search-panel">
             <h2>Öğretmen Ara</h2>
             <form method="GET" action="{% url 'search' %}">
               {% if messages %}
                 {% for message in messages %}
+                  {% if 'popup' not in message.tags %}
                   <p class="connto-alert">{{ message }}</p>
+                  {% endif %}
                 {% endfor %}
               {% endif %}
               <div class="connto-field">
@@ -42,6 +44,7 @@
                   {% endfor %}
                 </select>
               </div>
+              {% include 'conntoapp/partials/work-schedule-filter-fields.html' with filter_prefix='search' selected_works_full_time=selected_works_full_time selected_works_part_time=selected_works_part_time %}
               <div class="connto-field">
                 <label for="search-city">Şehir</label>
                 <select name="city" id="search-city" class="connto-select">

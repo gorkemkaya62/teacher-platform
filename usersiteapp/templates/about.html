@@ -25,6 +25,7 @@
             <img src="{% static 'userstatic/assets/images/icon2.png' %}" alt="Yıldız" />
             <h1>{{ user.fullname }}</h1>
             <p><strong>Branş:</strong> {{ user.get_branch_display }} · <strong>Deneyim:</strong> {{ user.get_experience_years_display }}</p>
+            <p><strong>Çalışma Şekli:</strong> {{ user.get_work_schedule_profile_display }}</p>
             <p><strong>Şehir:</strong> {{ user.get_city_display }}{% if user.district %}, {{ user.get_district_display }}{% endif %}</p>
             <p>{{ user.short_description }}</p>
             <p>{{ user.long_description }}</p>

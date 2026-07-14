@@ -1,0 +1,34 @@
+{% if messages %}
+  {% for message in messages %}
+    {% if 'popup' in message.tags %}
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          if (!window.Swal) return;
+
+          var icon = 'info';
+          var title = 'Bilgi';
+
+          {% if 'success' in message.tags %}
+            icon = 'success';
+            title = 'Başarılı';
+          {% elif 'error' in message.tags %}
+            icon = 'error';
+            title = 'Hata';
+          {% elif 'warning' in message.tags %}
+            icon = 'warning';
+            title = 'Uyarı';
+          {% endif %}
+
+          Swal.fire({
+            icon: icon,
+            title: title,
+            text: '{{ message|escapejs }}',
+            confirmButtonColor: '#2D7D6F',
+            confirmButtonText: 'Tamam',
+          });
+        });
+      </script>
+    {% endif %}
+  {% endfor %}
+{% endif %}

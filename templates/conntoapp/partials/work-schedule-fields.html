@@ -1,0 +1,85 @@
+<div class="connto-field connto-work-schedule-field{% if form.works_full_time.errors %} connto-work-schedule-field--error{% endif %}">
+  <span class="connto-work-schedule-field__label">Çalışma Şekli</span>
+  <div class="connto-work-schedule-checks" role="group" aria-label="Çalışma şekli seçimi">
+    <label class="connto-check connto-check--terms connto-work-schedule-check" for="{{ form.works_full_time.id_for_label }}">
+      <input
+        type="checkbox"
+        name="works_full_time"
+        id="{{ form.works_full_time.id_for_label }}"
+        class="connto-terms-checkbox connto-work-schedule-checkbox"
+        {% if form.works_full_time.value %}checked{% endif %}
+      />
+      <span class="connto-check-label">Tam Zamanlı</span>
+    </label>
+    <label class="connto-check connto-check--terms connto-work-schedule-check" for="{{ form.works_part_time.id_for_label }}">
+      <input
+        type="checkbox"
+        name="works_part_time"
+        id="{{ form.works_part_time.id_for_label }}"
+        class="connto-terms-checkbox connto-work-schedule-checkbox"
+        {% if form.works_part_time.value %}checked{% endif %}
+      />
+      <span class="connto-check-label">Yarı Zamanlı</span>
+    </label>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var field = document.querySelector('.connto-work-schedule-field');
+  var group = document.querySelector('.connto-work-schedule-checks');
+  if (!field || !group) return;
+
+  var form = field.closest('form');
+  var hasServerError = {{ form.works_full_time.errors|yesno:"true,false" }};
+
+  function hasSelection() {
+    return Array.prototype.some.call(
+      group.querySelectorAll('input[type="checkbox"]'),
+      function (input) { return input.checked; }
+    );
+  }
+
+  function setError(active) {
+    field.classList.toggle('connto-work-schedule-field--error', active);
+  }
+
+  function showPopup() {
+    if (window.Swal) {
+      window.Swal.fire({
+        icon: 'warning',
+        title: 'Uyarı',
+        text: 'Lütfen bilgileri eksiksiz doldurunuz.',
+        confirmButtonColor: '#2D7D6F',
+        confirmButtonText: 'Tamam',
+      });
+      return;
+    }
+    window.alert('Lütfen bilgileri eksiksiz doldurunuz.');
+  }
+
+  group.querySelectorAll('input[type="checkbox"]').forEach(function (input) {
+    input.addEventListener('change', function () {
+      if (hasSelection()) {
+        setError(false);
+      }
+    });
+  });
+
+  if (form) {
+    form.addEventListener('submit', function (event) {
+      if (!hasSelection()) {
+        event.preventDefault();
+        setError(true);
+        showPopup();
+      }
+    });
+  }
+
+  if (hasServerError) {
+    setError(true);
+    showPopup();
+  }
+});
+</script>

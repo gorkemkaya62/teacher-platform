@@ -1,0 +1,27 @@
+<div class="connto-field connto-work-schedule-field">
+  <span class="connto-work-schedule-field__label">Çalışma Şekli</span>
+  <div class="connto-work-schedule-checks" role="group" aria-label="Çalışma şekli filtresi">
+    <label class="connto-check connto-check--terms connto-work-schedule-check" for="{% if filter_prefix %}{{ filter_prefix }}-{% endif %}works-full-time">
+      <input
+        type="checkbox"
+        name="works_full_time"
+        id="{% if filter_prefix %}{{ filter_prefix }}-{% endif %}works-full-time"
+        class="connto-terms-checkbox connto-work-schedule-checkbox"
+        value="on"
+        {% if selected_works_full_time %}checked{% endif %}
+      />
+      <span class="connto-check-label">Tam Zamanlı</span>
+    </label>
+    <label class="connto-check connto-check--terms connto-work-schedule-check" for="{% if filter_prefix %}{{ filter_prefix }}-{% endif %}works-part-time">
+      <input
+        type="checkbox"
+        name="works_part_time"
+        id="{% if filter_prefix %}{{ filter_prefix }}-{% endif %}works-part-time"
+        class="connto-terms-checkbox connto-work-schedule-checkbox"
+        value="on"
+        {% if selected_works_part_time %}checked{% endif %}
+      />
+      <span class="connto-check-label">Yarı Zamanlı</span>
+    </label>
+  </div>
+</div>

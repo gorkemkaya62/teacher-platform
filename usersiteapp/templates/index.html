@@ -19,7 +19,7 @@
             <div class="infos">
               <h4>{{ user.get_branch_display }}</h4>
               <h1>{{ user.fullname }}</h1>
-              <p>{{ user.get_branch_display }} · {{ user.get_experience_years_display }} · {{ user.get_city_display }}</p>
+              <p>{{ user.get_branch_display }} · {{ user.get_experience_years_display }} · {{ user.get_work_schedule_profile_display }} · {{ user.get_city_display }}</p>
               <a href="{% url "about" user.id %}" class="about-btn"><img src="{% static 'userstatic/assets/images/icon.svg' %}" alt="Detaya git" /></a>
             </div>
           </div>

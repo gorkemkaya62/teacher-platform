@@ -37,6 +37,7 @@
           {% if field.name == 'phone_country_code' %}
             {% include 'conntoapp/partials/phone-fields.html' with code_field=form.phone_country_code number_field=form.phone_number %}
           {% elif field.name == 'phone_number' %}
+          {% elif field.name == 'works_full_time' or field.name == 'works_part_time' %}
           {% else %}
             <div class="connto-field{% if field.name == 'birth_date' %} connto-field--date{% endif %}">
               <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -49,6 +50,9 @@
                 </div>
               {% else %}
                 {{ field }}
+              {% endif %}
+              {% if field.name == 'branch' %}
+                {% include 'conntoapp/partials/work-schedule-fields.html' with form=form %}
               {% endif %}
             </div>
           {% endif %}

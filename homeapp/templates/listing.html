@@ -110,6 +110,7 @@
                 {% endfor %}
               </select>
             </div>
+            {% include 'conntoapp/partials/work-schedule-filter-fields.html' with filter_prefix='filter' selected_works_full_time=selected_works_full_time selected_works_part_time=selected_works_part_time %}
             <div class="connto-field">
               <label for="filter-city">Şehir</label>
               <select name="city" id="filter-city" class="connto-select form-control">
@@ -198,6 +199,7 @@
                   <p class="connto-teacher-card__meta">
                     <i class="fa fa-map-marker"></i> {{ user.get_city_display }}
                     · {{ user.get_experience_years_display }}
+                    · {{ user.get_work_schedule_profile_display }}
                   </p>
                   {% if user.short_description %}
                     <p class="connto-teacher-card__desc">{{ user.short_description|truncatechars:80 }}</p>

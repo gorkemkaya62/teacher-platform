@@ -39,6 +39,39 @@ def _map_teachers_payload(request, teachers):
     return payload
 
 
+def _is_checkbox_checked(request, name):
+    value = request.GET.get(name)
+    return value in ('on', 'true', '1', 'yes')
+
+
+def _selected_work_schedule_filters(request):
+    works_full_time = _is_checkbox_checked(request, 'works_full_time')
+    works_part_time = _is_checkbox_checked(request, 'works_part_time')
+
+    legacy_schedule = request.GET.get('work_schedule', '')
+    if legacy_schedule == 'tam_zamanli':
+        works_full_time = True
+    elif legacy_schedule == 'yari_zamanli':
+        works_part_time = True
+    elif legacy_schedule == 'her_ikisi':
+        works_full_time = True
+        works_part_time = True
+
+    return works_full_time, works_part_time
+
+
+def _build_work_schedule_filter(works_full_time, works_part_time):
+    if not works_full_time and not works_part_time:
+        return Q()
+
+    schedule_filter = Q()
+    if works_full_time:
+        schedule_filter |= Q(work_schedule__in=['tam_zamanli', 'her_ikisi'])
+    if works_part_time:
+        schedule_filter |= Q(work_schedule__in=['yari_zamanli', 'her_ikisi'])
+    return schedule_filter
+
+
 def _listing_context(request, teachers, **extra):
     context = {
         'teacher_cards': _build_teacher_cards(teachers),
@@ -64,6 +97,7 @@ def home(request):
         for key in popular_branch_keys
         if key in branch_map
     ]
+    works_full_time, works_part_time = _selected_work_schedule_filters(request)
     context = {
         'branches': TeacherChoices.BRANCH_CHOICES,
         'experiences': TeacherChoices.EXPERIENCE_CHOICES,
@@ -72,6 +106,8 @@ def home(request):
         'popular_branches': popular_branches,
         'selected_branch': request.GET.get('branch', ''),
         'selected_experience': request.GET.get('experience', ''),
+        'selected_works_full_time': works_full_time,
+        'selected_works_part_time': works_part_time,
         'selected_city': request.GET.get('city', ''),
         'selected_district': request.GET.get('district', ''),
         'selected_gender': request.GET.get('gender', ''),
@@ -82,6 +118,7 @@ def home(request):
 def searchTeacher(request):
     branch = request.GET.get("branch", "")
     experience = request.GET.get("experience", "")
+    works_full_time, works_part_time = _selected_work_schedule_filters(request)
     city = request.GET.get("city", "")
     district = request.GET.get("district", "")
     gender = request.GET.get("gender", "")
@@ -91,6 +128,9 @@ def searchTeacher(request):
         filters &= Q(branch=branch)
     if experience:
         filters &= Q(experience_years=experience)
+    schedule_filter = _build_work_schedule_filter(works_full_time, works_part_time)
+    if schedule_filter:
+        filters &= schedule_filter
     if city:
         filters &= Q(city=city)
     if district and city:
@@ -109,6 +149,8 @@ def searchTeacher(request):
         teachers,
         selected_branch=branch,
         selected_experience=experience,
+        selected_works_full_time=works_full_time,
+        selected_works_part_time=works_part_time,
         selected_city=city,
         selected_district=district if city else '',
         selected_gender=gender,
@@ -137,7 +179,7 @@ def course_center_profile(request):
 
         course_center.image = image
         course_center.save()
-        messages.success(request, 'Profil fotoğrafınız güncellendi.')
+        messages.success(request, 'Profil bilgileriniz başarıyla güncellendi.', extra_tags='popup')
         return redirect('course_center_profile')
 
     return render(request, 'course_center_profile.html', {

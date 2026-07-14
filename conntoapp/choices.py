@@ -25,6 +25,12 @@ class TeacherChoices:
         ('10+', '10+ Yıl'),
     ]
 
+    WORK_SCHEDULE_CHOICES = [
+        ('tam_zamanli', 'Tam Zamanlı'),
+        ('yari_zamanli', 'Yarı Zamanlı'),
+        ('her_ikisi', 'Her İkisi İçin Uygun'),
+    ]
+
 
 class CustomUserChoices():
     GENDER_CHOICES = [
