@@ -1,0 +1,128 @@
+<div class="connto-modal" id="terms-modal" aria-hidden="true" role="dialog" aria-labelledby="terms-modal-title">
+  <div class="connto-modal__backdrop" data-terms-close></div>
+  <div class="connto-modal__dialog" role="document">
+    <h2 id="terms-modal-title">Kullanım Şartları</h2>
+    <div class="connto-modal__body">
+      <p>{{ SITE_NAME }} platformunu kullanarak aşağıdaki şartları okuduğunuzu ve kabul ettiğinizi beyan edersiniz:</p>
+      <ul>
+        <li>Kayıt sırasında verdiğiniz bilgilerin doğru ve güncel olmasından siz sorumlusunuz.</li>
+        <li>Platformu yalnızca yasal ve eğitim amaçlı kullanmayı kabul edersiniz.</li>
+        <li>Hesap güvenliğinizden ve şifrenizin gizliliğinden siz sorumlusunuz.</li>
+        <li>Diğer kullanıcıların kişisel verilerini izinsiz paylaşmamayı kabul edersiniz.</li>
+        <li>Platform, hizmet koşullarını güncelleme hakkını saklı tutar.</li>
+      </ul>
+    </div>
+    <div class="connto-modal__actions">
+      <button type="button" class="connto-btn connto-btn--outline" data-terms-close>Vazgeç</button>
+      <button type="button" class="connto-btn connto-btn--glass" id="terms-modal-confirm">Onaylıyorum</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var termsModal = document.getElementById('terms-modal');
+    if (!termsModal) return;
+
+    var termsConfirmBtn = document.getElementById('terms-modal-confirm');
+    var pendingTermsField = null;
+
+    function isFieldApproved(field) {
+      return !!(field && field.classList.contains('connto-terms-field--approved'));
+    }
+
+    function setModalMode(field) {
+      if (isFieldApproved(field)) {
+        termsConfirmBtn.textContent = 'İptal et';
+        termsConfirmBtn.dataset.mode = 'revoke';
+        termsConfirmBtn.classList.remove('connto-btn--glass');
+        termsConfirmBtn.classList.add('connto-btn--outline');
+      } else {
+        termsConfirmBtn.textContent = 'Onaylıyorum';
+        termsConfirmBtn.dataset.mode = 'approve';
+        termsConfirmBtn.classList.remove('connto-btn--outline');
+        termsConfirmBtn.classList.add('connto-btn--glass');
+      }
+    }
+
+    function openTermsModal(field) {
+      pendingTermsField = field;
+      setModalMode(field);
+      termsModal.classList.add('connto-modal--open');
+      termsModal.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeTermsModal() {
+      termsModal.classList.remove('connto-modal--open');
+      termsModal.setAttribute('aria-hidden', 'true');
+      pendingTermsField = null;
+    }
+
+    function approveTermsField(field) {
+      if (!field) return;
+      var checkbox = field.querySelector('input[name="checkBox"]');
+      if (!checkbox) return;
+      checkbox.checked = true;
+      checkbox.dataset.approved = 'true';
+      field.classList.add('connto-terms-field--approved');
+    }
+
+    function clearTermsApproval(field) {
+      if (!field) return;
+      var checkbox = field.querySelector('input[name="checkBox"]');
+      if (!checkbox) return;
+      checkbox.checked = false;
+      checkbox.dataset.approved = 'false';
+      field.classList.remove('connto-terms-field--approved');
+    }
+
+    function handleTermsFieldClick(field) {
+      if (isFieldApproved(field)) {
+        clearTermsApproval(field);
+        return;
+      }
+      openTermsModal(field);
+    }
+
+    document.querySelectorAll('.connto-terms-field').forEach(function (field) {
+      var toggle = field.querySelector('.connto-terms-toggle');
+      var textButton = field.querySelector('.connto-terms-open');
+
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          handleTermsFieldClick(field);
+        });
+      }
+
+      if (textButton) {
+        textButton.addEventListener('click', function () {
+          handleTermsFieldClick(field);
+        });
+      }
+    });
+
+    termsConfirmBtn.addEventListener('click', function () {
+      if (!pendingTermsField) {
+        closeTermsModal();
+        return;
+      }
+
+      if (termsConfirmBtn.dataset.mode === 'revoke') {
+        clearTermsApproval(pendingTermsField);
+      } else {
+        approveTermsField(pendingTermsField);
+      }
+      closeTermsModal();
+    });
+
+    termsModal.querySelectorAll('[data-terms-close]').forEach(function (button) {
+      button.addEventListener('click', closeTermsModal);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && termsModal.classList.contains('connto-modal--open')) {
+        closeTermsModal();
+      }
+    });
+  })();
+</script>

@@ -798,6 +798,78 @@ class CityDistrictTests(TestCase):
         self.assertIn('works_full_time', form.errors)
         self.assertEqual(form.errors['works_full_time'], ['required'])
 
+    def test_register_form_rejects_under_18(self):
+        from conntoapp.forms import TeacherRegisterForm, latest_birth_date_for_minimum_age
+        too_young = latest_birth_date_for_minimum_age(18)
+        too_young = too_young.replace(year=too_young.year + 1)
+        form = TeacherRegisterForm(data={
+            'fullname': 'Genc Ogretmen',
+            'password': 'testpass123',
+            'email': 'young@test.com',
+            'gender': 'MALE',
+            'birth_date': too_young.isoformat(),
+            'branch': 'matematik',
+            'works_full_time': True,
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('birth_date', form.errors)
+        self.assertEqual(
+            form.errors['birth_date'],
+            ['Kayıt olmak için en az 18 yaşında olmalısınız.'],
+        )
+
+    def test_register_form_accepts_exactly_18(self):
+        from conntoapp.forms import TeacherRegisterForm, latest_birth_date_for_minimum_age
+        birth_date = latest_birth_date_for_minimum_age(18)
+        form = TeacherRegisterForm(data={
+            'fullname': 'On Sekiz Yas',
+            'password': 'testpass123',
+            'email': 'eighteen@test.com',
+            'gender': 'MALE',
+            'birth_date': birth_date.isoformat(),
+            'branch': 'matematik',
+            'works_full_time': True,
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_register_post_rejects_under_18(self):
+        from conntoapp.forms import latest_birth_date_for_minimum_age
+        too_young = latest_birth_date_for_minimum_age(18)
+        too_young = too_young.replace(year=too_young.year + 1)
+        response = self.client.post(reverse('register'), {
+            'fullname': 'Genc Kullanici',
+            'password': 'testpass123',
+            'email': 'youngpost@test.com',
+            'gender': 'MALE',
+            'birth_date': too_young.isoformat(),
+            'branch': 'matematik',
+            'works_full_time': 'on',
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+            'checkBox': 'on',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Kayıt olmak için en az 18 yaşında olmalısınız.')
+        self.assertContains(response, 'register-birth-date.js')
+        self.assertFalse(User.objects.filter(email='youngpost@test.com').exists())
+
+    def test_register_page_includes_birth_date_max_limit(self):
+        response = self.client.get(reverse('register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, f'max="{date.today().isoformat()}"')
+        self.assertContains(response, 'data-register-min-age="18"')
+        self.assertContains(response, 'register-birth-date.js')
+
     def test_register_form_accepts_both_work_schedules(self):
         from conntoapp.forms import TeacherRegisterForm
         form = TeacherRegisterForm(data={
@@ -834,7 +906,7 @@ class CityDistrictTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'connto-work-schedule-field--error')
-        self.assertContains(response, 'Lütfen bilgileri eksiksiz doldurunuz.')
+        self.assertNotContains(response, 'cdn.jsdelivr.net/npm/sweetalert2')
 
     def test_register_page_has_phone_country_selector(self):
         response = self.client.get(reverse('register'))

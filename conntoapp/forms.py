@@ -99,6 +99,19 @@ def configure_calendar_date_field(field, *, max_date=None, min_date=None, requir
         field.widget.attrs['required'] = True
 
 
+def latest_birth_date_for_minimum_age(min_age=18):
+    today = date.today()
+    year = today.year - min_age
+    try:
+        return date(year, today.month, today.day)
+    except ValueError:
+        return date(year, today.month, 28)
+
+
+def is_at_least_age(birth_date, min_age=18):
+    return birth_date <= latest_birth_date_for_minimum_age(min_age)
+
+
 class CityDistrictFormMixin:
     def _selected_city(self):
         if self.data.get("city"):
@@ -241,7 +254,8 @@ class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityD
             required=True,
         )
         self.fields['birth_date'].widget.attrs['autocomplete'] = 'bday'
-        self.fields['birth_date'].widget.attrs['title'] = 'Takvimden doğum tarihi seçin'
+        self.fields['birth_date'].widget.attrs['title'] = 'Kayıt için en az 18 yaşında olmalısınız'
+        self.fields['birth_date'].widget.attrs['data-register-min-age'] = '18'
         self.fields['fullname'].label = 'Ad Soyad'
         self.fields['password'].label = 'Şifre'
         self.fields['email'].label = 'E-posta'
@@ -250,6 +264,12 @@ class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityD
         self.fields['branch'].label = 'Branş'
         self.fields['city'].label = 'Şehir'
         self._inject_work_schedule_fields()
+
+    def clean_birth_date(self):
+        birth_date = self.cleaned_data.get('birth_date')
+        if birth_date and not is_at_least_age(birth_date, 18):
+            raise forms.ValidationError('Kayıt olmak için en az 18 yaşında olmalısınız.')
+        return birth_date
 
     def clean(self):
         cleaned_data = super().clean()

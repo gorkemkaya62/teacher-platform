@@ -66,6 +66,12 @@
         openDatePicker(input);
       });
     }
+
+    input.addEventListener('change', function () {
+      if (input.getAttribute('data-register-min-age') && typeof window.validateRegisterBirthDateInput === 'function') {
+        window.validateRegisterBirthDateInput(input, { showPopup: true });
+      }
+    });
   }
 
   function initDatePickers(root) {

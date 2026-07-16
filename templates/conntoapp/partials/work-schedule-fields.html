@@ -6,7 +6,7 @@
         type="checkbox"
         name="works_full_time"
         id="{{ form.works_full_time.id_for_label }}"
-        class="connto-terms-checkbox connto-work-schedule-checkbox"
+        class="connto-work-schedule-checkbox"
         {% if form.works_full_time.value %}checked{% endif %}
       />
       <span class="connto-check-label">Tam Zamanlı</span>
@@ -16,7 +16,7 @@
         type="checkbox"
         name="works_part_time"
         id="{{ form.works_part_time.id_for_label }}"
-        class="connto-terms-checkbox connto-work-schedule-checkbox"
+        class="connto-work-schedule-checkbox"
         {% if form.works_part_time.value %}checked{% endif %}
       />
       <span class="connto-check-label">Yarı Zamanlı</span>
@@ -24,7 +24,9 @@
   </div>
 </div>
 
+{% if show_validation_popup != False %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endif %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   var field = document.querySelector('.connto-work-schedule-field');
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var form = field.closest('form');
   var hasServerError = {{ form.works_full_time.errors|yesno:"true,false" }};
+  var showValidationPopup = {{ show_validation_popup|default:True|yesno:"true,false" }};
 
   function hasSelection() {
     return Array.prototype.some.call(
@@ -46,6 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function showPopup() {
+    if (!showValidationPopup) return;
     if (window.Swal) {
       window.Swal.fire({
         icon: 'warning',
