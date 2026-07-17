@@ -1,0 +1,65 @@
+<div class="connto-field connto-social-links-field">
+  <span class="connto-social-links-field__label">Sosyal Medya</span>
+  <p class="connto-social-links-field__hint">Eklemek istediğiniz hesapları seçin; yalnızca seçtikleriniz için bağlantı girebilirsiniz.</p>
+
+  <div class="connto-social-platform-checks" role="group" aria-label="Sosyal medya hesabı seçimi">
+    <label class="connto-check connto-check--terms connto-social-platform-check" for="{{ form.enable_social_twitter.id_for_label }}">
+      {{ form.enable_social_twitter }}
+      <span class="connto-check-label">X</span>
+    </label>
+    <label class="connto-check connto-check--terms connto-social-platform-check" for="{{ form.enable_social_instagram.id_for_label }}">
+      {{ form.enable_social_instagram }}
+      <span class="connto-check-label">Instagram</span>
+    </label>
+    <label class="connto-check connto-check--terms connto-social-platform-check" for="{{ form.enable_social_linkedin.id_for_label }}">
+      {{ form.enable_social_linkedin }}
+      <span class="connto-check-label">LinkedIn</span>
+    </label>
+    <label class="connto-check connto-check--terms connto-social-platform-check" for="{{ form.enable_social_facebook.id_for_label }}">
+      {{ form.enable_social_facebook }}
+      <span class="connto-check-label">Facebook</span>
+    </label>
+  </div>
+
+  <div class="connto-social-link-inputs">
+    <div class="connto-social-link-row" data-social-platform="twitter" hidden>
+      <label for="{{ form.twitter.id_for_label }}">{{ form.twitter.label }}</label>
+      {{ form.twitter }}
+      {% if form.twitter.errors %}
+        {% for error in form.twitter.errors %}
+          <p class="connto-social-link-error" data-server-error="1" style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="connto-social-link-row" data-social-platform="instagram" hidden>
+      <label for="{{ form.instagram.id_for_label }}">{{ form.instagram.label }}</label>
+      {{ form.instagram }}
+      {% if form.instagram.errors %}
+        {% for error in form.instagram.errors %}
+          <p class="connto-social-link-error" data-server-error="1" style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="connto-social-link-row" data-social-platform="linkedin" hidden>
+      <label for="{{ form.linkedin.id_for_label }}">{{ form.linkedin.label }}</label>
+      {{ form.linkedin }}
+      {% if form.linkedin.errors %}
+        {% for error in form.linkedin.errors %}
+          <p class="connto-social-link-error" data-server-error="1" style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="connto-social-link-row" data-social-platform="facebook" hidden>
+      <label for="{{ form.facebook.id_for_label }}">{{ form.facebook.label }}</label>
+      {{ form.facebook }}
+      {% if form.facebook.errors %}
+        {% for error in form.facebook.errors %}
+          <p class="connto-social-link-error" data-server-error="1" style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</div>

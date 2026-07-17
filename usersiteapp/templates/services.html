@@ -4,38 +4,31 @@
 {% block title %}{{ user.fullname }}{% endblock %}
 
 {% block content %}
-  <section class="service-area">
+  <section class="service-area connto-service-area">
     <div class="container">
-      <h1 class="section-heading" data-aos="fade-up">
+      <h1 class="section-heading connto-service-page-heading" data-aos="fade-up">
         <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Yıldız" />
-        Verdiği Dersler — {{ user.get_branch_display }}
+        Verdiği Dersler
         <img src="{% static 'userstatic/assets/images/star-2.png' %}" alt="Yıldız" />
       </h1>
-      <div class="row">
-        <div class="col-md-4">
-          <div class="service-sidebar" data-aos="fade-right">
-            <div class="service-sidebar-inner shadow-box">
-              <ul>
+
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+          <div class="service-content-wrap connto-service-content-wrap" data-aos="zoom-in">
+            <div class="service-content-inner shadow-box connto-service-content-inner">
+              <div class="service-items connto-service-items">
                 {% for service in user.userservices.all %}
-                  <li><i class="iconoir-check icon"></i> {{ service.service_name }}</li>
-                {% empty %}
-                  <li>Henüz ders eklenmemiş.</li>
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-8">
-          <div class="service-content-wrap" data-aos="zoom-in">
-            <div class="service-content-inner shadow-box">
-              <div class="service-items">
-                {% for service in user.userservices.all %}
-                  <div class="service-item">
-                    <h3>{{ service.service_name }}</h3>
-                    <p>{{ service.service_description }}</p>
+                  <div class="service-item connto-service-item">
+                    <h3 class="connto-service-item-title">
+                      <i class="iconoir-user connto-service-name__icon" aria-hidden="true"></i>
+                      <span>{{ service.service_name }}</span>
+                    </h3>
+                    {% if service.service_description %}
+                      <p>{{ service.service_description }}</p>
+                    {% endif %}
                   </div>
                 {% empty %}
-                  <p>Bu öğretmen henüz ders bilgisi eklememiş.</p>
+                  <p class="connto-service-empty">Bu öğretmen henüz ders bilgisi eklememiş.</p>
                 {% endfor %}
               </div>
             </div>

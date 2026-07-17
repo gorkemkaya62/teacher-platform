@@ -46,7 +46,7 @@
                     <h5>Sosyal Medya</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Twitter:</strong> {{ user.twitter }}</p>
+                    <p><strong>X:</strong> {{ user.twitter }}</p>
                     <p><strong>Facebook:</strong> {{ user.facebook }}</p>
                     <p><strong>LinkedIn:</strong> {{ user.linkedin }}</p>
                     <p><strong>Instagram:</strong> {{ user.instagram }}</p>
@@ -158,7 +158,12 @@
                             <tbody>
                                 {% for service in services %}
                                 <tr>
-                                    <td>{{ service.service_name }}</td>
+                                    <td>
+                                      <span class="connto-service-name connto-service-name--panel">
+                                        <i class="fa fa-user" aria-hidden="true"></i>
+                                        <span>{{ service.service_name }}</span>
+                                      </span>
+                                    </td>
                                     <td>{{ service.service_description }}</td>
                                     <td>{{ service.service_search_count }}</td>
                                 </tr>

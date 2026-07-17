@@ -7,7 +7,7 @@ from django.contrib.auth.hashers import make_password, check_password
 
 class CustomUser(AbstractUser):
     fullname = models.CharField(max_length=100, verbose_name="Ad Soyad")
-    twitter = models.CharField(max_length=100, null=True, blank=True, verbose_name="Twitter (X)")
+    twitter = models.CharField(max_length=100, null=True, blank=True, verbose_name="X")
     facebook = models.CharField(max_length=100, null=True, blank=True, verbose_name="Facebook")
     linkedin = models.CharField(max_length=100, null=True, blank=True, verbose_name="LinkedIn")
     instagram = models.CharField(max_length=100, null=True, blank=True, verbose_name="Instagram")

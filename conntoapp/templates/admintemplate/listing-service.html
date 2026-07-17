@@ -27,7 +27,6 @@
                 <table class="table table-hover">
                   <thead>
                     <tr>
-                      <th>Öğretmen</th>
                       <th>Ders Adı</th>
                       <th>Açıklama</th>
                       <th>Düzenle</th>
@@ -37,14 +36,18 @@
                   <tbody>
                     {% for service in user.userservices.all %}
                       <tr>
-                        <td><span class="list-img"><img src="{{ user.image.url }}" alt="" /></span></td>
-                        <td>{{ service.service_name }}</td>
+                        <td>
+                          <span class="connto-service-name connto-service-name--panel">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                            <span>{{ service.service_name }}</span>
+                          </span>
+                        </td>
                         <td>{{ service.service_description }}</td>
                         <td><a href="{% url 'updateService' service.id %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
                         <td><a href="#" onclick="confirmDelete('{% url 'deleteService' service.id %}'); return false;"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>
                       </tr>
                     {% empty %}
-                      <tr><td colspan="5">Henüz ders eklenmemiş.</td></tr>
+                      <tr><td colspan="4">Henüz ders eklenmemiş.</td></tr>
                     {% endfor %}
                   </tbody>
                 </table>

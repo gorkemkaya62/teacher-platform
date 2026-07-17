@@ -14,6 +14,7 @@ from .phone_data import (
     split_international_phone,
     validate_national_number,
 )
+from .social_links import SOCIAL_LINK_RULES, validate_optional_social_link
 from .widgets import PhoneCountryCodeWidget
 from django.contrib.auth.forms import PasswordChangeForm
 
@@ -33,6 +34,62 @@ def flags_to_work_schedule(works_full_time, works_part_time):
     if works_part_time:
         return 'yari_zamanli'
     return ''
+
+
+class SocialLinksFormMixin:
+    def _inject_social_platform_fields(self):
+        for field_name, rules in SOCIAL_LINK_RULES.items():
+            enable_name = f'enable_social_{field_name}'
+            initial = False
+            if self.data:
+                initial = enable_name in self.data
+            elif getattr(self, 'instance', None) and getattr(self.instance, 'pk', None):
+                existing = getattr(self.instance, field_name, None) or ''
+                initial = bool(str(existing).strip())
+
+            self.fields[enable_name] = forms.BooleanField(
+                required=False,
+                label=rules['label'],
+                initial=initial,
+                widget=forms.CheckboxInput(attrs={
+                    'class': 'connto-social-platform-checkbox',
+                    'data-social-platform': field_name,
+                }),
+            )
+
+    def _configure_social_link_fields(self):
+        for field_name, rules in SOCIAL_LINK_RULES.items():
+            if field_name not in self.fields:
+                continue
+            field = self.fields[field_name]
+            field.required = False
+            css_class = field.widget.attrs.get('class', '')
+            field.widget.attrs.update({
+                'class': f'{css_class} connto-social-link-input'.strip(),
+                'data-social-prefix': rules['prefix'].rstrip('/'),
+                'data-social-label': rules['label'],
+                'data-social-platform': field_name,
+                'placeholder': rules['placeholder'],
+            })
+
+    def _clean_social_links(self, cleaned_data):
+        for field_name, rules in SOCIAL_LINK_RULES.items():
+            enable_name = f'enable_social_{field_name}'
+            enabled = cleaned_data.get(enable_name, False)
+            if not enabled:
+                cleaned_data[field_name] = ''
+                continue
+            if field_name in self.errors:
+                continue
+            try:
+                cleaned_data[field_name] = validate_optional_social_link(
+                    cleaned_data.get(field_name),
+                    prefix=rules['prefix'],
+                    label=rules['label'],
+                )
+            except forms.ValidationError as exc:
+                self.add_error(field_name, exc)
+        return cleaned_data
 
 
 class WorkScheduleCheckboxMixin:
@@ -340,7 +397,13 @@ class TeacherLoginForm(forms.Form):
 
 # Öğretmen Profil Formları
 
-class TeacherProfileForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
+class TeacherProfileForm(
+    SocialLinksFormMixin,
+    WorkScheduleCheckboxMixin,
+    PhoneNumberFormMixin,
+    CityDistrictFormMixin,
+    forms.ModelForm,
+):
     class Meta:
         model = CustomUser
         fields = [
@@ -371,10 +434,13 @@ class TeacherProfileForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityDi
         self._configure_district_field()
         self._inject_phone_fields(required=False)
         self._inject_work_schedule_fields()
+        self._inject_social_platform_fields()
+        self._configure_social_link_fields()
 
     def clean(self):
         cleaned_data = super().clean()
-        return self._clean_work_schedule_checkboxes(cleaned_data)
+        cleaned_data = self._clean_work_schedule_checkboxes(cleaned_data)
+        return self._clean_social_links(cleaned_data)
 
     def save(self, commit=True):
         user = super().save(commit=False)

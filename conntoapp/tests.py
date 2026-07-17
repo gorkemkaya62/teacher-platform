@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from django import forms
 from django.test import TestCase, Client
 from django.urls import reverse, NoReverseMatch
 from django.contrib.auth import get_user_model
@@ -7,6 +8,8 @@ from conntoapp.models import (
     CourseCenter, AdminUser, UserSkill, UserEducation,
     UserExperience, UserServices, UserAwards,
 )
+from conntoapp.forms import TeacherProfileForm
+from conntoapp.social_links import validate_optional_social_link
 
 User = get_user_model()
 
@@ -87,6 +90,149 @@ class TeacherAuthTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Profil bilgileriniz başarıyla güncellendi.')
         self.assertContains(response, 'Swal.fire')
+
+    def _teacher_profile_payload(self, **overrides):
+        data = {
+            'active_tab': 'profile',
+            'branch': 'matematik',
+            'experience_years': '3-5',
+            'works_full_time': 'on',
+            'city': 'ankara',
+            'district': 'cankaya',
+            'gender': 'MALE',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+            'short_description': 'Matematik öğretmeni',
+            'long_description': 'Deneyimli matematik öğretmeni.',
+        }
+        data.update(overrides)
+        return data
+
+    def test_teacher_profile_accepts_valid_social_links(self):
+        self.client.login(username='teacher@test.com', password='testpass123')
+        response = self.client.post(
+            reverse('teacherProfileAccept'),
+            self._teacher_profile_payload(
+                enable_social_twitter='on',
+                enable_social_instagram='on',
+                enable_social_linkedin='on',
+                enable_social_facebook='on',
+                twitter='https://x.com/testteacher',
+                instagram='https://www.instagram.com/testteacher',
+                linkedin='https://www.linkedin.com/in/testteacher',
+                facebook='https://www.facebook.com/testteacher',
+            ),
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Profil bilgileriniz başarıyla güncellendi.')
+        self.teacher.refresh_from_db()
+        self.assertEqual(self.teacher.twitter, 'https://x.com/testteacher')
+        self.assertEqual(self.teacher.instagram, 'https://www.instagram.com/testteacher')
+
+    def test_teacher_profile_rejects_invalid_social_link(self):
+        self.client.login(username='teacher@test.com', password='testpass123')
+        response = self.client.post(
+            reverse('teacherProfileAccept'),
+            self._teacher_profile_payload(
+                enable_social_twitter='on',
+                twitter='https://twitter.com/testteacher',
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'X için yalnızca https://x.com ile başlayan bağlantılar kullanılabilir.')
+        self.assertContains(response, 'connto-social-links-field')
+        self.assertContains(response, 'social-links-validation.js')
+
+    def test_teacher_profile_allows_empty_social_links(self):
+        self.client.login(username='teacher@test.com', password='testpass123')
+        response = self.client.post(
+            reverse('teacherProfileAccept'),
+            self._teacher_profile_payload(
+                twitter='',
+                instagram='',
+                linkedin='',
+                facebook='',
+            ),
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Profil bilgileriniz başarıyla güncellendi.')
+
+
+    def test_teacher_profile_clears_unselected_social_links(self):
+        self.teacher.twitter = 'https://x.com/oldprofile'
+        self.teacher.instagram = 'https://www.instagram.com/oldprofile'
+        self.teacher.save()
+
+        self.client.login(username='teacher@test.com', password='testpass123')
+        response = self.client.post(
+            reverse('teacherProfileAccept'),
+            self._teacher_profile_payload(
+                enable_social_instagram='on',
+                instagram='https://www.instagram.com/newprofile',
+            ),
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.teacher.refresh_from_db()
+        self.assertEqual(self.teacher.twitter, '')
+        self.assertEqual(self.teacher.instagram, 'https://www.instagram.com/newprofile')
+
+
+class SocialLinkValidationTests(TestCase):
+    def test_empty_value_is_allowed(self):
+        self.assertEqual(
+            validate_optional_social_link('', prefix='https://x.com/', label='X'),
+            '',
+        )
+
+    def test_valid_link_is_accepted(self):
+        value = validate_optional_social_link(
+            'https://x.com/testteacher',
+            prefix='https://x.com/',
+            label='X',
+        )
+        self.assertEqual(value, 'https://x.com/testteacher')
+
+    def test_invalid_prefix_raises_error(self):
+        with self.assertRaises(forms.ValidationError):
+            validate_optional_social_link(
+                'https://twitter.com/testteacher',
+                prefix='https://x.com/',
+                label='X',
+            )
+
+    def test_teacher_profile_form_rejects_invalid_instagram(self):
+        teacher = User.objects.create_user(
+            username='social@test.com',
+            email='social@test.com',
+            password='testpass123',
+            fullname='Social Test',
+            gender='MALE',
+            birth_date=date(1990, 1, 1),
+            branch='matematik',
+            city='ankara',
+        )
+        form = TeacherProfileForm(
+            {
+                'branch': 'matematik',
+                'experience_years': '3-5',
+                'works_full_time': 'on',
+                'city': 'ankara',
+                'district': 'cankaya',
+                'gender': 'MALE',
+                'phone_country_code': '+90',
+                'phone_number': '5321234567',
+                'short_description': 'Test',
+                'long_description': 'Test bio',
+                'enable_social_instagram': 'on',
+                'instagram': 'https://instagram.com/test',
+            },
+            instance=teacher,
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn('instagram', form.errors)
 
 
 class CourseCenterAuthTests(TestCase):

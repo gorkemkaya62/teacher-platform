@@ -52,8 +52,23 @@
                     {% include 'conntoapp/partials/phone-fields.html' with code_field=teacherProfileForm.phone_country_code number_field=teacherProfileForm.phone_number %}
                   {% elif field.name == 'phone_number' %}
                   {% elif field.name == 'works_full_time' or field.name == 'works_part_time' %}
+                  {% elif field.name == 'twitter' or field.name == 'instagram' or field.name == 'linkedin' or field.name == 'facebook' %}
+                  {% elif field.name == 'enable_social_twitter' or field.name == 'enable_social_instagram' or field.name == 'enable_social_linkedin' or field.name == 'enable_social_facebook' %}
+                  {% elif field.name == 'gender' %}
+                    <br><label>{{ field.label }}</label>{{ field }}
+                    {% if field.errors %}
+                      {% for error in field.errors %}
+                        <p class="connto-field-error" style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+                      {% endfor %}
+                    {% endif %}
+                    {% include 'conntoapp/partials/social-links-fields.html' with form=teacherProfileForm %}
                   {% elif field.name != 'image' %}
                     <br><label>{{ field.label }}</label>{{ field }}
+                    {% if field.errors %}
+                      {% for error in field.errors %}
+                        <p class="{% if field.name == 'twitter' or field.name == 'instagram' or field.name == 'linkedin' or field.name == 'facebook' %}connto-social-link-error{% else %}connto-field-error{% endif %}"{% if field.name == 'twitter' or field.name == 'instagram' or field.name == 'linkedin' or field.name == 'facebook' %} data-server-error="1"{% endif %} style="color: #b91c1c; margin-top: 6px;">{{ error }}</p>
+                      {% endfor %}
+                    {% endif %}
                     {% if field.name == 'experience_years' %}
                       {% include 'conntoapp/partials/work-schedule-fields.html' with form=teacherProfileForm %}
                     {% endif %}
@@ -172,6 +187,7 @@
   <script src="{% static 'adminstatic/js/phone-field.js' %}"></script>
   <script src="{% static 'adminstatic/js/skill-degree.js' %}"></script>
   <script src="{% static 'adminstatic/js/education-ongoing.js' %}"></script>
+  <script src="{% static 'adminstatic/js/social-links-validation.js' %}"></script>
   <script>
     initCityDistrictSelect('#id_city', '#id_district');
 
