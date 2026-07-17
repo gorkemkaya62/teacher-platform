@@ -14,9 +14,12 @@ from .phone_data import (
     split_international_phone,
     validate_national_number,
 )
+from .email_domains import EmailDomainFormMixin
 from .social_links import SOCIAL_LINK_RULES, validate_optional_social_link
 from .widgets import PhoneCountryCodeWidget
 from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 
 def work_schedule_to_flags(work_schedule):
@@ -169,6 +172,18 @@ def is_at_least_age(birth_date, min_age=18):
     return birth_date <= latest_birth_date_for_minimum_age(min_age)
 
 
+def prepend_select_placeholder(field, label='Seçiniz', *, reset_initial=False):
+    choices = list(field.choices)
+    if choices and choices[0][0] == '':
+        choices[0] = ('', label)
+    else:
+        choices.insert(0, ('', label))
+    field.choices = choices
+    field.widget.choices = choices
+    if reset_initial or not field.initial:
+        field.initial = ''
+
+
 class CityDistrictFormMixin:
     def _selected_city(self):
         if self.data.get("city"):
@@ -280,15 +295,20 @@ class PhoneNumberFormMixin:
 
 # Öğretmen Kayıt / Giriş Formları
 
-class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityDistrictFormMixin, forms.ModelForm):
+class TeacherRegisterForm(
+    EmailDomainFormMixin,
+    WorkScheduleCheckboxMixin,
+    PhoneNumberFormMixin,
+    CityDistrictFormMixin,
+    forms.ModelForm,
+):
     class Meta:
         model = CustomUser
-        fields = ["fullname", "password", "email", "gender", "birth_date", "branch", "city", "district"]
+        fields = ["fullname", "password", "gender", "birth_date", "branch", "city", "district"]
 
         widgets = {
             'fullname': forms.TextInput(attrs={'type': 'text', 'required': True, 'placeholder': 'Ad Soyad'}),
             'password': forms.PasswordInput(attrs={'type': 'password', 'required': True, 'placeholder': 'Şifre'}),
-            'email': forms.EmailInput(attrs={'type': 'email', 'required': True, 'placeholder': 'E-posta'}),
             'gender': forms.Select(choices=CustomUserChoices.GENDER_CHOICES, attrs={'required': True}),
             'birth_date': calendar_date_widget(required=True),
             'branch': forms.Select(choices=TeacherChoices.BRANCH_CHOICES, attrs={'required': True}),
@@ -303,6 +323,7 @@ class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityD
         super().__init__(*args, **kwargs)
         self._configure_district_field()
         self._inject_phone_fields(required=True)
+        self._inject_email_domain_fields(required=True)
         today = date.today()
         configure_calendar_date_field(
             self.fields['birth_date'],
@@ -315,11 +336,14 @@ class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityD
         self.fields['birth_date'].widget.attrs['data-register-min-age'] = '18'
         self.fields['fullname'].label = 'Ad Soyad'
         self.fields['password'].label = 'Şifre'
-        self.fields['email'].label = 'E-posta'
         self.fields['gender'].label = 'Cinsiyet'
         self.fields['birth_date'].label = 'Doğum Tarihi'
         self.fields['branch'].label = 'Branş'
         self.fields['city'].label = 'Şehir'
+        reset_selects = not bool(self.data)
+        prepend_select_placeholder(self.fields['gender'], reset_initial=reset_selects)
+        prepend_select_placeholder(self.fields['branch'], reset_initial=reset_selects)
+        prepend_select_placeholder(self.fields['city'], reset_initial=reset_selects)
         self._inject_work_schedule_fields()
 
     def clean_birth_date(self):
@@ -330,10 +354,17 @@ class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityD
 
     def clean(self):
         cleaned_data = super().clean()
-        return self._clean_work_schedule_checkboxes(cleaned_data)
+        cleaned_data = self._clean_work_schedule_checkboxes(cleaned_data)
+        cleaned_data = self._clean_email_from_parts(cleaned_data)
+        email = cleaned_data.get('email')
+        if email and CustomUser.objects.filter(email=email).exists():
+            self.add_error('email_local', 'Bu e-posta adresi zaten kullanılıyor.')
+        return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.username = self.cleaned_data['email']
         user.phone = self.get_formatted_phone()
         self._apply_work_schedule_to_instance(user)
         if commit:
@@ -341,7 +372,7 @@ class TeacherRegisterForm(WorkScheduleCheckboxMixin, PhoneNumberFormMixin, CityD
         return user
 
 
-class CourseCenterRegisterForm(forms.ModelForm):
+class CourseCenterRegisterForm(EmailDomainFormMixin, forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'type': 'password',
         'required': True,
@@ -350,7 +381,7 @@ class CourseCenterRegisterForm(forms.ModelForm):
 
     class Meta:
         model = CourseCenter
-        fields = ['center_name', 'center_type', 'teacher_capacity', 'email', 'password']
+        fields = ['center_name', 'center_type', 'teacher_capacity', 'password']
 
         widgets = {
             'center_name': forms.TextInput(attrs={
@@ -363,19 +394,24 @@ class CourseCenterRegisterForm(forms.ModelForm):
             'teacher_capacity': forms.NumberInput(attrs={
                 'type': 'number', 'required': True, 'placeholder': 'Öğretmen Kapasitesi',
             }),
-            'email': forms.EmailInput(attrs={
-                'type': 'email', 'required': True, 'placeholder': 'Kurs Merkezi E-posta',
-            }),
         }
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if CourseCenter.objects.filter(email=email).exists():
-            raise forms.ValidationError("Bu e-posta adresi zaten kullanılıyor.")
-        return email
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.email_domain_field_label = 'Kurs Merkezi E-posta'
+        self._inject_email_domain_fields(required=True, after='teacher_capacity')
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_data = self._clean_email_from_parts(cleaned_data)
+        email = cleaned_data.get('email')
+        if email and CourseCenter.objects.filter(email=email).exists():
+            self.add_error('email_local', 'Bu e-posta adresi zaten kullanılıyor.')
+        return cleaned_data
 
     def save(self, commit=True):
         course_center = super().save(commit=False)
+        course_center.email = self.cleaned_data['email']
         course_center.set_password(self.cleaned_data["password"])
         if commit:
             course_center.save()
@@ -687,6 +723,49 @@ class TeacherPasswordChangeForm(PasswordChangeForm):
         self.fields['old_password'].label = 'Mevcut Şifre'
         self.fields['new_password1'].label = 'Yeni Şifre'
         self.fields['new_password2'].label = 'Yeni Şifre (Tekrar)'
+
+
+class CourseCenterPasswordChangeForm(forms.Form):
+    old_password = forms.CharField(
+        label='Mevcut Şifre',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Mevcut şifreniz'}),
+    )
+    new_password1 = forms.CharField(
+        label='Yeni Şifre',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Yeni şifreniz'}),
+    )
+    new_password2 = forms.CharField(
+        label='Yeni Şifre (Tekrar)',
+        widget=forms.PasswordInput(attrs={'placeholder': 'Yeni şifrenizi tekrar girin'}),
+    )
+
+    def __init__(self, course_center, *args, **kwargs):
+        self.course_center = course_center
+        super().__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data.get('old_password')
+        if old_password and not self.course_center.check_password(old_password):
+            raise ValidationError('Mevcut şifreniz hatalı.')
+        return old_password
+
+    def clean_new_password1(self):
+        new_password = self.cleaned_data.get('new_password1')
+        if new_password:
+            validate_password(new_password)
+        return new_password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        new_password1 = cleaned_data.get('new_password1')
+        new_password2 = cleaned_data.get('new_password2')
+        if new_password1 and new_password2 and new_password1 != new_password2:
+            self.add_error('new_password2', 'Yeni şifreler eşleşmiyor.')
+        return cleaned_data
+
+    def save(self):
+        self.course_center.set_password(self.cleaned_data['new_password1'])
+        self.course_center.save(update_fields=['password'])
 
 
 class AdminLoginForm(forms.Form):

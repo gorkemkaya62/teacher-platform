@@ -1,0 +1,32 @@
+<div class="connto-field connto-field--email-domain">
+  <label for="{{ form.email_local.id_for_label }}">{{ form.email_local.label }}</label>
+  <div class="connto-email-field__row">
+    <div class="connto-email-field__local">
+      {{ form.email_local }}
+    </div>
+    <span class="connto-email-field__at" aria-hidden="true">@</span>
+    <div class="connto-email-field__domain">
+      {{ form.email_domain }}
+    </div>
+  </div>
+  <div class="connto-email-field__custom connto-email-field__custom--hidden" data-email-custom-wrap>
+    <label for="{{ form.email_domain_custom.id_for_label }}">{{ form.email_domain_custom.label }}</label>
+    {{ form.email_domain_custom }}
+  </div>
+  {% if form.email_local.errors %}
+    {% for error in form.email_local.errors %}
+      <p class="connto-field-error">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+  {% if form.email_domain.errors %}
+    {% for error in form.email_domain.errors %}
+      <p class="connto-field-error">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+  {% if form.email_domain_custom.errors %}
+    {% for error in form.email_domain_custom.errors %}
+      <p class="connto-field-error">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+  <p class="connto-email-field__hint">Kullanıcı adınızı yazın ve e-posta uzantınızı listeden seçin.</p>
+</div>

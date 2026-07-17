@@ -38,6 +38,9 @@
             {% include 'conntoapp/partials/phone-fields.html' with code_field=form.phone_country_code number_field=form.phone_number %}
           {% elif field.name == 'phone_number' %}
           {% elif field.name == 'works_full_time' or field.name == 'works_part_time' %}
+          {% elif field.name == 'email_domain' or field.name == 'email_domain_custom' %}
+          {% elif field.name == 'email_local' %}
+            {% include 'conntoapp/partials/email-domain-fields.html' with form=form %}
           {% else %}
             <div class="connto-field{% if field.name == 'birth_date' %} connto-field--date{% endif %}">
               <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -71,10 +74,15 @@
       {% csrf_token %}
       <input type="hidden" name="is_course_center" value="true">
       {% for field in course_center_form %}
+        {% if field.name == 'email_domain' or field.name == 'email_domain_custom' %}
+        {% elif field.name == 'email_local' %}
+          {% include 'conntoapp/partials/email-domain-fields.html' with form=course_center_form %}
+        {% else %}
         <div class="connto-field">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}
         </div>
+        {% endif %}
       {% endfor %}
       {% include 'conntoapp/partials/terms-acceptance-field.html' %}
       <button type="submit" class="connto-btn connto-btn--glass connto-btn--block connto-btn--lg">Kayıt Ol</button>
@@ -122,10 +130,12 @@
 {% block js_files %}
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="{% static 'adminstatic/js/register-birth-date.js' %}"></script>
+  <script src="{% static 'adminstatic/js/register-email-domain.js' %}"></script>
   <script src="{% static 'adminstatic/js/city-district.js' %}"></script>
   <script src="{% static 'adminstatic/js/phone-field.js' %}"></script>
   <script>
     initCityDistrictSelect('#id_city', '#id_district');
     initRegisterBirthDateValidation(document);
+    initEmailDomainFields(document);
   </script>
 {% endblock %}

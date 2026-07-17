@@ -10,8 +10,20 @@ from conntoapp.models import (
 )
 from conntoapp.forms import TeacherProfileForm
 from conntoapp.social_links import validate_optional_social_link
+from conntoapp.email_domains import split_email_address
 
 User = get_user_model()
+
+
+def register_email_payload(address):
+    local, domain, custom = split_email_address(address)
+    payload = {
+        'email_local': local,
+        'email_domain': domain,
+    }
+    if domain == 'custom':
+        payload['email_domain_custom'] = custom
+    return payload
 
 
 class URLResolutionTests(TestCase):
@@ -263,7 +275,7 @@ class CourseCenterAuthTests(TestCase):
             'center_name': 'Yeni Kurs',
             'center_type': 'Sınav Hazırlık',
             'teacher_capacity': 5,
-            'email': 'yeni@kurs.com',
+            **register_email_payload('yeni@kurs.com'),
             'password': 'sifre123',
             'checkBox': 'on',
         })
@@ -289,9 +301,51 @@ class CourseCenterAuthTests(TestCase):
         self.assertContains(response, 'course-center-photo-trigger')
         self.assertContains(response, 'fa-pencil')
         self.assertNotContains(response, 'Fotoğrafı Güncelle')
-        self.assertNotContains(response, 'sifre')
+        self.assertContains(response, 'Ana Sayfa')
+        self.assertContains(response, 'Öğretmen Ara')
+        self.assertContains(response, 'Şifre Değiştir')
         self.assertContains(response, 'href="/home/#ogretmen-ara"')
+        self.assertContains(response, 'href="/home/profil/sifre-degistir"')
         self.assertNotContains(response, 'href="/home/searching"')
+
+    def test_course_center_change_password_requires_login(self):
+        response = self.client.get(reverse('course_center_change_password'))
+        self.assertEqual(response.status_code, 302)
+
+    def test_course_center_change_password_success(self):
+        session = self.client.session
+        session['course_center_id'] = self.cc.id
+        session['is_course_center'] = True
+        session.save()
+
+        response = self.client.post(reverse('course_center_change_password'), {
+            'old_password': 'kurspass123',
+            'new_password1': 'yenikurs123',
+            'new_password2': 'yenikurs123',
+        }, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Şifreniz başarıyla güncellendi.')
+
+        self.cc.refresh_from_db()
+        self.assertTrue(self.cc.check_password('yenikurs123'))
+        self.assertFalse(self.cc.check_password('kurspass123'))
+
+    def test_course_center_change_password_rejects_wrong_old_password(self):
+        session = self.client.session
+        session['course_center_id'] = self.cc.id
+        session['is_course_center'] = True
+        session.save()
+
+        response = self.client.post(reverse('course_center_change_password'), {
+            'old_password': 'yanlis',
+            'new_password1': 'yenikurs123',
+            'new_password2': 'yenikurs123',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Mevcut şifreniz hatalı.')
+
+        self.cc.refresh_from_db()
+        self.assertTrue(self.cc.check_password('kurspass123'))
 
     def test_course_center_profile_upload_photo(self):
         from django.core.files.uploadedfile import SimpleUploadedFile
@@ -856,7 +910,7 @@ class CityDistrictTests(TestCase):
         form = TeacherRegisterForm(data={
             'fullname': 'Yeni Ogretmen',
             'password': 'testpass123',
-            'email': 'yeni@test.com',
+            **register_email_payload('yeni@test.com'),
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
@@ -873,7 +927,7 @@ class CityDistrictTests(TestCase):
         form = TeacherRegisterForm(data={
             'fullname': 'Yeni Ogretmen',
             'password': 'testpass123',
-            'email': 'zero@test.com',
+            **register_email_payload('zero@test.com'),
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
@@ -891,7 +945,7 @@ class CityDistrictTests(TestCase):
         form = TeacherRegisterForm(data={
             'fullname': 'Yeni Ogretmen',
             'password': 'testpass123',
-            'email': 'yeni2@test.com',
+            **register_email_payload('yeni2@test.com'),
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
@@ -908,7 +962,7 @@ class CityDistrictTests(TestCase):
         response = self.client.post(reverse('register'), {
             'fullname': 'Ilce Test',
             'password': 'testpass123',
-            'email': 'ilce@test.com',
+            **register_email_payload('ilce@test.com'),
             'gender': 'MALE',
             'birth_date': '1990-01-01',
             'branch': 'fizik',
@@ -931,7 +985,7 @@ class CityDistrictTests(TestCase):
         form = TeacherRegisterForm(data={
             'fullname': 'Yeni Ogretmen',
             'password': 'testpass123',
-            'email': 'schedule@test.com',
+            **register_email_payload('schedule@test.com'),
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
@@ -951,7 +1005,7 @@ class CityDistrictTests(TestCase):
         form = TeacherRegisterForm(data={
             'fullname': 'Genc Ogretmen',
             'password': 'testpass123',
-            'email': 'young@test.com',
+            **register_email_payload('young@test.com'),
             'gender': 'MALE',
             'birth_date': too_young.isoformat(),
             'branch': 'matematik',
@@ -974,7 +1028,7 @@ class CityDistrictTests(TestCase):
         form = TeacherRegisterForm(data={
             'fullname': 'On Sekiz Yas',
             'password': 'testpass123',
-            'email': 'eighteen@test.com',
+            **register_email_payload('eighteen@test.com'),
             'gender': 'MALE',
             'birth_date': birth_date.isoformat(),
             'branch': 'matematik',
@@ -993,7 +1047,7 @@ class CityDistrictTests(TestCase):
         response = self.client.post(reverse('register'), {
             'fullname': 'Genc Kullanici',
             'password': 'testpass123',
-            'email': 'youngpost@test.com',
+            **register_email_payload('youngpost@test.com'),
             'gender': 'MALE',
             'birth_date': too_young.isoformat(),
             'branch': 'matematik',
@@ -1015,13 +1069,35 @@ class CityDistrictTests(TestCase):
         self.assertContains(response, f'max="{date.today().isoformat()}"')
         self.assertContains(response, 'data-register-min-age="18"')
         self.assertContains(response, 'register-birth-date.js')
+        self.assertContains(response, 'connto-email-field__row')
+        self.assertContains(response, 'register-email-domain.js')
+        self.assertContains(response, 'password-toggle.js')
+
+    def test_register_form_accepts_selected_gmail_domain(self):
+        from conntoapp.forms import TeacherRegisterForm
+        form = TeacherRegisterForm(data={
+            'fullname': 'Gmail Ogretmen',
+            'password': 'testpass123',
+            'email_local': 'ogretmen',
+            'email_domain': 'gmail.com',
+            'gender': 'MALE',
+            'birth_date': '1995-05-10',
+            'branch': 'matematik',
+            'works_full_time': True,
+            'city': 'ankara',
+            'district': 'cankaya',
+            'phone_country_code': '+90',
+            'phone_number': '5321234567',
+        })
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertEqual(form.cleaned_data['email'], 'ogretmen@gmail.com')
 
     def test_register_form_accepts_both_work_schedules(self):
         from conntoapp.forms import TeacherRegisterForm
         form = TeacherRegisterForm(data={
             'fullname': 'Esnek Ogretmen',
             'password': 'testpass123',
-            'email': 'esnek@test.com',
+            **register_email_payload('esnek@test.com'),
             'gender': 'MALE',
             'birth_date': '1995-05-10',
             'branch': 'matematik',
@@ -1040,7 +1116,7 @@ class CityDistrictTests(TestCase):
         response = self.client.post(reverse('register'), {
             'fullname': 'Eksik Ogretmen',
             'password': 'testpass123',
-            'email': 'eksik@test.com',
+            **register_email_payload('eksik@test.com'),
             'gender': 'MALE',
             'birth_date': '1990-01-01',
             'branch': 'matematik',
@@ -1069,6 +1145,24 @@ class CityDistrictTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'id="id_district"')
         self.assertContains(response, 'city-district.js')
+
+    def test_register_page_shows_select_placeholder_for_key_fields(self):
+        response = self.client.get(reverse('register'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Seçiniz')
+        self.assertContains(response, 'id="id_gender"')
+        self.assertContains(response, 'id="id_branch"')
+        self.assertContains(response, 'id="id_city"')
+        self.assertNotContains(response, 'id="id_branch"><option value="matematik" selected')
+        self.assertNotContains(response, 'name="branch"><option value="matematik" selected')
+
+    def test_register_form_branch_starts_unselected(self):
+        from conntoapp.forms import TeacherRegisterForm
+        form = TeacherRegisterForm()
+        self.assertEqual(form.fields['branch'].initial, '')
+        rendered = str(form['branch'])
+        self.assertIn('value="" selected', rendered)
+        self.assertNotIn('value="matematik" selected', rendered)
 
     def test_get_district_display(self):
         user = User.objects.create_user(

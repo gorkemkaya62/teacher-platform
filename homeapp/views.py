@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.db.models import Q
 from django.urls import reverse
+from conntoapp.forms import CourseCenterPasswordChangeForm
 from conntoapp.models import CustomUser, CourseCenter
 from conntoapp.choices import TeacherChoices, CustomUserChoices
 from conntoapp.city_coordinates import CITY_COORDINATES
@@ -184,6 +185,32 @@ def course_center_profile(request):
 
     return render(request, 'course_center_profile.html', {
         'course_center': course_center,
+    })
+
+
+def course_center_change_password(request):
+    redirect_response = redirect_if_not_course_center_member(request)
+    if redirect_response:
+        return redirect_response
+
+    course_center = get_object_or_404(
+        CourseCenter,
+        id=request.session['course_center_id'],
+    )
+
+    if request.method == 'POST':
+        form = CourseCenterPasswordChangeForm(course_center, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Şifreniz başarıyla güncellendi.')
+            return redirect('course_center_change_password')
+        messages.error(request, 'Lütfen bilgilerinizi kontrol edin.')
+    else:
+        form = CourseCenterPasswordChangeForm(course_center)
+
+    return render(request, 'course_center_change_password.html', {
+        'course_center': course_center,
+        'form': form,
     })
 
 

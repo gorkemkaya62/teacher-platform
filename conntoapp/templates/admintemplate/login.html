@@ -65,8 +65,6 @@
   (function () {
     var tabs = document.querySelectorAll('.connto-auth-tab');
     var hidden = document.getElementById('is_course_center_hidden');
-    var passwordInput = document.getElementById('password');
-    var toggleBtn = document.getElementById('togglePassword');
 
     function setLoginType(type) {
       var isCourseCenter = type === 'course_center';
@@ -83,16 +81,6 @@
         setLoginType(tab.dataset.type);
       });
     });
-
-    if (toggleBtn && passwordInput) {
-      toggleBtn.addEventListener('click', function () {
-        var icon = toggleBtn.querySelector('i');
-        var show = passwordInput.type === 'password';
-        passwordInput.type = show ? 'text' : 'password';
-        icon.classList.toggle('fa-eye', !show);
-        icon.classList.toggle('fa-eye-slash', show);
-      });
-    }
   })();
 </script>
 {% endblock %}
